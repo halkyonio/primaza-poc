@@ -1,4 +1,4 @@
-package rest;
+package io.halkyon.rest;
 
 import io.quarkiverse.renarde.Controller;
 import io.quarkus.qute.CheckedTemplate;
@@ -13,7 +13,7 @@ public class Claim extends Controller {
         public static native TemplateInstance index();
     }
 
-    @Path("/")
+    @Path("/claim")
     public TemplateInstance index() {
         return Claim.Templates.index();
     }
