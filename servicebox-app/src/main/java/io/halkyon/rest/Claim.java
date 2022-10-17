@@ -13,7 +13,7 @@ public class Claim extends Controller {
         public static native TemplateInstance index();
     }
 
-    @Path("/")
+    @Path("/claim")
     public TemplateInstance index() {
         return Claim.Templates.index();
     }

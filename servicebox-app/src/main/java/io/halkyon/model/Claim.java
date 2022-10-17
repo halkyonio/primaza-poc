@@ -1,4 +1,4 @@
-package model;
+package io.halkyon.model;
 
 import java.util.List;
 
