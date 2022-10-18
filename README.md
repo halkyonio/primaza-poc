@@ -1,6 +1,9 @@
-# servicebox-poc project
+# Primaza project
 
-Quarkus ServiceBox Application - POC
+Quarkus Primaza Service box Application - POC
+
+Primaza comes from the Greek word πρυμάτσα 
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .

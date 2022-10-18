@@ -11,6 +11,6 @@ public class GreetingResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Hello from Service Box App";
+        return "Hello from Primaza Service Box App";
     }
 }
