@@ -2,7 +2,7 @@
 
 Quarkus Primaza Service box Application - POC
 
-Primaza comes from the Greek word πρυμάτσα 
+Primaza comes from the Greek word πρυμάτσα, which is a line used to tie boats to the dock.
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
