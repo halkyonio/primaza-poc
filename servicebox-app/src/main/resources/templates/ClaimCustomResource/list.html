@@ -1,0 +1,16 @@
+{#include home}
+{#title}Claim{/title}
+{#body}
+<header class="header">
+    <h1>Claims</h1>
+</header>
+<section class="main">
+    <ul>
+        {#for claim in claims}
+        {#include ClaimCustomResource/item.html claim=claim /}
+        {/for}
+    </ul>
+</section>
+<footer class="footer"></footer>
+{/body}
+{/include}
