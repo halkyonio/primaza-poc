@@ -2,25 +2,9 @@ name: Primaza Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
-
-
-#jobs:
-#  build-jdk11:
-#    name: "JDK 11 Build"
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Set up JDK 17
-#        # Uses sha for added security since tags can be updated
-#        uses: joschi/setup-jdk@e87a7cec853d2dd7066adf837fe12bf0f3d45e52
-#        with:
-#          java-version: 11
-#      - name: Build
-#        run: mvn clean install
+    branches: [ main ]
 
 jobs:
   build:
