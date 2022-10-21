@@ -42,7 +42,7 @@ public class ClaimCustomResource {
     @POST
     @Transactional
     public Response add(@Form Claim claim) {
-        Claim.persist(claim);
+        claim.persist();
         return Response.status(Response.Status.FOUND).header("Location", "/claims").build();
     }
 }

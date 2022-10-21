@@ -11,7 +11,7 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 @Entity
 public class Claim extends PanacheEntity {
 
-    public Long id;
+
     @FormParam
 	public String name;
     public String serviceVersion;
