@@ -41,11 +41,8 @@ public class ClaimCustomResource {
 
     @POST
     @Transactional
-    public Response add(@Form Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
+    public Response add(@Form Claim claim) {
         Claim.persist(claim);
-        if (hxRequest) {
-            return Response.ok(Templates.item(claim)).header("HX-Trigger", "clear-add-todo").build();
-        }
-        return Response.status(Response.Status.FOUND).header("Location", "/todos").build();
+        return Response.status(Response.Status.FOUND).header("Location", "/claims").build();
     }
 }
