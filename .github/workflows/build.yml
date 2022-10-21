@@ -1,4 +1,4 @@
-name: "CI - JDK 17 Build"
+name: Primaza Build
 
 on:
   push:
