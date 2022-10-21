@@ -15,8 +15,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/claims")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+//@Produces(MediaType.APPLICATION_JSON)
+//@Consumes(MediaType.APPLICATION_JSON)
 public class ClaimCustomResource {
     @CheckedTemplate
     public static class Templates {

@@ -4,11 +4,10 @@
     {#body}
         <header class="header">
             <h1>Claims</h1>
-            <form action="/claims" method="POST">
+            <form action="/claims" hx-post="/claims" hx-="this" method="POST">
                 <input type="text"
                     name="name"
-                    placeholder="What do you want to claim ?"
-                    hx-post="/claims">
+                    placeholder="What do you want to claim ?">
                 <button type="submit">Submit</button>
             </form>
         </header>
