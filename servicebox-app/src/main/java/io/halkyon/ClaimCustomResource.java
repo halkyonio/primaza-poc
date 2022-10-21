@@ -6,12 +6,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
+import org.jboss.resteasy.annotations.Form;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/claims")
@@ -21,6 +21,7 @@ public class ClaimCustomResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
+        public static native TemplateInstance item(Claim claims);
     }
 
     @GET
@@ -36,5 +37,15 @@ public class ClaimCustomResource {
     @Path("/{name}")
     public Claim get(String name) {
         return Claim.findByName(name);
+    }
+
+    @POST
+    @Transactional
+    public Response add(@Form Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
+        Claim.persist(claim);
+        if (hxRequest) {
+            return Response.ok(Templates.item(claim)).header("HX-Trigger", "clear-add-todo").build();
+        }
+        return Response.status(Response.Status.FOUND).header("Location", "/todos").build();
     }
 }

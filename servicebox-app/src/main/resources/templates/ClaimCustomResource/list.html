@@ -2,11 +2,14 @@
 {#include home}
     {#title}Claim{/title}
     {#body}
-        <div class="header">
+        <header class="header">
             <h1>Claims</h1>
-        </div>
+            <form action="/claims" method="POST" hx-target="#claim-list" hx-swap="beforeend">
+                <input class="new-claim" name="title" placeholder="What do you want to claim?" autofocus>
+            </form>
+        </header>
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="claim-list">
                 <thead>
                   <tr>
                       <th aria-valuetext="left">Name</th>

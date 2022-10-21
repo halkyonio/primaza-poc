@@ -1,0 +1,15 @@
+{@io.halkyon.model.Claim claim}
+<li id="item-{claim.name}">
+    <div class="view">
+        <form action="/claims/{claim.name}" method="POST" id="toggle-{claim.name}" hx-target="#item-{claim.name}" hx-swap="outerhtml">
+        </form>
+        <input class="toggle" type="checkbox" onclick="document.getElementById('toggle-{claim.name}').requestSubmit()">
+        <label>{claim.name}</label>
+        <form action="/claims/{claim.name}/delete" method="POST">
+            <button type="submit" class="destroy"></button>
+        </form>
+    </div>
+    <form action="/claims/{claim.name}" method="POST">
+        <input class="edit" name="title" value="{claim.name}">
+    </form>
+</li>
