@@ -1,16 +1,20 @@
+{@java.lang.Integer items}
 {#include home}
-{#title}Claim{/title}
-{#body}
-<header class="header">
-    <h1>Claims</h1>
-</header>
-<section class="main">
-    <ul>
-        {#for claim in claims}
-        {#include ClaimCustomResource/item.html claim=claim /}
-        {/for}
-    </ul>
-</section>
-<footer class="footer"></footer>
-{/body}
+  {#title}Claim{/title}
+  {#body}
+  <header class="header">
+      <h1>Claims</h1>
+  </header>
+  <section class="main">
+      <ul>
+          {#for claim in claims}
+          <li>{claim.name}</li>
+          {/for}
+      </ul>
+  </section>
+    <footer class="footer">
+      <span>
+        <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+      </span>
+  {/body}
 {/include}

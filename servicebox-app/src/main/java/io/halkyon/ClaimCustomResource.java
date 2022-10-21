@@ -23,14 +23,15 @@ public class ClaimCustomResource {
         public static native TemplateInstance list(List<Claim> claims);
     }
 
-    private TemplateInstance showList(List<Claim> claims) {
-        return Templates.list(claims).data("itemsLeft", Claim.count());
-    }
-
     @GET
     public TemplateInstance list() {
         return showList(Claim.listAll()).data("all",true);
     }
+
+    private TemplateInstance showList(List<Claim> claims) {
+        return Templates.list(claims).data("items", Claim.count());
+    }
+
     @GET
     @Path("/{name}")
     public Claim get(String name) {
