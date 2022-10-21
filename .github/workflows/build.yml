@@ -1,0 +1,50 @@
+name: "CI - JDK 17 Build"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+#jobs:
+#  build-jdk11:
+#    name: "JDK 11 Build"
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Set up JDK 17
+#        # Uses sha for added security since tags can be updated
+#        uses: joschi/setup-jdk@e87a7cec853d2dd7066adf837fe12bf0f3d45e52
+#        with:
+#          java-version: 11
+#      - name: Build
+#        run: mvn clean install
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [
+          { 'version': '11', opts: '' },
+          { 'version': '16', 'opts': '' },
+          { 'version': '17', 'opts': '' }
+        ]
+    name: build with jdk ${{matrix.java.version}}
+
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout
+
+      - uses: actions/setup-java@v2
+        name: set up jdk ${{matrix.java.version}}
+        with:
+          distribution: temurin
+          java-version: ${{matrix.java.version}}
+          cache: maven
+
+      - name: build with maven
+        run: mvn clean install
+
