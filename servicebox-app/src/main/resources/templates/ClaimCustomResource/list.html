@@ -1,22 +1,29 @@
 {@java.lang.Integer items}
 {#include home}
-  {#title}Claim{/title}
-  {#body}
-  <header class="header">
-      <h1>Claims</h1>
-  </header>
-  <section class="main">
-      <ul>
-          {#for claim in claims}
-          <li>{claim.name}</li>
-          {/for}
-      </ul>
-  </section>
-    <footer class="footer">
-      <span>
-        <!-- Showing the number of claims. Returned by the template key: items of ClaimCustomResource -->
-        <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-      </span>
-    </footer>
-  {/body}
+    {#title}Claim{/title}
+    {#body}
+        <div class="header">
+            <h1>Claims</h1>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                      <th align="left">Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {#for claim in claims}
+                      <tr><td>{claim.name}</td></tr>
+                  {/for}
+                </tbody>
+            </table>
+        </div>
+        <footer class="footer">
+        <span>
+          <!-- Showing the number of claims. Returned by the template key: items of ClaimCustomResource -->
+          <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+        </span>
+        </footer>
+    {/body}
 {/include}
