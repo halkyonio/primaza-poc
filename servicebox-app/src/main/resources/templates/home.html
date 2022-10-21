@@ -4,16 +4,16 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{#insert title}Claims{/}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <script src="/webjars/htmx.org/dist/htmx.min.js"></script>
-    <script src="/todos.js"></script>
+    <!-- TODO <script src="/claims.js"></script> -->
 </head>
 <body>
+<!-- Section tag will insert from the included template their body section -->
 <section hx-boost="true">{#insert body}No body!{/}</section>
 <footer class="info">
     <p>Double-click to edit a Claim</p>
-    <p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
-    <p>Created by <a href="https://derkoe.dev">derkoe</a></p>
-    <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    <p>Created by the <a href="https://snowdrop.dev">snowdrop team</a></p>
 </footer>
 </body>
 </html>
