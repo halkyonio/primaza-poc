@@ -20,7 +20,8 @@
                 </thead>
                 <tbody id="claim-list">
                   {#for claim in claims}
-                      <tr><td>{claim.name}</td></tr>
+                      <!-- Include the HTML template rendering the claim item -->
+                      {#include ClaimCustomResource/item.html claim=claim /}
                   {/for}
                 </tbody>
             </table>
