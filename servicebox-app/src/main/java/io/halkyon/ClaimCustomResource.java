@@ -21,7 +21,7 @@ public class ClaimCustomResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
-        public static native TemplateInstance item(Claim claims);
+        public static native TemplateInstance item(Claim claim);
     }
 
     @GET
@@ -43,7 +43,7 @@ public class ClaimCustomResource {
     @Transactional
     public Response add(@Form Claim claim) {
         claim.persist();
-        return Response.status(Response.Status.FOUND).header("Location", "/claims").build();
-        //return Response.ok(Templates.item(claim)).header("Location", "/claims").build();
+        // Return as HTML the template rendering the item
+        return Response.ok(Templates.item(claim)).header("Location", "/claims").build();
     }
 }
