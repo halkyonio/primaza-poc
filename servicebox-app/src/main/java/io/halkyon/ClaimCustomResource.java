@@ -44,5 +44,6 @@ public class ClaimCustomResource {
     public Response add(@Form Claim claim) {
         claim.persist();
         return Response.status(Response.Status.FOUND).header("Location", "/claims").build();
+        //return Response.ok(Templates.item(claim)).header("Location", "/claims").build();
     }
 }
