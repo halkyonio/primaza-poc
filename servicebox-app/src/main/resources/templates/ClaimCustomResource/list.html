@@ -2,15 +2,29 @@
 {#include home}
     {#title}Claim{/title}
     {#body}
-        <header class="header">
+        <hr class="header">
             <h1>Claims</h1>
             <form action="/claims" hx-post="/claims" hx-target="#claim-list" method="POST" hx-swap="beforeend">
-                <input type="text"
-                    name="name"
-                    placeholder="What do you want to claim ?">
-                <button type="submit">Submit</button>
+            <div class="row mb-2">
+                <label for="name" class="col-sm-2 col-form-label">Claim name:</label>
+                <div class="col-sm-10">
+                   <input type="text"
+                       name="name"
+                       placeholder="What do you want to claim ?">
+                </div>
+            </div>
+            <div class="row mb-2">
+                <label for="serviceRequested" class="col-sm-2 col-form-label">Service requested:</label>
+                <div class="col-sm-10">
+                   <input type="text"
+                       name="serviceRequested"
+                       placeholder="Service requested">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </header>
+        <hr>
         <div class="table-responsive">
             <table class="table">
                 <thead>

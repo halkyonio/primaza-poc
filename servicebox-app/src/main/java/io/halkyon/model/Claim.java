@@ -14,6 +14,7 @@ public class Claim extends PanacheEntity {
 
     @FormParam
 	public String name;
+    @FormParam
     public String serviceRequested;
 
     public static Claim findByName(String name) {
