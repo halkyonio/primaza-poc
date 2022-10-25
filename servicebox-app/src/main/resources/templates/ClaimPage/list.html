@@ -36,14 +36,14 @@
                 <tbody id="claim-list">
                   {#for claim in claims}
                       <!-- Include the HTML template rendering the claim item -->
-                      {#include ClaimExtendedResource/item.html claim=claim /}
+                      {#include ClaimPage/item.html claim=claim /}
                   {/for}
                 </tbody>
             </table>
         </div>
         <footer class="footer">
         <span>
-          <!-- Showing the number of claims. Returned by the template key: items of ClaimExtendedResource -->
+          <!-- Showing the number of claims. Returned by the template key: items of ClaimPage -->
           <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
         </span>
         </footer>

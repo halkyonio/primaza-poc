@@ -1,4 +1,4 @@
-package io.halkyon;
+package io.halkyon.template;
 
 
 import io.halkyon.model.Claim;
@@ -15,7 +15,7 @@ import java.util.List;
 @Path("/claims")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ClaimExtendedResource {
+public class ClaimPage {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
