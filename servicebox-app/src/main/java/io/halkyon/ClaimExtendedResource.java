@@ -2,8 +2,6 @@ package io.halkyon;
 
 
 import io.halkyon.model.Claim;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import org.jboss.resteasy.annotations.Form;
@@ -15,9 +13,9 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/claims")
-//@Produces(MediaType.APPLICATION_JSON)
-//@Consumes(MediaType.APPLICATION_JSON)
-public class ClaimCustomResource {
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class ClaimExtendedResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
@@ -35,7 +33,7 @@ public class ClaimCustomResource {
 
     @GET
     @Path("/{name}")
-    public Claim get(String name) {
+    public Claim findByName(@PathParam("name") String name) {
         return Claim.findByName(name);
     }
 
