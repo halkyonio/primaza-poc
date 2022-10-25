@@ -1,0 +1,51 @@
+{@java.lang.Integer items}
+{#include home}
+    {#title}Claim{/title}
+    {#body}
+        <hr class="header">
+            <h1>Claims</h1>
+            <form action="/claims" hx-post="/claims" hx-target="#claim-list" method="POST" hx-swap="beforeend">
+            <div class="row mb-2">
+                <label for="name" class="col-sm-2 col-form-label">Claim name:</label>
+                <div class="col-sm-10">
+                   <input type="text"
+                       name="name"
+                       placeholder="What do you want to claim ?">
+                </div>
+            </div>
+            <div class="row mb-2">
+                <label for="serviceRequested" class="col-sm-2 col-form-label">Service requested:</label>
+                <div class="col-sm-10">
+                   <input type="text"
+                       name="serviceRequested"
+                       placeholder="Service requested">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </header>
+        <hr>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                      <th aria-valuetext="left">Name</th>
+                      <th aria-valuetext="left">Service requested</th>
+                  </tr>
+                </thead>
+                <tbody id="claim-list">
+                  {#for claim in claims}
+                      <!-- Include the HTML template rendering the claim item -->
+                      {#include ClaimExtendedResource/item.html claim=claim /}
+                  {/for}
+                </tbody>
+            </table>
+        </div>
+        <footer class="footer">
+        <span>
+          <!-- Showing the number of claims. Returned by the template key: items of ClaimExtendedResource -->
+          <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+        </span>
+        </footer>
+    {/body}
+{/include}

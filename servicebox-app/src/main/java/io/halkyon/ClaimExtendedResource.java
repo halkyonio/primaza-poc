@@ -2,25 +2,24 @@ package io.halkyon;
 
 
 import io.halkyon.model.Claim;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
+import org.jboss.resteasy.annotations.Form;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/claims")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ClaimCustomResource {
+public class ClaimExtendedResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
+        public static native TemplateInstance item(Claim claim);
     }
 
     @GET
@@ -34,7 +33,16 @@ public class ClaimCustomResource {
 
     @GET
     @Path("/{name}")
-    public Claim get(String name) {
+    public Claim findByName(@PathParam("name") String name) {
         return Claim.findByName(name);
+    }
+
+    @POST
+    @Transactional
+    @Consumes("application/x-www-form-urlencoded")
+    public Response add(@Form Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
+        claim.persist();
+        // Return as HTML the template rendering the item for HTMX
+        return Response.accepted(Templates.item(claim)).status(Response.Status.CREATED).header("Location", "/claims").build();
     }
 }
