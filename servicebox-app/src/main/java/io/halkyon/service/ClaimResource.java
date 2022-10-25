@@ -6,9 +6,10 @@ import io.quarkus.rest.data.panache.ResourceProperties;
 
 
 /***
- * REST Data with Panache generates JAX-RS resources based on this interface. You don't need to implement it.
- * For the Claim entity this extension will generate its implementation providing support for CRUD operations and `application/json` as response content types.
- * For extending this interface the @see io.halkyon.template.ClaimPage is provided.
+ * The "@ResourceProperties" annotation of the Quarkus JAX-RS panache extension generates the JAX-RS CRUD endpoints for the ClaimResource interface.
+ * More information is available within the quarkus documentation: <a href="https://quarkus.io/guides/rest-data-panache">https://quarkus.io/guides/rest-data-panache</a>
+ * The endpoints generated support as HTTP request/response, the `application/json` content type.
+ * The endpoints can be overridden, extended using the @see io.halkyon.template.ClaimPage class.
  */
 @ResourceProperties(path = "claims")
 public interface ClaimResource extends PanacheEntityResource<Claim, Long> { }
