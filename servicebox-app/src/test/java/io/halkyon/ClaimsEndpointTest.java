@@ -24,7 +24,7 @@ public class ClaimsEndpointTest {
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
-                .body(CLAIM.apply("Oracle"))
+                .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
                 .when().post("/claims")
                 .then()
                 .statusCode(201)
@@ -39,7 +39,7 @@ public class ClaimsEndpointTest {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(CLAIM.apply("Oracle"))
+                .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
                 .when().post("/claims")
                 .then()
                 .statusCode(201);
