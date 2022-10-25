@@ -19,7 +19,7 @@ public class ClaimsEndpointTest {
     private static final UnaryOperator<String> CLAIM = fruit ->  String.format("{\"name\":\"%s\"}", fruit);
 
     @Test
-    public void testAddFruit(){
+    public void testAddClaim(){
 
         given()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -31,6 +31,18 @@ public class ClaimsEndpointTest {
                 .body(containsString("Oracle"))
                 .body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
+    }
+
+    @Test
+    public void testAddClaimViaHtmxForm(){
+        // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
+        given()
+                .header("HX-Request", true)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(CLAIM.apply("Oracle"))
+                .when().post("/claims")
+                .then()
+                .statusCode(201);
     }
 
     @Test
@@ -69,13 +81,13 @@ public class ClaimsEndpointTest {
                         containsString("mariadb-demo"),
                         containsString("postgresql-13"));
 
-        //Delete the Cherry:
+        //Delete the 'mysql-demo':
         given()
                 .when().delete(path + "/1")
                 .then()
                 .statusCode(204);
 
-        //List all, cherry should be missing now:
+        //List all, 'mysql-demo' should be missing now:
         given()
                 .when().get(path)
                 .then()

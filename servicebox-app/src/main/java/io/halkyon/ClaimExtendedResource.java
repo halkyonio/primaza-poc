@@ -39,9 +39,10 @@ public class ClaimExtendedResource {
 
     @POST
     @Transactional
-    public Response add(@Form Claim claim) {
+    @Consumes("application/x-www-form-urlencoded")
+    public Response add(@Form Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
         claim.persist();
-        // Return as HTML the template rendering the item
-        return Response.ok(Templates.item(claim)).header("Location", "/claims").build();
+        // Return as HTML the template rendering the item for HTMX
+        return Response.accepted(Templates.item(claim)).status(Response.Status.CREATED).header("Location", "/claims").build();
     }
 }
