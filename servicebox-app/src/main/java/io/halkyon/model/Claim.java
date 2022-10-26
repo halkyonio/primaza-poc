@@ -1,6 +1,7 @@
 package io.halkyon.model;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -16,12 +17,24 @@ public class Claim extends PanacheEntity {
 	public String name;
     @FormParam
     public String serviceRequested;
+
+    public Claim() {}
+    public Claim(String name, String serviceRequested, String description, String status, String owner, Date created) {
+        this.name = name;
+        this.serviceRequested = serviceRequested;
+        this.description = description;
+        this.status = status;
+        this.owner = owner;
+        this.created = created;
+    }
+
     @FormParam
     public String description;
     @FormParam
     public String status;
     @FormParam
     public String owner;
+
     @FormParam
     public Date created;
 
