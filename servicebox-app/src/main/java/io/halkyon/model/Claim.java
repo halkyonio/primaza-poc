@@ -1,5 +1,6 @@
 package io.halkyon.model;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,11 +12,18 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 @Entity
 public class Claim extends PanacheEntity {
 
-
     @FormParam
 	public String name;
     @FormParam
     public String serviceRequested;
+    @FormParam
+    public String description;
+    @FormParam
+    public String status;
+    @FormParam
+    public String owner;
+    @FormParam
+    public Date created;
 
     public static Claim findByName(String name) {
         return find("name", name).firstResult();
