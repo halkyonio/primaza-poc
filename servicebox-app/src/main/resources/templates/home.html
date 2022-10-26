@@ -1,21 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>{#insert title}Claims{/}</title>
-    <link rel='stylesheet' href='/webjars/bootstrap/css/bootstrap.min.css'>
-    <link rel='stylesheet' href='/css/primaza.css'>
-    <script src="/webjars/htmx.org/dist/htmx.min.js"></script>
-    <!-- TODO <script src="/claims.js"></script> -->
-</head>
-<body>
-<div class="container-fluid">
-  <!-- Section tag will insert from the included template their body section -->
-  <section hx-boost="true">{#insert body}No body!{/}</section>
-  <footer class="info">
-      <p>Created by the <a href="https://snowdrop.dev">snowdrop team</a></p>
-  </footer>
-</div>
-</body>
-</html>
+{#include base}
+  {#body}
+    <div class="container">
+      <h1>Welcome to Primaza</h1>
+      </p>
+      <div class="container">
+        <a class="btn btn-primary" href="/claims">Claims</a></p>
+        <a class="btn btn-primary" href="/services">Services</a>
+      </div>
+    </div>
+  {/body}
+{/include}

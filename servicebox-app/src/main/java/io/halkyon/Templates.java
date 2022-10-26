@@ -9,4 +9,6 @@ import java.util.List;
 public class Templates {
         public static native TemplateInstance claimList(List<io.halkyon.model.Claim> claims);
         public static native TemplateInstance claimItem(io.halkyon.model.Claim claim);
+
+        public static native TemplateInstance home();
 }

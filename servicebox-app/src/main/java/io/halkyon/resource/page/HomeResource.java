@@ -1,22 +1,15 @@
 package io.halkyon.resource.page;
 
+import io.halkyon.Templates;
+import io.quarkus.qute.TemplateInstance;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/home")
 public class HomeResource {
     @GET
-    public Response home() {
-        return Response.status(Response.Status.TEMPORARY_REDIRECT).header("Location", "/claims").build();
-    }
-
-    @GET
-    @Path("/hello")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello from Primaza Service Box App";
+    public TemplateInstance home() {
+        return Templates.home().data("title","Home page");
     }
 }
