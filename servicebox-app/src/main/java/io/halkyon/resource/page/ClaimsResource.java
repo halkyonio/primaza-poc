@@ -59,10 +59,10 @@ public class ClaimsResource {
         claim.persist();
         if (errors.size() > 0) {
             for(String error : errors) {
-                response.append("<div class=\"alert alert-danger\"><strong>Error! </strong>" + error +"</div>");
+                response.append("<div class=\"alert alert-danger\"><strong>Error! </strong>" + error + "</div>");
             };
         } else {
-            response.append("Claim created successfully - id" + claim.id);
+            response.append("<div class=\"alert alert-success\">Claim created successfully for id: " + claim.id + "</div>");
         }
         // Return as HTML the template rendering the item for HTMX
         return Response.accepted(response.toString()).status(Response.Status.CREATED).header("Location", "/claim").build();
