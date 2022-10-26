@@ -15,7 +15,7 @@ import java.util.List;
 @Path("/claims")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ClaimPage {
+public class ClaimPageResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance list(List<Claim> claims);
