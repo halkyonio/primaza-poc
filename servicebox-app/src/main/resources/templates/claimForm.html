@@ -4,7 +4,7 @@
   {#body}
      <div class="container">
        <h1>Claims</h1>
-       <form class="form-horizontal"  action="/claims" hx-post="/claims" method="POST" hx-swap="beforeend">
+       <form class="form-horizontal"  action="/claims" hx-post="/claims" hx-target="#response" method="POST" hx-swap="beforeend">
          <div class="form-group">
             <label class="control-label col-sm-2" for="name">Claim name:</label>
             <div class="col-sm-5">
@@ -36,6 +36,10 @@
            </div>
          </div>
        </form>
+       <div style="height: 10px;"></div>
+       <div class="container">
+         <div id="response"/>
+       </div>
        <hr>
        <a href="/claims">Back</a>
      </div>
