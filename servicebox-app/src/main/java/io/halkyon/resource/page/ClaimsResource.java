@@ -15,7 +15,7 @@ import java.util.List;
 @Path("/claims")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ClaimResource {
+public class ClaimsResource {
 
     @GET
     public TemplateInstance list() {
