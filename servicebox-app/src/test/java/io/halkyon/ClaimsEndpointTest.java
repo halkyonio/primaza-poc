@@ -43,6 +43,8 @@ public class ClaimsEndpointTest {
                 .when().post("/claim")
                 .then()
                 .statusCode(201);
+
+        // TODO check the created date is not null
     }
 
     @Test

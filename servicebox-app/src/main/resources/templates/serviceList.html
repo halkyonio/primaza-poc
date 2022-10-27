@@ -1,0 +1,34 @@
+{@java.lang.Integer items}
+{#include base}
+  {#title}Service{/title}
+  {#body}
+    <div class="container">
+      <div class="btn btn-primary"><a href="/service" class="text-white">New service</a></div>
+    </div>
+    <hr>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+              <tr>
+                  <th aria-valuetext="left">Name</th>
+                  <th aria-valuetext="left">Version</th>
+                  <th aria-valuetext="left">Endpoint</th>
+                  <th aria-valuetext="left">Deployed</th>
+              </tr>
+            </thead>
+            <tbody id="service-list">
+              {#for service in services}
+                  <!-- Include the HTML template rendering the service item -->
+                  {#include serviceItem.html service=service /}
+              {/for}
+            </tbody>
+        </table>
+    </div>
+    <footer class="footer">
+    <span>
+      <!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
+      <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+    </span>
+    </footer>
+  {/body}
+{/include}
