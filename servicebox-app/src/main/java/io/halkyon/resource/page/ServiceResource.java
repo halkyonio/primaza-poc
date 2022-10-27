@@ -11,6 +11,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import java.sql.Date;
 
 
 @Path("/service")
@@ -24,6 +25,10 @@ public class ServiceResource {
     @Transactional
     @Consumes("application/x-www-form-urlencoded")
     public Response add(@Form io.halkyon.model.Service service, @HeaderParam("HX-Request") boolean hxRequest) {
+
+        if (service.created == null) {
+            service.created = new Date(System.currentTimeMillis());
+        }
 
         service.persist();
         // Return as HTML the template rendering the item for HTMX
