@@ -14,15 +14,19 @@ public class ClaimValidator {
     public List<String> validateForm(Claim claim) {
         List<String> errors = new ArrayList<>();
 
-        if (claim.name.isEmpty()) {
+        if(claim==null) {
             errors.add("Claim name must not be null");
         }
 
-        if (claim.description.isEmpty()) {
+        if (claim.name==null || claim.name.isEmpty()) {
+            errors.add("Claim name must not be null");
+        }
+
+        if (claim.description==null || claim.description.isEmpty()) {
             errors.add("Description must not be null");
         }
 
-        if (claim.serviceRequested.isEmpty()) {
+        if (claim.serviceRequested==null || claim.serviceRequested.isEmpty()) {
             errors.add("The service to be used must not be null");
         }
 

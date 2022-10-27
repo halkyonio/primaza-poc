@@ -40,7 +40,7 @@ public class ClaimsEndpointTest {
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claims")
+                .when().post("/claim")
                 .then()
                 .statusCode(201);
     }
