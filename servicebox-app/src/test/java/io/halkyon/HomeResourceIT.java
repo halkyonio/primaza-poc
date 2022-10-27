@@ -3,6 +3,6 @@ package io.halkyon;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-public class GreetingResourceIT extends GreetingResourceTest {
+public class HomeResourceIT extends HomeResourceTest {
     // Execute the same tests but in packaged mode.
 }

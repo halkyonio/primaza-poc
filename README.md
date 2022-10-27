@@ -16,6 +16,37 @@ cd servicebox-app
 ./mvnw compile quarkus:dev
 ```
 
+## Requests samples
+
+curl --header "Content-Type: application/json" \
+--request POST \
+--data '{"name":"Oracle"}' \
+http://localhost:8080/claims
+
+
+curl --header "Content-Type: application/json" \                                                                                                     ✔  16:22:00
+--request POST \
+--data '{"name":"Oracle", "version": "3.11.2", "endpoint": "tcp:5672", "deployed": "false"}' \
+http://localhost:8080/services
+
+curl --header "Content-Type: application/json" \
+--request POST \
+--data '{"name":"Oracle", "version": "3.11.2", "endpoint": "tcp:5672", "deployed": "false"}' \
+http://localhost:8080/services
+
+curl --header "Content-Type: application/x-www-form-urlencoded" \
+--header "HX-Request: true" \
+--request POST \
+--data '{"name":"Oracle", "version": "3.11.2", "endpoint": "tcp:5672", "deployed": "false"}' \
+http://localhost:8080/services
+
+curl -X POST http://localhost:8080/claims --header "Content-Type: application/json" \
+--request POST \
+--data "{\"name\":\"Oracle\"}"
+
+
+
+
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
 
 ## Packaging and running the application
