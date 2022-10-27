@@ -50,6 +50,7 @@ public class ClaimResource {
         } else {
             response.append("<div class=\"alert alert-success\">Claim created successfully for id: " + claim.id + "</div>");
         }
+
         // Return as HTML the template rendering the item for HTMX
         return Response.accepted(response.toString()).status(Response.Status.CREATED).header("Location", "/claim").build();
     }

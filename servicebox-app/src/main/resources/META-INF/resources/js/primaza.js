@@ -1,3 +1,5 @@
-function clearcontent(elementID) {
-    document.getElementById(elementID).innerHTML = "";
-}
+(() => {
+    document.addEventListener("submit", () => {
+        document.getElementById("response").innerHTML = "";
+    });
+})();
