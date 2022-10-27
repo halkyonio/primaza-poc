@@ -35,7 +35,7 @@ public class ServicesEndpointTest {
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/services")
+                .when().post("/service")
                 .then()
                 .statusCode(201);
     }

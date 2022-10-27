@@ -1,8 +1,8 @@
 package io.halkyon.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
+import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,13 +18,17 @@ public class Service extends PanacheEntityBase {
     @GeneratedValue(generator = "svcSeq")
     Long id;
 
+    @FormParam
     public String name;
 
+    @FormParam
     public String version;
 
     /* in form of tcp:8080*/
+    @FormParam
     public String endpoint;
 
+    @FormParam
     public Boolean deployed;
 
     public static Service findByName(String name) {

@@ -13,5 +13,5 @@ public class Templates {
         public static native TemplateInstance home();
 
         public static native TemplateInstance serviceList(List<io.halkyon.model.Service> services);
-        public static native TemplateInstance serviceItem(io.halkyon.model.Service servive);
+        public static native TemplateInstance serviceItem(io.halkyon.model.Service service);
 }
