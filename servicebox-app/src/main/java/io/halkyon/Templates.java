@@ -11,5 +11,5 @@ public class Templates {
         public static native TemplateInstance claimItem(io.halkyon.model.Claim claim);
 
         public static native TemplateInstance serviceList(List<io.halkyon.model.Service> services);
-        public static native TemplateInstance serviceItem(io.halkyon.model.Service servive);
+        public static native TemplateInstance serviceItem(io.halkyon.model.Service service);
 }
