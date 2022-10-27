@@ -1,4 +1,4 @@
-package io.halkyon.services;
+package io.halkyon.resource;
 
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
