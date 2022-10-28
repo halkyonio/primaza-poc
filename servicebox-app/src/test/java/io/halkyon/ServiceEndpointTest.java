@@ -4,7 +4,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.MediaType;
-import java.util.function.UnaryOperator;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -12,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
 
 @QuarkusTest
-public class ServicesEndpointTest {
+public class ServiceEndpointTest {
 
 
     @Test
@@ -22,7 +21,7 @@ public class ServicesEndpointTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
                 .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/services")
+                .when().post("/service")
                 .then()
                 .statusCode(201);
 
@@ -44,7 +43,7 @@ public class ServicesEndpointTest {
     public void testFindByName(){
 
         given()
-                .when().get("/services")
+                .when().get("/service")
                 .then()
                 .statusCode(200)
                 .body(
@@ -54,7 +53,7 @@ public class ServicesEndpointTest {
                         containsString("PaymentAPI"));
 
         given()
-                .when().get("/services/MYSQL")
+                .when().get("/service/MYSQL")
                 .then()
                 .statusCode(200)
                 .body(containsString("MYSQL"));
@@ -62,7 +61,7 @@ public class ServicesEndpointTest {
 
     @Test
     public void testServiceEntity() {
-        final String path="/services";
+        final String path="/service";
         //List all
         given()
                 .when().get(path)

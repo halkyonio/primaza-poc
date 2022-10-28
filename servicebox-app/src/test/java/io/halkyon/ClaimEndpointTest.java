@@ -3,7 +3,6 @@ package io.halkyon;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import java.util.function.UnaryOperator;
@@ -14,7 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
 
 @QuarkusTest
-public class ClaimsEndpointTest {
+public class ClaimEndpointTest {
 
     private static final UnaryOperator<String> CLAIM = fruit ->  String.format("{\"name\":\"%s\"}", fruit);
 
@@ -25,7 +24,7 @@ public class ClaimsEndpointTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
                 .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claims")
+                .when().post("/claim")
                 .then()
                 .statusCode(201)
                 .body(containsString("Oracle"))
@@ -51,7 +50,7 @@ public class ClaimsEndpointTest {
     public void testFindByName(){
 
         given()
-                .when().get("/claims")
+                .when().get("/claim")
                 .then()
                 .statusCode(200)
                 .body(
@@ -62,7 +61,7 @@ public class ClaimsEndpointTest {
                         containsString("postgresql-13"));
 
         given()
-                .when().get("/claims/mysql-demo")
+                .when().get("/claim/mysql-demo")
                 .then()
                 .statusCode(200)
                 .body(containsString("mysql-demo"));
@@ -70,7 +69,7 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testClaimEntity() {
-        final String path="/claims";
+        final String path="/claim";
         //List all
         given()
                 .when().get(path)

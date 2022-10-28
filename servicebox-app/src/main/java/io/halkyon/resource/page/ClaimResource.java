@@ -28,6 +28,26 @@ public class ClaimResource {
         return Templates.claimForm().data("title","Claim form");
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/all")
+    public TemplateInstance list() {
+        return showList(io.halkyon.model.Claim.listAll()).data("all", true);
+    }
+
+    private TemplateInstance showList(List<io.halkyon.model.Claim> claims) {
+        return Templates.claimList(claims).data("items", io.halkyon.model.Claim.count());
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{name}")
+    public io.halkyon.model.Claim findByName(@PathParam("name") String name) {
+        return io.halkyon.model.Claim.findByName(name);
+    }
+
     @POST
     @Transactional
     @Consumes("application/x-www-form-urlencoded")
