@@ -21,7 +21,7 @@ public class ServiceEndpointTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
                 .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/service")
+                .when().post("/services")
                 .then()
                 .statusCode(201);
 
@@ -34,7 +34,7 @@ public class ServiceEndpointTest {
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/service")
+                .when().post("/services")
                 .then()
                 .statusCode(201);
     }
@@ -43,7 +43,7 @@ public class ServiceEndpointTest {
     public void testFindByName(){
 
         given()
-                .when().get("/service")
+                .when().get("/services")
                 .then()
                 .statusCode(200)
                 .body(
@@ -53,7 +53,7 @@ public class ServiceEndpointTest {
                         containsString("PaymentAPI"));
 
         given()
-                .when().get("/service/MYSQL")
+                .when().get("/services/name/MYSQL")
                 .then()
                 .statusCode(200)
                 .body(containsString("MYSQL"));
@@ -61,7 +61,7 @@ public class ServiceEndpointTest {
 
     @Test
     public void testServiceEntity() {
-        final String path="/service";
+        final String path="/services";
         //List all
         given()
                 .when().get(path)

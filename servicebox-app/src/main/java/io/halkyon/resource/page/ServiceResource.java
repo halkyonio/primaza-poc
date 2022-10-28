@@ -19,9 +19,11 @@ import java.sql.Date;
 import java.util.List;
 
 
-@Path("/service")
+@Path("/services")
 public class ServiceResource {
     @GET
+    @Path("/new")
+    @Produces(MediaType.TEXT_HTML)
     public TemplateInstance service() {
         return Templates.serviceForm().data("title","Service form");
     }
@@ -29,6 +31,7 @@ public class ServiceResource {
     @POST
     @Transactional
     @Consumes("application/x-www-form-urlencoded")
+    @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Service service, @HeaderParam("HX-Request") boolean hxRequest) {
 
         if (service.created == null) {
@@ -41,8 +44,7 @@ public class ServiceResource {
     }
 
     @GET
-    @Path("/all")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_JSON)
     public TemplateInstance list() {
         return showList(io.halkyon.model.Service.listAll()).data("all", true);
@@ -56,7 +58,7 @@ public class ServiceResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{name}")
+    @Path("/name/{name}")
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
         return io.halkyon.model.Service.findByName(name);
     }

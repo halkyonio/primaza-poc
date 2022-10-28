@@ -24,7 +24,7 @@ public class ClaimEndpointTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
                 .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claim")
+                .when().post("/claims")
                 .then()
                 .statusCode(201)
                 .body(containsString("Oracle"))
@@ -39,7 +39,7 @@ public class ClaimEndpointTest {
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claim")
+                .when().post("/claims")
                 .then()
                 .statusCode(201);
 
@@ -50,7 +50,7 @@ public class ClaimEndpointTest {
     public void testFindByName(){
 
         given()
-                .when().get("/claim")
+                .when().get("/claims")
                 .then()
                 .statusCode(200)
                 .body(
@@ -61,7 +61,7 @@ public class ClaimEndpointTest {
                         containsString("postgresql-13"));
 
         given()
-                .when().get("/claim/mysql-demo")
+                .when().get("/claims/name/mysql-demo")
                 .then()
                 .statusCode(200)
                 .body(containsString("mysql-demo"));
@@ -69,7 +69,7 @@ public class ClaimEndpointTest {
 
     @Test
     public void testClaimEntity() {
-        final String path="/claim";
+        final String path="/claims";
         //List all
         given()
                 .when().get(path)

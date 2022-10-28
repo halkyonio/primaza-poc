@@ -13,4 +13,5 @@ import io.quarkus.rest.data.panache.ResourceProperties;
  * The endpoints generated support as HTTP request/response, the `application/json` content type.
  * The endpoints can be overridden, extended using the @see io.halkyon.template.ServicePageResource class.
  */
+@ResourceProperties(path="/services")
 public interface ServiceResource extends PanacheEntityResource<Service, Long> { }
