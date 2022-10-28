@@ -4,7 +4,10 @@
   {#body}
      <div class="container" id="form">
        <h1>Claims</h1>
-       <form class="form-horizontal" action="/claim" hx-post="/claim" hx-target="#response" method="POST" hx-swap="innerHTML">
+       <form class="form-horizontal" action="/claim" method="POST"
+             hx-post="/claim"
+             hx-target="#response"
+             hx-swap="innerHTML">
          <div class="form-group">
             <label class="control-label col-sm-2" for="name">Claim name:</label>
             <div class="col-sm-5">
@@ -32,13 +35,30 @@
          </br>
          <div class="form-group">
            <div class="col-sm-offset-2 col-sm-10">
-             <button id="claim-button" type="submit" class="btn btn-primary">Submit</button>
+             <button class="btn btn-primary"
+                     id="claim-button"
+                     type="submit"
+                     _="
+                     -- Remove the HTML content from the DIV id=response
+                     -- to avoid to see previously displayed messages, errors
+                     --
+                     on submit remove .response">Submit</button>
            </div>
          </div>
        </form>
        <div style="height: 10px;"></div>
        <div class="container">
-         <div id="response"/>
+         <div id="response"
+              _="
+                 -- Disable the Submit button of the form
+                 -- if we got as HTML response the text alert-success
+                 --
+                 on htmx:afterSwap
+                 if detail.xhr.responseText.includes('alert-success')
+                   add @disabled to #claim-button
+                 else
+                   remove @disabled from #claim-button
+                 end"/>
        </div>
        <hr>
        <a href="/claims">Back</a>
