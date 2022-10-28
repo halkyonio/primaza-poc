@@ -3,7 +3,6 @@ package io.halkyon;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import java.util.function.UnaryOperator;
@@ -14,7 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
 
 @QuarkusTest
-public class ClaimsEndpointTest {
+public class ClaimEndpointTest {
 
     private static final UnaryOperator<String> CLAIM = fruit ->  String.format("{\"name\":\"%s\"}", fruit);
 
@@ -40,7 +39,7 @@ public class ClaimsEndpointTest {
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claim")
+                .when().post("/claims")
                 .then()
                 .statusCode(201);
 
@@ -62,7 +61,7 @@ public class ClaimsEndpointTest {
                         containsString("postgresql-13"));
 
         given()
-                .when().get("/claims/mysql-demo")
+                .when().get("/claims/name/mysql-demo")
                 .then()
                 .statusCode(200)
                 .body(containsString("mysql-demo"));

@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import java.sql.Date;
 import java.util.List;
 
-@Path("/claim")
+@Path("/claims")
 public class ClaimResource {
     ClaimValidator claimValidator;
 
@@ -24,13 +24,35 @@ public class ClaimResource {
     }
 
     @GET
+    @Path("/new")
+    @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
         return Templates.claimForm().data("title","Claim form");
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public TemplateInstance list() {
+        return showList(io.halkyon.model.Claim.listAll()).data("all", true);
+    }
+
+    private TemplateInstance showList(List<io.halkyon.model.Claim> claims) {
+        return Templates.claimList(claims).data("items", io.halkyon.model.Claim.count());
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/name/{name}")
+    public io.halkyon.model.Claim findByName(@PathParam("name") String name) {
+        return io.halkyon.model.Claim.findByName(name);
     }
 
     @POST
     @Transactional
     @Consumes("application/x-www-form-urlencoded")
+    @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
         List<String> errors = claimValidator.validateForm(claim);
         StringBuffer response = new StringBuffer();
