@@ -25,7 +25,7 @@ public class ClaimResource {
 
     @GET
     public TemplateInstance claim() {
-        return Templates.claimForm().data("tile","Claim form");
+        return Templates.claimForm().data("title","Claim form");
     }
 
     @POST

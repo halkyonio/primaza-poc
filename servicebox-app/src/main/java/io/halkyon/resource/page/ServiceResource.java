@@ -18,7 +18,7 @@ import java.sql.Date;
 public class ServiceResource {
     @GET
     public TemplateInstance service() {
-        return Templates.claimForm().data("tile","Claim form");
+        return Templates.serviceForm().data("title","Service form");
     }
 
     @POST
