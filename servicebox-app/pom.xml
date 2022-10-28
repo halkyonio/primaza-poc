@@ -16,6 +16,7 @@
   <properties>
     <htmx.version>1.8.2</htmx.version>
     <bootstrap.version>5.2.2</bootstrap.version>
+    <hyperscript.version>0.9.7</hyperscript.version>
   </properties>
 
   <dependencies>
@@ -42,6 +43,11 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>htmx.org</artifactId>
       <version>${htmx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>hyperscript.org</artifactId>
+      <version>${hyperscript.version}</version>
     </dependency>
 
     <!-- ORM - DB -->
