@@ -1,3 +1,12 @@
+<p align="center">
+    <a href="https://github.com/halkyonio/primaza-poc/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/halkyonio/primaza-poc"/></a>
+    <a href="https://github.com/halkyonio/primaza-poc/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/m/halkyonio/primaza-poc"/></a>
+    <a href="https://github.com/halkyonio/primaza-poc/actions/workflows/push.yml" alt="Build Status">
+        <img src="https://github.com/halkyonio/primaza-poc/actions/workflows/push.yaml/badge.svg"></a>
+</p>
+
 # Primaza project
 
 Quarkus Primaza Service box Application - POC
