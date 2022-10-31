@@ -3,6 +3,7 @@ package io.halkyon.resource.page;
 import io.halkyon.Templates;
 import io.halkyon.service.ClaimStatus;
 import io.halkyon.service.ClaimValidator;
+import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 import org.jboss.resteasy.annotations.Form;
 
@@ -55,26 +56,24 @@ public class ClaimResource {
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
         List<String> errors = claimValidator.validateForm(claim);
-        StringBuffer response = new StringBuffer();
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claim");
 
-        if (claim.created == null) {
-            claim.created = new Date(System.currentTimeMillis());
-        }
-        if (claim.status == null) {
-            claim.status = ClaimStatus.NEW.toString();
-        }
-
-        claim.persist();
         if (errors.size() > 0) {
-            for(String error : errors) {
-                response.append("<div class=\"alert alert-danger\"><strong>Error! </strong>" + error + "</div>");
-            };
+            response.withErrors(errors);
         } else {
-            response.append("<div class=\"alert alert-success\">Claim created successfully for id: " + claim.id + "</div>");
+            if (claim.created == null) {
+                claim.created = new Date(System.currentTimeMillis());
+            }
+            if (claim.status == null) {
+                claim.status = ClaimStatus.NEW.toString();
+            }
+
+            claim.persist();
+            response.withSuccessMessage(claim.id);
         }
 
         // Return as HTML the template rendering the item for HTMX
-        return Response.accepted(response.toString()).status(Response.Status.CREATED).header("Location", "/claim").build();
+        return response.build();
     }
 
 }
