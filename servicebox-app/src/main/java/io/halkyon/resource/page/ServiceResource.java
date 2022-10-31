@@ -2,6 +2,7 @@ package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Service;
+import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 import org.jboss.resteasy.annotations.Form;
 
@@ -18,7 +19,6 @@ import javax.ws.rs.core.Response;
 import java.sql.Date;
 import java.util.List;
 
-
 @Path("/services")
 public class ServiceResource {
     @GET
@@ -33,14 +33,16 @@ public class ServiceResource {
     @Consumes("application/x-www-form-urlencoded")
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Service service, @HeaderParam("HX-Request") boolean hxRequest) {
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/services");
 
         if (service.created == null) {
             service.created = new Date(System.currentTimeMillis());
         }
 
         service.persist();
+        response.withSuccessMessage(service.id);
         // Return as HTML the template rendering the item for HTMX
-        return Response.accepted(Templates.serviceItem(service)).status(Response.Status.CREATED).header("Location", "/services").build();
+        return response.build();
     }
 
     @GET
