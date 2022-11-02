@@ -8,3 +8,5 @@ INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (1, '
 INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (2, 'PostgreSQL',         '11.5',     'tcp:5432',     false,  PARSEDATETIME('2022-05-20 07:30:00','yyyy-MM-dd HH:mm:ss'));
 INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (3, 'ActiveMQ Artemis',   '2.26',     'tcp:8161',     false,  PARSEDATETIME('2022-07-13 11:42:00','yyyy-MM-dd HH:mm:ss'));
 INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (4, 'PaymentAPI',         '1.1',      'http:8080',    true,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
+
+INSERT INTO cluster(id, name, url, environment, created) VALUES (1, 'ocp4.11-node-1', 'https://10.0.2.10:6443', 'DEV', PARSEDATETIME('2022-10-18 20:02:01','yyyy-MM-dd HH:mm:ss'));
