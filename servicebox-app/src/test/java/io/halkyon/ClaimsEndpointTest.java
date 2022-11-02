@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
 
 @QuarkusTest
-public class ClaimEndpointTest {
+public class ClaimsEndpointTest {
 
     private static final UnaryOperator<String> CLAIM = fruit ->  String.format("{\"name\":\"%s\"}", fruit);
 

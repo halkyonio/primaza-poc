@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsNot.not;
 
 @QuarkusTest
-public class ServiceEndpointTest {
+public class ServicesEndpointTest {
 
 
     @Test
