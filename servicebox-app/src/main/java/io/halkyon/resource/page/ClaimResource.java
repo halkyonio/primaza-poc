@@ -1,27 +1,39 @@
 package io.halkyon.resource.page;
 
-import io.halkyon.Templates;
-import io.halkyon.service.ClaimStatus;
-import io.halkyon.service.ClaimValidator;
-import io.halkyon.utils.AcceptedResponseBuilder;
-import io.quarkus.qute.TemplateInstance;
-import org.jboss.resteasy.annotations.Form;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.sql.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.Form;
+
+import io.halkyon.Templates;
+import io.halkyon.model.Claim;
+import io.halkyon.services.ClaimStatus;
+import io.halkyon.services.ClaimValidator;
+import io.halkyon.services.ClaimingJobService;
+import io.halkyon.utils.AcceptedResponseBuilder;
+import io.quarkus.qute.TemplateInstance;
+
 @Path("/claims")
 public class ClaimResource {
-    ClaimValidator claimValidator;
+    private final ClaimValidator claimValidator;
+    private final ClaimingJobService claimingService;
 
     @Inject
-    public ClaimResource(ClaimValidator claimValidator){
+    public ClaimResource(ClaimValidator claimValidator, ClaimingJobService claimingService){
         this.claimValidator = claimValidator;
+        this.claimingService = claimingService;
     }
 
     @GET
@@ -35,10 +47,10 @@ public class ClaimResource {
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_JSON)
     public TemplateInstance list() {
-        return showList(io.halkyon.model.Claim.listAll()).data("all", true);
+        return showList(Claim.listAll()).data("all", true);
     }
 
-    private TemplateInstance showList(List<io.halkyon.model.Claim> claims) {
+    private TemplateInstance showList(List<Claim> claims) {
         return Templates.claimList(claims).data("items", io.halkyon.model.Claim.count());
     }
 
@@ -68,7 +80,7 @@ public class ClaimResource {
                 claim.status = ClaimStatus.NEW.toString();
             }
 
-            claim.persist();
+            claimingService.claimService(claim);
             response.withSuccessMessage(claim.id);
         }
 

@@ -1,18 +1,20 @@
 package io.halkyon.model;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import org.jboss.resteasy.annotations.jaxrs.FormParam;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
-import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 @Entity
 public class Claim extends PanacheEntityBase {
@@ -43,9 +45,12 @@ public class Claim extends PanacheEntityBase {
     public String status;
     @FormParam
     public String owner;
-
     @FormParam
     public Date created;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "service_id", referencedColumnName = "id")
+    public Service service;
+    public Integer attempts = 0;
 
     public static Claim findByName(String name) {
         return find("name", name).firstResult();
