@@ -16,6 +16,7 @@
   <properties>
     <htmx.version>1.8.2</htmx.version>
     <bootstrap.version>5.2.2</bootstrap.version>
+    <quarkus-helm.version>0.1.2</quarkus-helm.version>
   </properties>
 
   <dependencies>
@@ -38,6 +39,15 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-webjars-locator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-kubernetes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.helm</groupId>
+      <artifactId>quarkus-helm</artifactId>
+      <version>${quarkus-helm.version}</version>
     </dependency>
 
     <!-- Webjars -->
