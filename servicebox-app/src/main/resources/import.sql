@@ -1,0 +1,12 @@
+INSERT INTO claim(id, name, description, owner, serviceRequested, status, created) VALUES (1, 'mysql-demo',           'Quarkus JET Mysql demo',                 'quarkus team',               'mysql-7.5',        'new',      to_timestamp('2022-10-18 10:30:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO claim(id, name, description, owner, serviceRequested, status, created) VALUES (2, 'postgresql-team-dev',  'Spring Boot Config Server PostgreSQL',   'snowdrop team',              'postgresql-11.5',  'pending',  to_timestamp('2022-10-18 08:22:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO claim(id, name, description, owner, serviceRequested, status, created) VALUES (3, 'postgresql-team-test', 'Invoicing EAP Testing',                  'EAP QE team',                'postgresql-11.5',  'new',      to_timestamp('2022-10-18 11:00:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO claim(id, name, description, owner, serviceRequested, status, created) VALUES (4, 'mariadb-demo ',        'Dummy Java Maria DB ',                   'snowdrop r&d team',          'mariadb-7.5',      'bind',     to_timestamp('2022-10-18 14:45:10','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO claim(id, name, description, owner, serviceRequested, status, created) VALUES (6, 'postgresql-13 ',       'Quarkus Primaza & Postgresql',           'snwodrop & devtools teams',  'postgresql-13.5',  'bind',     to_timestamp('2022-10-18 20:02:01','yyyy-MM-dd HH24:MI:SS'));
+
+INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (1, 'MYSQL',              '8.0.3',    'tcp:3306',     true,   to_timestamp('2022-10-08 10:30:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (2, 'PostgreSQL',         '11.5',     'tcp:5432',     false,  to_timestamp('2022-05-20 07:30:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (3, 'ActiveMQ Artemis',   '2.26',     'tcp:8161',     false,  to_timestamp('2022-07-13 11:42:00','yyyy-MM-dd HH24:MI:SS'));
+INSERT INTO service(id, name, version, endpoint, deployed, created) VALUES (4, 'PaymentAPI',         '1.1',      'http:8080',    true,   to_timestamp('2022-02-23 21:26:00','yyyy-MM-dd HH24:MI:SS'));
+
+INSERT INTO cluster(id, name, url, environment, created) VALUES (1, 'ocp4.11-node-1', 'https://10.0.2.10:6443', 'DEV', to_timestamp('2022-10-18 20:02:01','yyyy-MM-dd HH24:MI:SS'));
