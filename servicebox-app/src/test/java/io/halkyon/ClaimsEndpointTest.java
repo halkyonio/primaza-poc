@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
+import io.halkyon.model.Claim;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
@@ -16,7 +17,6 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testAddClaim(){
-
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
@@ -35,7 +35,7 @@ public class ClaimsEndpointTest {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
+                .body("{\"name\": \"mysql-demo\", \"serviceRequested\": \"mysql:3306\"}")
                 .when().post("/claims")
                 .then()
                 .statusCode(201);
@@ -44,58 +44,34 @@ public class ClaimsEndpointTest {
     }
 
     @Test
-    public void testFindByName(){
-
-        given()
-                .when().get("/claims")
-                .then()
-                .statusCode(200)
-                .body(
-                        containsString("mysql-demo"),
-                        containsString("postgresql-team-dev"),
-                        containsString("postgresql-team-test"),
-                        containsString("mariadb-demo"),
-                        containsString("postgresql-13"));
-
-        given()
-                .when().get("/claims/name/mysql-demo")
-                .then()
-                .statusCode(200)
-                .body(containsString("mysql-demo"));
-    }
-
-    @Test
     public void testClaimEntity() {
         final String path="/claims";
-        //List all
         given()
-                .when().get(path)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body("{\"name\": \"Postgresql-testClaimEntity\", \"serviceRequested\": \"Postgresql-5509\"}")
+                .when().post("/claims")
+                .then()
+                .statusCode(201);
+
+        Claim claim = given()
+                .when().get("/claims/name/Postgresql-testClaimEntity")
                 .then()
                 .statusCode(200)
-                .body(
-                        containsString("mysql-demo"),
-                        containsString("postgresql-team-dev"),
-                        containsString("postgresql-team-test"),
-                        containsString("mariadb-demo"),
-                        containsString("postgresql-13"));
+                .extract().as(Claim.class);
 
-        //Delete the 'mysql-demo':
+        //Delete the 'Postgresql':
         given()
-                .when().delete(path + "/4")
+                .when().delete(path + "/" + claim.id)
                 .then()
                 .statusCode(204);
 
-        //List all, 'mariadb-demo' should be missing now:
+        //List all, 'Postgresql' should be missing now:
         given()
                 .when().get(path)
                 .then()
                 .statusCode(200)
-                .body(
-                        containsString("mysql-demo"),
-                        containsString("postgresql-team-dev"),
-                        containsString("postgresql-team-test"),
-                        not(containsString("mariadb-demo")),
-                        containsString("postgresql-13"));
+                .body(not(containsString("Postgresql-testClaimEntity")));
     }
 
 }
