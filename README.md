@@ -9,7 +9,7 @@
 
 # Primaza project
 
-Quarkus Primaza Service box Application - POC
+Quarkus Primaza Service Box Application - POC
 
 Application developers need access to backing services to build and connect workloads.
 Today in Kubernetes, the exposure of secrets for connecting workloads to external services such as REST APIs, databases, event buses, and many more is manual and custom-made.
