@@ -51,7 +51,7 @@ jobs:
           cache: maven
 
       - name: build with maven
-        run: mvn clean install -Dnative
+        run: mvn clean install -Dnative -Dquarkus.test.native-image-profile=test
 
   push:
     name: Push Images to Quay.io

@@ -11,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,5 +64,13 @@ public class ClusterResource {
 
         // Return as HTML the template rendering the item for HTMX
         return Response.accepted(response.toString()).status(Response.Status.CREATED).header("Location", "/clusters").build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/name/{name}")
+    public Cluster findByName(@PathParam("name") String name) {
+        return Cluster.findByName(name);
     }
 }

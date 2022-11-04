@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
+import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimingJobService;
 import io.quarkus.scheduler.Scheduler;
@@ -30,52 +31,33 @@ public class ClaimingJobServiceTest {
     Scheduler scheduler;
 
     @Test
-    public void testJobShouldRunWhenStartApplication(){
-        // When we start the application, the claiming job is automatically triggered
-        // Then:
-        // - the claim "postgresql-team-dev" should have changed from status "pending" to "claimed"
-        // - the claim "postgresql-team-test" should have changed from status "new" to "claimed"
-        // - the claim "mysql-demo" should have changed from status "new" to "pending" because there is no service "mysql-7.5"
-        // Both claims should have populated the relationship claim-service
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/postgresql-team-dev")
-                .then()
-                .statusCode(200)
-                .body("status", is(ClaimStatus.CLAIMED.toString()))
-                .body("service.name", containsString("PostgreSQL"));
-
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/postgresql-team-test")
-                .then()
-                .statusCode(200)
-                .body("status", is(ClaimStatus.CLAIMED.toString()))
-                .body("service.name", containsString("PostgreSQL"));
-
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/mysql-demo")
-                .then()
-                .statusCode(200)
-                .body("status", is(ClaimStatus.PENDING.toString()))
-                .body("attempts", is(1));
-    }
-
-    @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
         pauseScheduler();
+        Claim postgresClaim = createClaim("Postgresql", "postgresql-8");
+        Claim mySqlClaim = createClaim("MySQL", "mysql-7.5");
+        createPostgresqlService();
+
         // When we run the job once:
         // Then:
-        // - the claim "mysql-demo" should increase the attempts to 2
+        // - the claim "PostgresSQL" should change from "new" to "claimed"
+        // - the claim "MySQL" should increase the attempts to 2
         // When we run the job again:
         // Then:
         // - the claim "mysql-demo" should increase the attempts to 3 and status should have changed to "error".
+        job.execute();
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + postgresClaim.name)
+                .then()
+                .statusCode(200)
+                .body("status", is(ClaimStatus.CLAIMED.toString()))
+                .body("service.name", containsString("PostgreSQL"));
+
         for (int attempt = 1; attempt < maxAttempts; attempt++) {
             job.execute();
             given()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .get("/claims/name/mysql-demo")
+                    .get("/claims/name/" + mySqlClaim.name)
                     .then()
                     .statusCode(200)
                     .body("status", is(ClaimStatus.PENDING.toString()))
@@ -85,7 +67,7 @@ public class ClaimingJobServiceTest {
         job.execute();
         given()
                 .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/mysql-demo")
+                .get("/claims/name/" + mySqlClaim.name)
                 .then()
                 .statusCode(200)
                 .body("status", is(ClaimStatus.ERROR.toString()))
@@ -118,4 +100,23 @@ public class ClaimingJobServiceTest {
         await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
     }
 
+    private Claim createClaim(String name, String serviceRequested) {
+        return given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body(String.format("{\"name\": \"%s\", \"serviceRequested\": \"%s\", \"status\": \"new\"}", name, serviceRequested))
+                .when().post("/claims")
+                .then()
+                .statusCode(201)
+                .extract()
+                .as(Claim.class);
+    }
+
+    private void createPostgresqlService() {
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body("{\"name\": \"PostgreSQL\", \"version\": \"8\", \"endpoint\": \"tcp:5672\", \"deployed\": \"true\" }")
+                .when().post("/services");
+    }
 }
