@@ -22,7 +22,7 @@ Primaza exposes several endpoints to manage a few type of objects:
 
 - Claim: Claims should provide a mechanism for application developers to express which Service their applications require without having to know the exact coordinates (group kind version) of the Service Resource.
 - Service: represents things like databases, message queues, DNS records, etc.
-- Clusters: represent a Kubernetes cluster
+- Cluster: represent a Kubernetes cluster
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
