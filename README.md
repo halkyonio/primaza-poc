@@ -44,7 +44,7 @@ From each specific resource page you have the possibility to create them using t
 
 ### Usage via `curl`
 
-If you wish to send create some resources via `curl` here there are some examples:
+If you wish to create some resources using curl, use one of the following requests:
 
 Adding a Claim
 
