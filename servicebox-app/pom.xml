@@ -40,15 +40,6 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-webjars-locator</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-kubernetes</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkiverse.helm</groupId>
-      <artifactId>quarkus-helm</artifactId>
-      <version>${quarkus-helm.version}</version>
-    </dependency>
 
     <!-- Webjars -->
     <dependency>
@@ -164,6 +155,23 @@
         <dependency>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-container-image-jib</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>kubernetes</id>
+      <properties>
+        <quarkus.profile>kubernetes</quarkus.profile>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkiverse.helm</groupId>
+          <artifactId>quarkus-helm</artifactId>
+          <version>${quarkus-helm.version}</version>
         </dependency>
       </dependencies>
     </profile>

@@ -86,7 +86,7 @@ jobs:
           kubectl create namespace $K8S_NAMESPACE
           kubectl config set-context --current --namespace=$K8S_NAMESPACE
 
-          mvn clean install -DskipTests -Ppush-images -Dquarkus.container-image.build=true \
+          mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=$KIND_REGISTRY \
             -Dquarkus.container-image.group=$KIND_REGISTRY_GROUP \
