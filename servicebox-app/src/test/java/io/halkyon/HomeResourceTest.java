@@ -15,7 +15,7 @@ public class HomeResourceTest {
           .when().get("/hello")
           .then()
              .statusCode(200)
-             .body(is("Hello from Primaza Service Box App"));
+             .body(is("Hello from Primaza Service Box app"));
     }
 
 }

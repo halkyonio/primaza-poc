@@ -17,6 +17,6 @@ public class AppResource {
     @Path("/hello")
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Hello from Primaza Service Box App";
+        return "Hello from Primaza Service Box app";
     }
 }

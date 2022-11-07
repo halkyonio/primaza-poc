@@ -10,6 +10,6 @@ import javax.ws.rs.Path;
 public class HomeResource {
     @GET
     public TemplateInstance home() {
-        return Templates.home().data("title","Home page");
+        return Templates.App.home().data("title","Home page");
     }
 }

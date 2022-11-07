@@ -18,7 +18,7 @@
             <tbody id="cluster-list">
               {#for cluster in clusters}
                   <!-- Include the HTML template rendering the cluster item -->
-                  {#include clusterItem.html cluster=cluster /}
+                  {#include clusters/item.html cluster=cluster /}
               {/for}
             </tbody>
         </table>
