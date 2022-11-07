@@ -40,7 +40,7 @@ public class ClaimResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.claimForm().data("title","Claim form");
+        return Templates.Claims.form().data("title","Claim form");
     }
 
     @GET
@@ -51,7 +51,7 @@ public class ClaimResource {
     }
 
     private TemplateInstance showList(List<Claim> claims) {
-        return Templates.claimList(claims).data("items", io.halkyon.model.Claim.count());
+        return Templates.Claims.list(claims).data("items", io.halkyon.model.Claim.count());
     }
 
     @GET

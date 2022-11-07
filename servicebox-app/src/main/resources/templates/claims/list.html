@@ -21,7 +21,7 @@
             <tbody id="claim-list">
               {#for claim in claims}
                   <!-- Include the HTML template rendering the claim item -->
-                  {#include claimItem.html claim=claim /}
+                  {#include claims/item.html claim=claim /}
               {/for}
             </tbody>
         </table>

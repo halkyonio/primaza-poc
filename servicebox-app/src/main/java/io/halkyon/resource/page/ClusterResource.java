@@ -29,13 +29,13 @@ public class ClusterResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newClusterForm() {
-        return Templates.clusterForm().data("title","Cluster form");
+        return Templates.Clusters.form().data("title","Cluster form");
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.clusterList(Cluster.listAll())
+        return Templates.Clusters.list(Cluster.listAll())
                 .data("title","Cluster form")
                 .data("items", Cluster.count())
                 .data("all", true);
