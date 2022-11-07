@@ -16,13 +16,13 @@ Today in Kubernetes, the exposure of secrets for connecting workloads to externa
 Connecting workloads to backing services is always a challenge because each service provider suggests a different way to access their secrets, and each application developer consumes those secrets in a custom way to their workloads.
 Primaza aims to support the discoverability, life cycle management and connectivity of services running in Kubernetes.
 
-Primaza comes from the Greek word πρυμάτσα, which is a line used to tie boats to the dock.
-
 Primaza exposes several endpoints to manage a few type of objects:
 
 - Claim: Claims should provide a mechanism for application developers to express which Service their applications require without having to know the exact coordinates (group kind version) of the Service Resource.
 - Service: represents things like databases, message queues, DNS records, etc.
 - Cluster: represent a Kubernetes cluster
+
+Primaza name comes from the Greek word πρυμάτσα, which is a line used to tie boats to the dock.
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
