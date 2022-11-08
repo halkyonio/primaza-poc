@@ -160,6 +160,9 @@
     </profile>
     <profile>
       <id>push-images</id>
+      <properties>
+        <quarkus.profile>postgresql</quarkus.profile>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>io.quarkus</groupId>
