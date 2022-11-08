@@ -51,7 +51,7 @@ public class ClaimingJobServiceTest {
                 .get("/claims/name/" + postgresClaim.name)
                 .then()
                 .statusCode(200)
-                .body("status", is(ClaimStatus.CLAIMED.toString()))
+                .body("status", is(ClaimStatus.BIND.toString()))
                 .body("service.name", containsString("postgresql"));
 
         for (int attempt = 1; attempt < maxAttempts; attempt++) {
