@@ -35,7 +35,8 @@ public class ClaimingJobServiceTest {
         pauseScheduler();
         Claim postgresClaim = createClaim("Postgresql", "postgresql-8");
         Claim mySqlClaim = createClaim("MySQL", "mysql-7.5");
-        createPostgresqlService();
+        createService("postgresql", "8", true);
+        createService("MySQL", "7.5", false);
 
         // When we run the job once:
         // Then:
@@ -51,7 +52,7 @@ public class ClaimingJobServiceTest {
                 .then()
                 .statusCode(200)
                 .body("status", is(ClaimStatus.CLAIMED.toString()))
-                .body("service.name", containsString("PostgreSQL"));
+                .body("service.name", containsString("postgresql"));
 
         for (int attempt = 1; attempt < maxAttempts; attempt++) {
             job.execute();
@@ -65,6 +66,7 @@ public class ClaimingJobServiceTest {
         }
 
         job.execute();
+        // Because mysql service is not deployed:
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + mySqlClaim.name)
@@ -112,11 +114,14 @@ public class ClaimingJobServiceTest {
                 .as(Claim.class);
     }
 
-    private void createPostgresqlService() {
+    private void createService(String serviceName, String serviceVersion, boolean deployed) {
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
-                .body("{\"name\": \"PostgreSQL\", \"version\": \"8\", \"endpoint\": \"tcp:5672\", \"deployed\": \"true\" }")
+                .body("{\"name\": \"" + serviceName + "\", "
+                        + "\"version\": \"" + serviceVersion + "\", "
+                        + "\"endpoint\": \"tcp:5672\", "
+                        + "\"deployed\": \"" + deployed + "\" }")
                 .when().post("/services");
     }
 }
