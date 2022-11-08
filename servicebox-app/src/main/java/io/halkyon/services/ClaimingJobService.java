@@ -53,7 +53,8 @@ public class ClaimingJobService {
 
     private Map<String, Service> listAllAvailableServices() {
         Map<String, Service> services = new HashMap<>();
-        Service.listAll()
+        Service.list("deployed=true")
+                .stream().map(Service.class::cast)
                 .forEach(s -> {
                     // combination by service name + version
                     String serviceNameWithVersion = s.name + "-" + s.version;
