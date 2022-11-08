@@ -1,7 +1,10 @@
 package io.halkyon.model;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
+import io.halkyon.Templates;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -58,5 +62,26 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> listAll() {
         return findAll(Sort.ascending("name")).list();
+    }
+
+    public static List<Claim> getClaims(String name, String serviceRequested) {
+        Map<String, Object> parameters = new HashMap<>();
+        addIfNotNull(parameters, "name", name );
+        addIfNotNull(parameters, "servicerequested", serviceRequested);
+
+        if ( parameters.isEmpty() ) {
+            return listAll();
+        }
+        String query = parameters.entrySet().stream()
+                .map( entry -> entry.getKey() + "=:" + entry.getKey() )
+                .collect( Collectors.joining(" and ") );
+
+        return list(query, parameters);
+    }
+
+    private static void addIfNotNull(Map<String, Object> map, String key, String value) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 }
