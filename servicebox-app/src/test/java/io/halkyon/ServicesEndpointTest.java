@@ -68,4 +68,24 @@ public class ServicesEndpointTest {
                 .body(not(containsString("RabbitMQ3")));
     }
 
+    @Test
+    public void testCannotAddServiceWithSameNameAndVersion(){
+        String request = "{\"name\": \"RabbitMQ4\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }";
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body(request)
+                .when().post("/services")
+                .then()
+                .statusCode(201);
+
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body(request)
+                .when().post("/services")
+                .then()
+                .statusCode(409);
+    }
+
 }

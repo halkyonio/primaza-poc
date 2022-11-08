@@ -16,7 +16,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
 import io.quarkus.scheduler.Scheduled;
-import io.smallrye.common.annotation.Blocking;
 
 /**
  * The claiming service will poll new or pending claims and try to find an available service.
@@ -53,7 +52,8 @@ public class ClaimingJobService {
 
     private Map<String, Service> listAllAvailableServices() {
         Map<String, Service> services = new HashMap<>();
-        Service.listAll()
+        Service.list("deployed=true")
+                .stream().map(Service.class::cast)
                 .forEach(s -> {
                     // combination by service name + version
                     String serviceNameWithVersion = s.name + "-" + s.version;
@@ -77,7 +77,7 @@ public class ClaimingJobService {
             }
 
         } else {
-            claim.status = ClaimStatus.CLAIMED.toString();
+            claim.status = ClaimStatus.BIND.toString();
             claim.service = service;
         }
 

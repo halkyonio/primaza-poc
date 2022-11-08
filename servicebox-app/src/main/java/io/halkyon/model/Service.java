@@ -7,11 +7,15 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import java.sql.Date;
 import java.util.List;
 
 @Entity
+@Table(indexes = @Index(columnList = "name,version", unique = true))
 public class Service extends PanacheEntityBase {
 
     @Id

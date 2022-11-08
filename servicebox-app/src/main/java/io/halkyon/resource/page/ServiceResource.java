@@ -25,7 +25,7 @@ public class ServiceResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance service() {
-        return Templates.serviceForm().data("title","Service form");
+        return Templates.Services.form().data("title","Service form");
     }
 
     @POST
@@ -53,7 +53,7 @@ public class ServiceResource {
     }
 
     private TemplateInstance showList(List<Service> services) {
-        return Templates.serviceList(services).data("items", io.halkyon.model.Service.count());
+        return Templates.Services.list(services).data("items", io.halkyon.model.Service.count());
     }
 
 
