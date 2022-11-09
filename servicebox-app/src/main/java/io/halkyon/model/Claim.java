@@ -14,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
-import io.halkyon.Templates;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -72,9 +71,10 @@ public class Claim extends PanacheEntityBase {
         if ( parameters.isEmpty() ) {
             return listAll();
         }
+
         String query = parameters.entrySet().stream()
                 .map( entry -> entry.getKey() + "=:" + entry.getKey() )
-                .collect( Collectors.joining(" and ") );
+                .collect( Collectors.joining(" or ") );
 
         List<Claim> claims = list(query, parameters);
         return claims;
