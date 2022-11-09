@@ -3,7 +3,7 @@
   {#title}Claim{/title}
   {#body}
     <div class="container pt-4">
-      <div class="btn btn-primary"><a href="/claims/new" class="text-white">New claim</a></div>
+      <a href="/claims/new" class="btn btn-info active" role="button" aria-pressed="true">New claim</a>
 	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-list" hx-swap="innerHTML">
 	  	<div class="form-group pt-3">
 	  	    <label class="control-label col-sm-2" for="name">Name</label>
@@ -20,8 +20,8 @@
          </div>
 	  </form>
       </div>
-    <hr>
-    <div class="table-responsive">
+    <hr class="container">
+    <div class="container table-responsive">
         <table class="table">
             <thead>
               <tr>
@@ -41,13 +41,15 @@
             </tbody>
         </table>
     </div>
-    <footer class="footer">
+    <footer class="container footer">
     <span>
       <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
       <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
     </span>
     </footer>
-    <hr>
-    <a href="/">Home</a>
+    <hr class="container">
+    <div class="container">
+       <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
+    </div>
   {/body}
 {/include}
