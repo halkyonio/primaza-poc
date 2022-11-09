@@ -4,7 +4,18 @@
   {#body}
     <div class="container">
       <div class="btn btn-primary"><a href="/claims/new" class="text-white">New claim</a></div>
-    </div>
+      <h3>Searching claims</h3>
+	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-list" hx-swap="outerHTML">
+	  	<div class="form-group">
+	  		<input class="form-control new-claim" type="search" name="name" id="query" placeholder="Enter Query...">
+	  	</div>
+        <div class="form-group">
+           <div class="col-sm-offset-2 col-sm-10">
+             <button id="claim-button" type="submit" class="btn btn-primary">Search !</button>
+           </div>
+         </div>
+	  </form>
+      </div>
     <hr>
     <div class="table-responsive">
         <table class="table">
