@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -112,16 +113,5 @@ public class ClaimingJobServiceTest {
                 .statusCode(201)
                 .extract()
                 .as(Claim.class);
-    }
-
-    private void createService(String serviceName, String serviceVersion, boolean deployed) {
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"" + serviceName + "\", "
-                        + "\"version\": \"" + serviceVersion + "\", "
-                        + "\"endpoint\": \"tcp:5672\", "
-                        + "\"deployed\": \"" + deployed + "\" }")
-                .when().post("/services");
     }
 }

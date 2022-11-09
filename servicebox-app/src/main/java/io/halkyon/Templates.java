@@ -27,6 +27,15 @@ public class Templates {
                 public static native TemplateInstance form();
         }
 
+        @CheckedTemplate(basePath = "credentials", requireTypeSafeExpressions = false)
+        public static class Credentials {
+                public static native TemplateInstance list(List<io.halkyon.model.Credential> credentials);
+
+                public static native TemplateInstance item(io.halkyon.model.Credential credential);
+
+                public static native TemplateInstance form();
+        }
+
         @CheckedTemplate(basePath = "clusters")
         public static class Clusters {
                 public static native TemplateInstance list(List<io.halkyon.model.Cluster> clusters);

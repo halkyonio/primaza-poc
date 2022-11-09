@@ -10,7 +10,13 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlLink;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
@@ -78,11 +84,29 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
 
         public void clickOn(String elementId) {
             try {
-                currentPage = currentPage.getElementById(elementId).click();
+                DomElement element = currentPage.getElementById(elementId);
+                currentPage = element.click();
+                if (element instanceof HtmlInput
+                        || element instanceof HtmlLink
+                        || element instanceof HtmlAnchor) {
+                    refreshPageContent();
+                }
                 waitUntilLoaded();
+
             } catch (IOException e) {
                 this.failure = e;
             }
+        }
+
+        public void type(String elementId, String value) {
+            HtmlInput input = (HtmlInput) currentPage.getElementById(elementId);
+            input.setValue(value);
+        }
+
+        public void select(String elementId, String option) {
+            HtmlSelect select = (HtmlSelect) currentPage.getElementById(elementId);
+            HtmlOption optionToSelect = select.getOptionByText(option);
+            select.setSelectedAttribute(optionToSelect, true);
         }
 
         public void assertPathIs(String expectedPath) {
@@ -95,12 +119,15 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
             assertTrue(body.contains(expectedContent), "Content: " + expectedContent + ", not found in body: " + body);
         }
 
-        private void waitUntilLoaded() {
+        private void refreshPageContent() {
             try {
                 currentPage.refresh();
             } catch (IOException e) {
                 this.failure = e;
             }
+        }
+
+        private void waitUntilLoaded() {
             currentPage.getEnclosingWindow().getJobManager().waitForJobs(JAVASCRIPT_WAIT_TIMEOUT_MILLIS);
         }
 
