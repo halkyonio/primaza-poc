@@ -5,7 +5,7 @@
     <div class="container">
       <div class="btn btn-primary"><a href="/claims/new" class="text-white">New claim</a></div>
       <h3>Searching claims</h3>
-	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-list" hx-swap="outerHTML">
+	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-list" hx-swap="innerHTML">
 	  	<div class="form-group">
 	  		<input class="form-control new-claim" type="search" name="name" id="query" placeholder="Enter Query...">
 	  	</div>

@@ -47,8 +47,24 @@ public class ClaimResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
-    public TemplateInstance filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
-        return showList(Claim.getClaims(name, serviceRequested)).data("all",false);
+    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested, @HeaderParam("HX-Request") boolean hxRequest) {
+        List<Claim> claims = Claim.getClaims(name, serviceRequested);
+        if (hxRequest) {
+            StringBuffer claimTable  = new StringBuffer();
+            for (Claim c : claims) {
+                claimTable.append("<tr>");
+                claimTable.append("<td>").append(c.name).append("</td>");
+                claimTable.append("<td>").append(c.description).append("</td>");
+                claimTable.append("<td>").append(c.owner).append("</td>");
+                claimTable.append("<td>").append(c.serviceRequested).append("</td>");
+                claimTable.append("<td>").append(c.created).append("</td>");
+                claimTable.append("</tr>");
+            }
+            return Response.accepted(claimTable.toString()).status(Response.Status.CREATED).header("Location", "/claims/filter").build();
+        } else {
+            // return showList(Claim.getClaims(name, serviceRequested)).data("all",false);
+            return null;
+        }
     }
 
     private TemplateInstance showList(List<Claim> claims) {

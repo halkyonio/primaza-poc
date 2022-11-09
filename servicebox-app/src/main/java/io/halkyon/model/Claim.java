@@ -76,7 +76,8 @@ public class Claim extends PanacheEntityBase {
                 .map( entry -> entry.getKey() + "=:" + entry.getKey() )
                 .collect( Collectors.joining(" and ") );
 
-        return list(query, parameters);
+        List<Claim> claims = list(query, parameters);
+        return claims;
     }
 
     private static void addIfNotNull(Map<String, Object> map, String key, String value) {
