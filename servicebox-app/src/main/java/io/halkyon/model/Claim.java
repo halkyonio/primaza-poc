@@ -76,7 +76,8 @@ public class Claim extends PanacheEntityBase {
                 .map( entry -> entry.getKey() + "=:" + entry.getKey() )
                 .collect( Collectors.joining(" or ") );
 
-        List<Claim> claims = list(query, parameters);
+        /* String query = "name = ?1 or servicerequested = ?2";*/
+        List<Claim> claims = list(query, name,serviceRequested);
         return claims;
     }
 
