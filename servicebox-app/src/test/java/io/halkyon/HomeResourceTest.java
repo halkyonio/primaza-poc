@@ -35,7 +35,7 @@ public class HomeResourceTest {
         page.goTo("/");
         page.clickOn("home-claims-btn-id");
         page.assertPathIs("/claims");
-        // New claim button
+        // New button
         page.assertContentContains("New claim");
         // Go back button
         page.assertContentContains("Home");
@@ -46,7 +46,7 @@ public class HomeResourceTest {
         page.goTo("/");
         page.clickOn("home-services-btn-id");
         page.assertPathIs("/services");
-        // New claim button
+        // New button
         page.assertContentContains("New service");
         // Go back button
         page.assertContentContains("Home");
@@ -57,8 +57,19 @@ public class HomeResourceTest {
         page.goTo("/");
         page.clickOn("home-clusters-btn-id");
         page.assertPathIs("/clusters");
-        // New claim button
+        // New button
         page.assertContentContains("New cluster");
+        // Go back button
+        page.assertContentContains("Home");
+    }
+
+    @Test
+    public void testShouldGoToCredentialsPage() {
+        page.goTo("/");
+        page.clickOn("home-credentials-btn-id");
+        page.assertPathIs("/credentials");
+        // New button
+        page.assertContentContains("New credential");
         // Go back button
         page.assertContentContains("Home");
     }
