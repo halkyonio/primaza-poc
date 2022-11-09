@@ -45,10 +45,10 @@ public class ClaimResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
-    public List<Claim> filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
-        return io.halkyon.model.Claim.getClaims(name, serviceRequested);
+    public TemplateInstance filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
+        return showList(Claim.getClaims(name, serviceRequested)).data("all",false);
     }
 
     private TemplateInstance showList(List<Claim> claims) {
