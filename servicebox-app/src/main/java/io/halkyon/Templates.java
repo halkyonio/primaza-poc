@@ -15,6 +15,7 @@ public class Templates {
         @CheckedTemplate(basePath = "claims")
         public static class Claims {
                 public static native TemplateInstance list(List<io.halkyon.model.Claim> claims);
+                public static native TemplateInstance table(List<io.halkyon.model.Claim> claims);
                 public static native TemplateInstance form();
         }
 

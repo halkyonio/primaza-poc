@@ -47,20 +47,10 @@ public class ClaimResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
-    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested, @HeaderParam("HX-Request") boolean hxRequest) {
+    public Object filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested, @HeaderParam("HX-Request") boolean hxRequest) {
         List<Claim> claims = Claim.getClaims(name, serviceRequested);
         if (hxRequest) {
-            StringBuffer claimTable  = new StringBuffer();
-            for (Claim c : claims) {
-                claimTable.append("<tr>");
-                claimTable.append("<td>").append(c.name).append("</td>");
-                claimTable.append("<td>").append(c.description).append("</td>");
-                claimTable.append("<td>").append(c.owner).append("</td>");
-                claimTable.append("<td>").append(c.serviceRequested).append("</td>");
-                claimTable.append("<td>").append(c.created).append("</td>");
-                claimTable.append("</tr>");
-            }
-            return Response.accepted(claimTable.toString()).status(Response.Status.CREATED).header("Location", "/claims/filter").build();
+            return Templates.Claims.table(claims);
         } else {
             // return showList(Claim.getClaims(name, serviceRequested)).data("all",false);
             return null;
