@@ -54,7 +54,7 @@ public class ClaimsEndpointTest {
     @Test
     public void testQueryUsingServiceRequestedToGetClaims(){
         given().header("HX-Request","true")
-               .queryParam("servicerequested","mysql-7.5")
+               .queryParam("servicerequested","mysql-8.0.3")
                .when()
                  .get("/claims/filter")
                .then()

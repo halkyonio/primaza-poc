@@ -27,7 +27,7 @@ public class ClaimsJPATest {
     @Test
     public void testQueryByServiceRequested() {
         // when
-        List<Claim> claims = Claim.getClaims("","mariadb-7.5");
+        List<Claim> claims = Claim.getClaims("","mariadb-10.9");
 
         // then
         MatcherAssert.assertThat(claims, Matchers.hasSize(1));
@@ -37,7 +37,7 @@ public class ClaimsJPATest {
     public void testUsingRepositoryAndQuery() {
         String name = "mysql-demo";
         String serviceRequested= "";
-        ClaimRepository claim = new ClaimRepository();
+        Claim claim = new Claim();
 
         String query = "name = ?1 or servicerequested = ?2";
         List<Claim> claims = claim.list(query, name, serviceRequested);
