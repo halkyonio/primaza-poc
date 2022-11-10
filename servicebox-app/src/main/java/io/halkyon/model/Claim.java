@@ -76,9 +76,9 @@ public class Claim extends PanacheEntityBase {
                 .map( entry -> entry.getKey() + "=:" + entry.getKey() )
                 .collect( Collectors.joining(" or ") );
 
-        /* String query = "name = ?1 or servicerequested = ?2";*/
-        List<Claim> claims = list(query, parameters);
-        return claims;
+        // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not, etc
+        // String query = "name like ?1 or servicerequested = ?2";
+        return list(query, parameters);
     }
 
     private static void addIfNotNull(Map<String, Object> map, String key, String value) {
