@@ -37,24 +37,23 @@ public class ClaimsJPATest {
     public void testUsingRepositoryAndQuery() {
         String name = "mysql-demo";
         String serviceRequested= "";
-        ClaimRepository cr = new ClaimRepository();
+        ClaimRepository claim = new ClaimRepository();
 
         String query = "name = ?1 or servicerequested = ?2";
-        List<Claim> claims = cr.list(query, name, serviceRequested);
+        List<Claim> claims = claim.list(query, name, serviceRequested);
 
         MatcherAssert.assertThat(claims, Matchers.hasSize(1));
     }
 
-    // Test is failing using like :-(
     @Test
     public void testUsingRepositoryAndQueryWithLike() {
-        String name = "mysql";
+        String name = "mysql%";
         String serviceRequested= "";
-        ClaimRepository cr = new ClaimRepository();
+        Claim claimEntity = new Claim();
 
         String query = "name like ?1 or servicerequested = ?2";
-        List<Claim> claims = cr.list(query, name, serviceRequested);
+        List<Claim> claims = claimEntity.list(query, name, serviceRequested);
 
-        MatcherAssert.assertThat(claims, Matchers.hasSize(0));
+        MatcherAssert.assertThat(claims, Matchers.hasSize(1));
     }
 }
