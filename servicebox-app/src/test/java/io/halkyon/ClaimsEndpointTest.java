@@ -37,14 +37,14 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testQueryUsingNameToGetClaims(){
-         given().contentType(ContentType.JSON)
-                .queryParam("name","mysql-demo")
-                .when()
-                  .get("/claims/filter")
-                .then()
-                  .body("items.size()", is(1));
-         /*
-         RequestSpecification httpRequest = RestAssured.given().contentType(ContentType.JSON).queryParam("name","mysql-demo");
+        given().header("HX-Request","true")
+               .queryParam("name","mysql-demo")
+               .when()
+                 .get("/claims/filter")
+               .then()
+                 .body(containsString("<td>mysql-demo</td>"));
+
+         /*RequestSpecification httpRequest = RestAssured.given().header("HX-Request","true").queryParam("name","mysql-demo");
          Response response = httpRequest.get("/claims/filter");
          ResponseBody body = response.getBody();
          System.out.println("Response Body is: " + body.asString());
@@ -53,12 +53,12 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testQueryUsingServiceRequestedToGetClaims(){
-        given().contentType(ContentType.JSON)
-                .queryParam("servicerequested","mysql-7.5")
-                .when()
-                  .get("/claims/filter")
-                .then()
-                  .body("items.size()", is(1));
+        given().header("HX-Request","true")
+               .queryParam("servicerequested","mysql-7.5")
+               .when()
+                 .get("/claims/filter")
+               .then()
+                 .body(containsString("<td>mysql-demo</td>"));
     }
 
     @Test
