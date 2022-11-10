@@ -19,7 +19,7 @@ import java.util.List;
 public class Service extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "svcSeq", sequenceName = "svc_id_seq", allocationSize = 1, initialValue = 6)
+    @SequenceGenerator(name = "svcSeq", sequenceName = "svc_id_seq", allocationSize = 1, initialValue = 7)
     @GeneratedValue(generator = "svcSeq")
     public Long id;
 
