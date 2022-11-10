@@ -22,7 +22,7 @@ public class Templates {
         @CheckedTemplate(basePath = "services")
         public static class Services {
                 public static native TemplateInstance list(List<io.halkyon.model.Service> services);
-
+                public static native TemplateInstance options(List<io.halkyon.model.Service> services);
                 public static native TemplateInstance item(io.halkyon.model.Service service);
 
                 public static native TemplateInstance form();

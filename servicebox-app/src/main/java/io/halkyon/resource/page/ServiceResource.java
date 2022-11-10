@@ -52,6 +52,14 @@ public class ServiceResource {
         return showList(io.halkyon.model.Service.listAll()).data("all", true);
     }
 
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/options")
+    public TemplateInstance listOptions() {
+        return Templates.Services.options(Service.listAll());
+    }
+
     private TemplateInstance showList(List<Service> services) {
         return Templates.Services.list(services).data("items", io.halkyon.model.Service.count());
     }

@@ -9,9 +9,13 @@
 	  	    <label class="control-label col-sm-2" for="name">Name</label>
 	  		<input class="form-control" type="search" name="name" id="query" placeholder="Enter claim name ...">
 	  	</div>
-	  	<div class="form-group pt-3">
+	  	<div class="form-group pt-3"
+	  	     hx-get="/services/options"
+	  	     hx-trigger="load"
+	  	     hx-target="#services-to-select"
+	  	     hx-swap="innerHTML">
 	  	    <label class="control-label col-sm-2" for="name">Service requested</label>
-	  		<input class="form-control" type="search" name="servicerequested" id="query" placeholder="Enter service requested ...">
+	  		<select id="services-to-select" class="form-control" name="servicerequested" placeholder="Select the service"></select>
 	  	</div>
         <div class="form-group pt-3">
            <div class="col-sm-offset-2 col-sm-5">
