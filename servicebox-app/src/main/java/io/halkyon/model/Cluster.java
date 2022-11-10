@@ -3,10 +3,7 @@ package io.halkyon.model;
 import java.sql.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
@@ -17,8 +14,7 @@ import io.quarkus.panache.common.Sort;
 public class Cluster extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "clSeq", sequenceName = "cl_id_seq", allocationSize = 1, initialValue = 5)
-    @GeneratedValue(generator = "clSeq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @FormParam

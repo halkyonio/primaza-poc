@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
@@ -23,8 +17,7 @@ import io.quarkus.panache.common.Sort;
 public class Claim extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "claimSeq", sequenceName = "claim_id_seq", allocationSize = 1, initialValue = 7)
-    @GeneratedValue(generator = "claimSeq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @FormParam
