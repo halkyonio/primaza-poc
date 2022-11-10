@@ -1,14 +1,13 @@
 package io.halkyon.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
-import io.quarkus.security.credential.Credential;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
@@ -41,10 +40,6 @@ public class Service extends PanacheEntityBase {
 
     @FormParam
     public Date created;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
-    public List<Credential> credentials;
 
     public static Service findByName(String name) {
         return find("name", name).firstResult();
