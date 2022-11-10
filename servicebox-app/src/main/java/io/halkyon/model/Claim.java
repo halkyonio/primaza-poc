@@ -75,7 +75,7 @@ public class Claim extends PanacheEntityBase {
     }
 
     private static void addIfNotNull(Map<String, Object> map, String key, String value) {
-        if (value != null) {
+        if (!value.isEmpty()) {
             map.put(key, value);
         }
     }

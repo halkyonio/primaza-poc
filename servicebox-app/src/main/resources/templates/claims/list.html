@@ -38,10 +38,8 @@
               </tr>
             </thead>
             <tbody id="claim-list">
-              {#for claim in claims}
-                  <!-- Include the HTML template rendering the claim item -->
-                  {#include claims/item.html claim=claim /}
-              {/for}
+               <!-- Include the HTML table template to display the claims -->
+               {#include claims/table.html /}
             </tbody>
         </table>
     </div>
