@@ -4,7 +4,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 import java.sql.Date;
 import java.util.List;
