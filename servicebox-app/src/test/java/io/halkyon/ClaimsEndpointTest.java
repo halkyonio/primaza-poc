@@ -13,10 +13,14 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.quarkus.test.junit.QuarkusTest;
+
+import java.util.regex.Matcher;
 
 @QuarkusTest
 public class ClaimsEndpointTest {
@@ -36,6 +40,13 @@ public class ClaimsEndpointTest {
     }
 
     @Test
+    public void testQueryClaimBody(){
+         RequestSpecification httpRequest = RestAssured.given().header("HX-Request","true").queryParam("name","mysql-demo");
+         Response response = httpRequest.get("/claims/filter");
+         ResponseBody body = response.getBody();
+         MatcherAssert.assertThat(body,Matchers.notNullValue());
+    }
+    @Test
     public void testQueryUsingNameToGetClaims(){
         given().header("HX-Request","true")
                .queryParam("name","mysql-demo")
@@ -43,12 +54,6 @@ public class ClaimsEndpointTest {
                  .get("/claims/filter")
                .then()
                  .body(containsString("<td>mysql-demo</td>"));
-
-         /*RequestSpecification httpRequest = RestAssured.given().header("HX-Request","true").queryParam("name","mysql-demo");
-         Response response = httpRequest.get("/claims/filter");
-         ResponseBody body = response.getBody();
-         System.out.println("Response Body is: " + body.asString());
-         */
     }
 
     @Test
