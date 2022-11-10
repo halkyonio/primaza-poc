@@ -12,9 +12,6 @@ import java.util.List;
 @QuarkusTest
 public class ClaimsJPATest {
 
-    public class ClaimRepository implements PanacheRepository<Claim> {
-    }
-
     @Test
     public void testQueryByName() {
         // when
