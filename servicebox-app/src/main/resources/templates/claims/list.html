@@ -6,16 +6,16 @@
       <a href="/claims/new" class="btn btn-info active" role="button" aria-pressed="true">New claim</a>
 	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-list" hx-swap="innerHTML">
 	  	<div class="form-group pt-3">
-	  	    <label class="control-label col-sm-2" for="name">Name</label>
-	  		<input class="form-control" type="search" name="name" id="query" placeholder="Enter claim name ...">
+	  	    <label class="control-label col-sm-2" for="claim_search_by_name">Name</label>
+	  		<input id="claim_search_by_name" class="form-control" type="search" name="name" id="query" placeholder="Enter claim name ...">
 	  	</div>
-	  	<div class="form-group pt-3"
-	  	     hx-get="/services/options"
-	  	     hx-trigger="load"
-	  	     hx-target="#services-to-select"
-	  	     hx-swap="innerHTML">
-	  	    <label class="control-label col-sm-2" for="name">Service requested</label>
-	  		<select id="services-to-select" class="form-control" name="servicerequested" placeholder="Select the service"></select>
+	  	<div class="form-group pt-3">
+	  	    <label class="control-label col-sm-2" for="claim_search_by_service">Service requested</label>
+	  		<select id="claim_search_by_service" class="form-control" name="servicerequested" placeholder="Select the service">
+                {#for service in services}
+                <option>{service.name}-{service.version}</option>
+                {/for}
+            </select>
 	  	</div>
         <div class="form-group pt-3">
            <div class="col-sm-offset-2 col-sm-5">

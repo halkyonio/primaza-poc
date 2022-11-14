@@ -13,6 +13,7 @@ import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Claim;
+import io.halkyon.model.Service;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimValidator;
 import io.halkyon.services.ClaimingJobService;
@@ -57,7 +58,9 @@ public class ClaimResource {
     }
 
     private TemplateInstance showList(List<Claim> claims) {
-        return Templates.Claims.list(claims).data("items", io.halkyon.model.Claim.count());
+        return Templates.Claims.list(claims)
+                .data("services", Service.listAll())
+                .data("items", io.halkyon.model.Claim.count());
     }
 
     @GET
