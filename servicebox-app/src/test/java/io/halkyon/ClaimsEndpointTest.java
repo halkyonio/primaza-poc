@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createClaim;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -48,22 +49,23 @@ public class ClaimsEndpointTest {
     }
     @Test
     public void testQueryUsingNameToGetClaims(){
+        final String claimName = "testQueryUsingNameToGetClaims";
+        createClaim(claimName, "Postgresql-5509");
         given().header("HX-Request","true")
-               .queryParam("name","mysql-demo")
+               .queryParam("name",claimName)
                .when()
                  .get("/claims/filter")
                .then()
-                 .body(containsString("<td>mysql-demo</td>"));
+                 .body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
     public void testQueryUsingServiceRequestedToGetClaims(){
-        given().header("HX-Request","true")
-               .queryParam("servicerequested","mysql-8.0.3")
-               .when()
-                 .get("/claims/filter")
-               .then()
-                 .body(containsString("<td>mysql-demo</td>"));
+        final String claimName = "testQueryUsingServiceRequestedToGetClaims";
+        createClaim(claimName, "Postgresql-5509");
+        given().queryParam("servicerequested","Postgresql-5509")
+               .when().get("/claims/filter")
+               .then().body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
@@ -82,33 +84,27 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testClaimEntity() {
-        final String path="/claims";
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"Postgresql-testClaimEntity\", \"serviceRequested\": \"Postgresql-5509\"}")
-                .when().post("/claims")
-                .then()
-                .statusCode(201);
+        final String claimName = "testClaimEntity";
+        createClaim(claimName, "Postgresql-5509");
 
         Claim claim = given()
-                .when().get("/claims/name/Postgresql-testClaimEntity")
+                .when().get("/claims/name/" + claimName)
                 .then()
                 .statusCode(200)
                 .extract().as(Claim.class);
 
         //Delete the 'Postgresql':
         given()
-                .when().delete(path + "/" + claim.id)
+                .when().delete("/claims/" + claim.id)
                 .then()
                 .statusCode(204);
 
         //List all, 'Postgresql' should be missing now:
         given()
-                .when().get(path)
+                .when().get("/claims")
                 .then()
                 .statusCode(200)
-                .body(not(containsString("Postgresql-testClaimEntity")));
+                .body(not(containsString(claimName)));
     }
 
 }

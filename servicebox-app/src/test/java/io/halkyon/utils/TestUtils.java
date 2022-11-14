@@ -17,6 +17,16 @@ public final class TestUtils {
                         + "\"version\": \"" + serviceVersion + "\", "
                         + "\"endpoint\": \"tcp:5672\", "
                         + "\"deployed\": \"" + deployed + "\" }")
-                .when().post("/services");
+                .when().post("/services")
+                .then().statusCode(201);
+    }
+
+    public static void createClaim(String claimName, String serviceRequested) {
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .body("{\"name\": \"" + claimName + "\", \"serviceRequested\": \"" + serviceRequested + "\"}")
+                .when().post("/claims")
+                .then().statusCode(201);
     }
 }

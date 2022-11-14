@@ -3,6 +3,7 @@ package io.halkyon.model;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,7 @@ public class Claim extends PanacheEntityBase {
 
     private static void addIfNotNull(Map<String, Object> map, String key, String value) {
         if (value != null && !value.isEmpty()) {
-            map.put(key, "%" + value + "%");
+            map.put(key, "%" + value.toLowerCase(Locale.ROOT) + "%");
         }
     }
 }
