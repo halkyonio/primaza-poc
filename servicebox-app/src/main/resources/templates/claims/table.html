@@ -1,3 +1,25 @@
-{#for claim in claims}
-  {#include claims/item.html claim=claim /}
-{/for}
+<div class="container table-responsive">
+  <table class="table">
+    <thead>
+    <tr>
+      <th aria-valuetext="left">Name</th>
+      <th aria-valuetext="left">Description</th>
+      <th aria-valuetext="left">Owner</th>
+      <th aria-valuetext="left">Service requested</th>
+      <th aria-valuetext="left">Status</th>
+      <th aria-valuetext="left">Created</th>
+    </tr>
+    </thead>
+    <tbody>
+    {#for claim in claims}
+    {#include claims/item.html claim=claim /}
+    {/for}
+    </tbody>
+  </table>
+</div>
+<footer class="footer">
+  <id class="container">
+    <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+  </id>
+</footer>

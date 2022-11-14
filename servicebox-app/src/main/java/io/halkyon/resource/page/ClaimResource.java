@@ -48,9 +48,11 @@ public class ClaimResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
-    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested, @HeaderParam("HX-Request") boolean hxRequest) {
+    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
         List<Claim> claims = Claim.getClaims(name, serviceRequested);
-        return Response.ok(Templates.Claims.table(claims)).build();
+        return Response.ok(Templates.Claims.table(claims)
+                .data("items", claims.size()))
+                .build();
     }
 
     private TemplateInstance showList(List<Claim> claims) {
