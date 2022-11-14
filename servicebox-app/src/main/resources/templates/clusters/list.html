@@ -2,9 +2,8 @@
 {#include base}
   {#title}Clusters{/title}
   {#body}
-    <div class="container">
-      <div class="btn btn-primary"><a href="/clusters/new" class="text-white">New cluster</a></div>
-    </div>
+  <div class="container pt-4">
+    <a href="/clusters/new" class="btn btn-info active" role="button" aria-pressed="true">New cluster</a>
     <hr>
     <div class="table-responsive">
         <table class="table">
@@ -23,13 +22,14 @@
             </tbody>
         </table>
     </div>
-    <footer class="footer">
-    <span>
+    <div class="container">
       <!-- Showing the number of clusters. Returned by the template key: items of ClusterResource -->
       <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-    </span>
-    </footer>
+    </div>
     <hr>
-    <a href="/">Home</a>
+    <div class="container">
+       <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
+    </div>
+  </div>
   {/body}
 {/include}

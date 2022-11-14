@@ -24,11 +24,15 @@
            </div>
          </div>
 	  </form>
-      </div>
+    </div>
     <hr>
     <div id="claim-table">
         <!-- Include the HTML table template to display the claims -->
         {#include claims/table.html /}
+    </div>
+    <div class="container">
+      <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
+      <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
     </div>
     <hr>
     <div class="container">
