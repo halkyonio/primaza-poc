@@ -52,8 +52,7 @@ public class ClaimResource {
         if (hxRequest) {
             return Templates.Claims.table(claims);
         } else {
-            // return showList(Claim.getClaims(name, serviceRequested)).data("all",false);
-            return null;
+            return Response.ok(Templates.Claims.table(claims)).build();
         }
     }
 
