@@ -6,7 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
@@ -66,17 +72,17 @@ public class Claim extends PanacheEntityBase {
         }
 
         String query = parameters.entrySet().stream()
-                .map( entry -> entry.getKey() + "=:" + entry.getKey() )
-                .collect( Collectors.joining(" or ") );
+                .map( entry -> "LOWER(" + entry.getKey() + ") " + "like :" + entry.getKey() )
+                .collect( Collectors.joining(" AND ") );
 
         // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not, etc
         // String query = "name like ?1 or servicerequested = ?2";
-        return list(query, parameters);
+        return Claim.list(query, parameters);
     }
 
     private static void addIfNotNull(Map<String, Object> map, String key, String value) {
         if (value != null && !value.isEmpty()) {
-            map.put(key, value);
+            map.put(key, "%" + value + "%");
         }
     }
 }
