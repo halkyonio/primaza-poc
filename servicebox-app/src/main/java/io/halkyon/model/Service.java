@@ -7,6 +7,7 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
@@ -23,8 +24,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class Service extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "svcSeq", sequenceName = "svc_id_seq", allocationSize = 1, initialValue = 5)
-    @GeneratedValue(generator = "svcSeq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @FormParam

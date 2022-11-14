@@ -5,13 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +13,7 @@ import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Claim;
+import io.halkyon.model.Service;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimValidator;
 import io.halkyon.services.ClaimingJobService;
@@ -50,8 +45,20 @@ public class ClaimResource {
         return showList(Claim.listAll()).data("all", true);
     }
 
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/filter")
+    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
+        List<Claim> claims = Claim.getClaims(name, serviceRequested);
+        return Response.ok(Templates.Claims.table(claims)
+                .data("items", claims.size()))
+                .build();
+    }
+
     private TemplateInstance showList(List<Claim> claims) {
-        return Templates.Claims.list(claims).data("items", io.halkyon.model.Claim.count());
+        return Templates.Claims.list(claims)
+                .data("services", Service.listAll())
+                .data("items", io.halkyon.model.Claim.count());
     }
 
     @GET

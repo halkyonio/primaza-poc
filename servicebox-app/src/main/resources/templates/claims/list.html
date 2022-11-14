@@ -2,37 +2,37 @@
 {#include base}
   {#title}Claim{/title}
   {#body}
+    <div class="container pt-4">
+      <a href="/claims/new" class="btn btn-info active" role="button" aria-pressed="true">New claim</a>
+	  <form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-table" hx-swap="innerHTML">
+	  	<div class="form-group pt-3">
+	  	    <label class="control-label col-sm-2" for="claim_search_by_name">Name</label>
+	  		<input id="claim_search_by_name" class="form-control" type="search" name="name" id="query" placeholder="Enter claim name ...">
+	  	</div>
+	  	<div class="form-group pt-3">
+	  	    <label class="control-label col-sm-2" for="claim_search_by_service">Service requested</label>
+	  		<select id="claim_search_by_service" class="form-control" name="servicerequested" placeholder="Select the service">
+                <option selected value="">Any</option>
+                {#for service in services}
+                <option>{service.name}-{service.version}</option>
+                {/for}
+            </select>
+	  	</div>
+        <div class="form-group pt-3">
+           <div class="col-sm-offset-2 col-sm-5">
+             <button id="claim-button" type="submit" class="btn btn-primary">Search claims!</button>
+           </div>
+         </div>
+	  </form>
+      </div>
+    <hr>
+    <div id="claim-table">
+        <!-- Include the HTML table template to display the claims -->
+        {#include claims/table.html /}
+    </div>
+    <hr>
     <div class="container">
-      <div class="btn btn-primary"><a href="/claims/new" class="text-white">New claim</a></div>
+       <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
     </div>
-    <hr>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-              <tr>
-                  <th aria-valuetext="left">Name</th>
-                  <th aria-valuetext="left">Description</th>
-                  <th aria-valuetext="left">Owner</th>
-                  <th aria-valuetext="left">Service requested</th>
-                  <th aria-valuetext="left">Status</th>
-                  <th aria-valuetext="left">Created</th>
-              </tr>
-            </thead>
-            <tbody id="claim-list">
-              {#for claim in claims}
-                  <!-- Include the HTML template rendering the claim item -->
-                  {#include claims/item.html claim=claim /}
-              {/for}
-            </tbody>
-        </table>
-    </div>
-    <footer class="footer">
-    <span>
-      <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
-      <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-    </span>
-    </footer>
-    <hr>
-    <a href="/">Home</a>
   {/body}
 {/include}

@@ -1,15 +1,18 @@
 package io.halkyon.model;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
@@ -20,8 +23,7 @@ import io.quarkus.panache.common.Sort;
 public class Claim extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "claimSeq", sequenceName = "claim_id_seq", allocationSize = 1, initialValue = 7)
-    @GeneratedValue(generator = "claimSeq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @FormParam
@@ -58,5 +60,29 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> listAll() {
         return findAll(Sort.ascending("name")).list();
+    }
+
+    public static List<Claim> getClaims(String name, String serviceRequested) {
+        Map<String, Object> parameters = new HashMap<>();
+        addIfNotNull(parameters, "name", name );
+        addIfNotNull(parameters, "servicerequested", serviceRequested);
+
+        if ( parameters.isEmpty() ) {
+            return listAll();
+        }
+
+        String query = parameters.entrySet().stream()
+                .map( entry -> "LOWER(" + entry.getKey() + ") " + "like :" + entry.getKey() )
+                .collect( Collectors.joining(" AND ") );
+
+        // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not, etc
+        // String query = "name like ?1 or servicerequested = ?2";
+        return Claim.list(query, parameters);
+    }
+
+    private static void addIfNotNull(Map<String, Object> map, String key, String value) {
+        if (value != null && !value.isEmpty()) {
+            map.put(key, "%" + value + "%");
+        }
     }
 }

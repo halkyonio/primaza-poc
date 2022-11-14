@@ -3,14 +3,24 @@ package io.halkyon;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
 import javax.ws.rs.core.MediaType;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
+import io.restassured.specification.RequestSpecification;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.quarkus.test.junit.QuarkusTest;
+
+import java.util.regex.Matcher;
 
 @QuarkusTest
 public class ClaimsEndpointTest {
@@ -27,6 +37,33 @@ public class ClaimsEndpointTest {
                 .body(containsString("Oracle"))
                 .body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
+    }
+
+    @Test
+    public void testQueryClaimBody(){
+         RequestSpecification httpRequest = RestAssured.given().header("HX-Request","true").queryParam("name","mysql-demo");
+         Response response = httpRequest.get("/claims/filter");
+         ResponseBody body = response.getBody();
+         MatcherAssert.assertThat(body,Matchers.notNullValue());
+    }
+    @Test
+    public void testQueryUsingNameToGetClaims(){
+        given().header("HX-Request","true")
+               .queryParam("name","mysql-demo")
+               .when()
+                 .get("/claims/filter")
+               .then()
+                 .body(containsString("<td>mysql-demo</td>"));
+    }
+
+    @Test
+    public void testQueryUsingServiceRequestedToGetClaims(){
+        given().header("HX-Request","true")
+               .queryParam("servicerequested","mysql-8.0.3")
+               .when()
+                 .get("/claims/filter")
+               .then()
+                 .body(containsString("<td>mysql-demo</td>"));
     }
 
     @Test
