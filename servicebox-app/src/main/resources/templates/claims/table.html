@@ -12,14 +12,12 @@
     </thead>
     <tbody>
     {#for claim in claims}
-    {#include claims/item.html claim=claim /}
+      {#include claims/item.html claim=claim /}
     {/for}
     </tbody>
   </table>
 </div>
-<footer class="footer">
-  <id class="container">
-    <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
-    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-  </id>
-</footer>
+<div class="container">
+  <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
+  <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+</div>
