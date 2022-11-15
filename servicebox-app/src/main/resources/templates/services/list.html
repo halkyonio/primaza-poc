@@ -23,14 +23,10 @@
           </tbody>
       </table>
     </div>
-    <div class="container">
-      <!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
-      <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-    </div>
+    <!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
     <hr>
-    <div class="container">
-       <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
-    </div>
+    <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
   </div>
   {/body}
 {/include}
