@@ -1,6 +1,7 @@
 package io.halkyon;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsNot.not;
 
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Cluster;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 
 @QuarkusTest
 public class ClustersEndpointTest {
@@ -31,8 +34,10 @@ public class ClustersEndpointTest {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         given()
                 .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"ocp4.11-node-2\", \"environment\": \"TEST\", \"url\": \"https://10.0.2.12:6443\" }")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("name", "ocp4.11-node-2")
+                .multiPart("environment", "TEST")
+                .multiPart("url", "https://10.0.2.12:6443")
                 .when().post("/clusters")
                 .then()
                 .statusCode(201);
