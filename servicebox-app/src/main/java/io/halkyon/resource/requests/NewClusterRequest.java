@@ -1,7 +1,6 @@
 package io.halkyon.resource.requests;
 
 import java.io.InputStream;
-import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 

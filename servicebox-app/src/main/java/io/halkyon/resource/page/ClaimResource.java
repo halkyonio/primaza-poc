@@ -16,17 +16,17 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimValidator;
-import io.halkyon.services.ClaimingJobService;
+import io.halkyon.services.ClaimingServiceJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/claims")
 public class ClaimResource {
     private final ClaimValidator claimValidator;
-    private final ClaimingJobService claimingService;
+    private final ClaimingServiceJob claimingService;
 
     @Inject
-    public ClaimResource(ClaimValidator claimValidator, ClaimingJobService claimingService){
+    public ClaimResource(ClaimValidator claimValidator, ClaimingServiceJob claimingService){
         this.claimValidator = claimValidator;
         this.claimingService = claimingService;
     }

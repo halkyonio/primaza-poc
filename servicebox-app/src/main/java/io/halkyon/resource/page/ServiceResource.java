@@ -2,10 +2,12 @@ package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Service;
+import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 import org.jboss.resteasy.annotations.Form;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,6 +23,10 @@ import java.util.List;
 
 @Path("/services")
 public class ServiceResource {
+
+    @Inject
+    ServiceDiscoveryJob serviceDiscoveryJob;
+
     @GET
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
@@ -39,6 +45,7 @@ public class ServiceResource {
             service.created = new Date(System.currentTimeMillis());
         }
 
+        serviceDiscoveryJob.checkService(service);
         service.persist();
         response.withSuccessMessage(service.id);
         // Return as HTML the template rendering the item for HTMX

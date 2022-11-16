@@ -25,18 +25,18 @@ import io.quarkus.scheduler.Scheduled;
  * After a number of attempts have been made to find a suitable service, the claim status will change to "error".
  */
 @ApplicationScoped
-public class ClaimingJobService {
+public class ClaimingServiceJob {
 
-    @ConfigProperty(name = "servicebox.claiming-service.max-attempts")
+    @ConfigProperty(name = "servicebox.claiming-service-job.max-attempts")
     int maxAttempts;
 
     /**
-     * This method will be executed at every `${servicebox.claiming-service.poll-every}`.
+     * This method will be executed at every `${servicebox.claiming-service-job.poll-every}`.
      * First, it will collect the list of all available services, and then will loop over the new or pending claims to link
      * the service if the criteria matches.
      */
     @Transactional
-    @Scheduled(every="${servicebox.claiming-service.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every="${servicebox.claiming-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
         Map<String, Service> allServices = listAllAvailableServices();
         Claim.find("status in :statuses", Collections.singletonMap("statuses",
