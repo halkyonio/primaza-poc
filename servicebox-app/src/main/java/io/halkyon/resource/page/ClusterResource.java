@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -22,10 +23,14 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.NewClusterRequest;
+import io.halkyon.services.ServiceDiscoveryJob;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/clusters")
 public class ClusterResource {
+
+    @Inject
+    ServiceDiscoveryJob serviceDiscoveryJob;
 
     @GET
     @Path("/new")
@@ -64,6 +69,7 @@ public class ClusterResource {
             cluster.created = new Date(System.currentTimeMillis());
         }
 
+        serviceDiscoveryJob.checkCluster(cluster);
         cluster.persist();
         if (errors.size() > 0) {
             for(String error : errors) {

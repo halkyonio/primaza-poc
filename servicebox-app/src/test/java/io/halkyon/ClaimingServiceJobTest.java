@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -15,17 +16,17 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.ClaimingJobService;
+import io.halkyon.services.ClaimingServiceJob;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class ClaimingJobServiceTest {
+public class ClaimingServiceJobTest {
 
     @Inject
-    ClaimingJobService job;
+    ClaimingServiceJob job;
 
-    @ConfigProperty(name = "servicebox.claiming-service.max-attempts")
+    @ConfigProperty(name = "servicebox.claiming-service-job.max-attempts")
     int maxAttempts;
 
     @Inject
@@ -34,10 +35,10 @@ public class ClaimingJobServiceTest {
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
         pauseScheduler();
-        Claim postgresClaim = createClaim("Postgresql", "postgresql-8");
-        Claim mySqlClaim = createClaim("MySQL", "mysql-7.5");
-        createService("postgresql", "8", true);
-        createService("MySQL", "7.5", false);
+        Claim postgresClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
+        Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
+        createService("postgresqlClaimingServiceJobTest", "8", true);
+        createService("MySQLClaimingServiceJobTest", "7.5", false);
 
         // When we run the job once:
         // Then:
@@ -101,17 +102,5 @@ public class ClaimingJobServiceTest {
     private void pauseScheduler() {
         scheduler.pause();
         await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
-    }
-
-    private Claim createClaim(String name, String serviceRequested) {
-        return given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body(String.format("{\"name\": \"%s\", \"serviceRequested\": \"%s\", \"status\": \"new\"}", name, serviceRequested))
-                .when().post("/claims")
-                .then()
-                .statusCode(201)
-                .extract()
-                .as(Claim.class);
     }
 }

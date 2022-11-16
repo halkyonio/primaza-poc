@@ -57,6 +57,8 @@ jobs:
     name: Verify in Kubernetes
     runs-on: ubuntu-latest
     needs: build
+    env:
+      SERVICE_BOX_KUBERNETES_NAMESPACE: sb
     strategy:
       matrix:
         java: [ 17 ]
@@ -78,13 +80,13 @@ jobs:
       - name: Start Helm Repository (ChartMuseum)
         run: docker run --rm -u 0 -it -d -p 8080:8080 -e DEBUG=1 -e STORAGE=local -e STORAGE_LOCAL_ROOTDIR=/charts -v $(pwd)/charts:/charts chartmuseum/chartmuseum:latest
 
-      - name: Verify ServiceBox
+      - id: setup-servicebox-step
+        name: Start ServiceBox
         run: |
-          K8S_NAMESPACE=sb
+          KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
           KIND_REGISTRY_GROUP=local
           VERSION=latest
-          kubectl create namespace $K8S_NAMESPACE
-          kubectl config set-context --current --namespace=$K8S_NAMESPACE
+          kubectl create namespace $KUBERNETES_NAMESPACE
 
           mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
@@ -100,22 +102,69 @@ jobs:
           helm repo add local http://localhost:8080
 
           # And install application from the Helm repository
-          helm install --devel servicebox-app local/servicebox-app -n $K8S_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/servicebox-app:$VERSION
-          kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=servicebox-app -n $K8S_NAMESPACE
+          helm install --devel servicebox-app local/servicebox-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/servicebox-app:$VERSION
+          kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE
 
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $K8S_NAMESPACE -o name)
-          if [ $(kubectl exec -i $POD_NAME --container servicebox-app -n $K8S_NAMESPACE -- sh -c "curl -s -i localhost:8080/home") = *"500 Internal Server Error"* ]
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE -o name)
+          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $KUBERNETES_NAMESPACE -- sh -c "curl -s -i localhost:8080/home")
+          if [ "$RESULT" = *"500 Internal Server Error"* ]
           then
-            echo Service Box is not working
-            kubectl describe $POD_NAME
-            kubectl logs $POD_NAME
+            echo "Service Box is not working"
             exit 1
           fi
+      - name: Register Kind cluster in Service Box
+        run: |
+          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
+          KIND_URL=https://kubernetes.default.svc
+          # To connect to Kind from outside a pod:
+          # KIND_URL=$(kubectl config view -o jsonpath='{"Cluster name\tServer\n"}{range .clusters[*]}{.name}{"\t"}{.cluster.server}{"\n"}{end}' | grep kind-kind | sed "s/kind-kind//" | xargs)
+          kind get kubeconfig > /tmp/local-kind-kubeconfig
+          kubectl cp /tmp/local-kind-kubeconfig sb/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app
+          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+          if [ "$RESULT" = *"500 Internal Server Error"* ]
+          then
+            echo "Cluster failed to be saved in Service Box: $RESULT"
+            exit 1
+          fi
+          echo "Cluster installed in Service Box: $RESULT"
+      - name: Create Postgresql Service in Service Box
+        run: |
+          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
 
+          # First, we install Postgresql via Helm.
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm install postgresql bitnami/postgresql --version 11.9.1 --set auth.username=superman --set auth.password=superman
+          ## the service endpoint should be: "postgresql:5432"
+
+          # Next, we register the Postgresql service in Service Box
+          BODY="{\"name\": \"postgresql\", \"version\": \"11\", \"endpoint\": \"postgresql:5432\"}"
+          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/json' --data '$BODY' -s -i localhost:8080/services")
+          if [ "$RESULT" = *"500 Internal Server Error"* ]
+          then
+            echo "Service failed to be saved in Service Box: $RESULT"
+            exit 1
+          fi
+          echo "Service installed in Service Box: $RESULT"
+
+          SERVICE=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/services/name/postgresql")
+          if [ $(echo "$SERVICE" | jq -r '.deployed') = "true" ]
+          then
+            echo "ServiceBox didn't discovery the Postgresql service: $SERVICE"
+            exit 1
+          fi
+      - name: (Only if it failed) Log Service Box traces at failures
+        if: failure()
+        run: |
+          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
+          kubectl logs $POD_NAME -n $SERVICE_BOX_KUBERNETES_NAMESPACE
+          kubectl describe $POD_NAME -n $SERVICE_BOX_KUBERNETES_NAMESPACE
   push:
     name: Push Images to Quay.io
     runs-on: ubuntu-latest
-    needs: build
+    needs: [ build, verify-in-kubernetes ]
     strategy:
       matrix:
         java: [ 17 ]

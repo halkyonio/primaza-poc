@@ -10,12 +10,17 @@ import javax.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Cluster;
+import io.halkyon.services.KubernetesClientService;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
 public class ClustersEndpointTest {
+
+    @InjectMock
+    KubernetesClientService mockKubernetesClientService;
 
     @Test
     public void testAddCluster(){
