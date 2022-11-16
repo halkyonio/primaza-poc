@@ -3,7 +3,7 @@ package io.halkyon.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.halkyon.model.Cluster;
+import io.halkyon.resource.requests.NewClusterRequest;
 
 public final class ClusterValidator {
 
@@ -11,7 +11,7 @@ public final class ClusterValidator {
 
     }
 
-    public static List<String> validateCluster(Cluster cluster) {
+    public static List<String> validateCluster(NewClusterRequest cluster) {
         List<String> errors = new ArrayList<>();
 
         if (cluster == null) {

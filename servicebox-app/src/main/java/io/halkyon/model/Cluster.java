@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import org.jboss.resteasy.annotations.jaxrs.FormParam;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 
@@ -16,20 +14,11 @@ public class Cluster extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-
-    @FormParam
     public String name;
-
-    @FormParam
     public String url;
-
-    @FormParam
     public String environment;
-
-    @FormParam
+    @Lob
     public String kubeConfig;
-
-    @FormParam
     public Date created;
 
     public static Cluster findByName(String name) {

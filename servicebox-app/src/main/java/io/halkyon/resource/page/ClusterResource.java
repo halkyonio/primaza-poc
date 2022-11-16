@@ -2,6 +2,7 @@ package io.halkyon.resource.page;
 
 import static io.halkyon.services.ClusterValidator.validateCluster;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
@@ -16,10 +17,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.annotations.Form;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
+import io.halkyon.resource.requests.NewClusterRequest;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/clusters")
@@ -43,10 +45,19 @@ public class ClusterResource {
 
     @POST
     @Transactional
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@Form Cluster cluster, @HeaderParam("HX-Request") boolean hxRequest) {
-        List<String> errors = validateCluster(cluster);
+    public Response add(@MultipartForm NewClusterRequest clusterRequest, @HeaderParam("HX-Request") boolean hxRequest)
+            throws IOException {
+        List<String> errors = validateCluster(clusterRequest);
+        Cluster cluster = new Cluster();
+        cluster.name = clusterRequest.name;
+        cluster.url = clusterRequest.url;
+        cluster.environment = clusterRequest.environment;
+        if (clusterRequest.kubeConfig != null) {
+            cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+        }
+
         StringBuffer response = new StringBuffer();
 
         if (cluster.created == null) {
