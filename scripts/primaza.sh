@@ -32,8 +32,8 @@ pe "k wait -n ingress \
   --selector=app.kubernetes.io/component=controller \
   --timeout=120s"
 
-pe "k create namespace $NAMESPACE"
-pe "k config set-context --current --namespace=$NAMESPACE"
+pe "k create namespace ${NAMESPACE}"
+pe "k config set-context --current --namespace=${NAMESPACE}"
 
 pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
    -Dquarkus.container-image.push=true \
@@ -48,31 +48,31 @@ pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/servicebox-app"
 pe "helm install --devel servicebox-app \
   --dependency-update \
   ./target/helm/kubernetes/servicebox-app \
-  -n $NAMESPACE \
+  -n ${NAMESPACE} \
   --set app.image=localhost:5000/${REGISTRY_GROUP}/servicebox-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
-pe "k wait -n $NAMESPACE \
+pe "k wait -n ${NAMESPACE} \
   --for=condition=ready pod \
   -l app.kubernetes.io/name=servicebox-app \
   --timeout=7m"
 
 p "waiting till Primaza Application is running"
-POD_NAME=$(k get pod -l app.kubernetes.io/name=servicebox-app -n $NAMESPACE -o name)
-while [[ $(kubectl exec -i $POD_NAME -c servicebox-app -n $NAMESPACE -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+POD_NAME=$(k get pod -l app.kubernetes.io/name=servicebox-app -n ${NAMESPACE} -o name)
+while [[ $(kubectl exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
   do sleep 1
 done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
 kind get kubeconfig > local-kind-kubeconfig
-pe "kubectl cp local-kind-kubeconfig sb/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app -n $NAMESPACE"
+pe "kubectl cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
 
-RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 if [ "$RESULT" = *"500 Internal Server Error"* ]
 then
     p "Cluster failed to be saved in Service Box: $RESULT"
-    pe "kubectl describe $POD_NAME -n $NAMESPACE"
-    pe "kubectl logs $POD_NAME -n $NAMESPACE"
+    pe "kubectl describe $POD_NAME -n ${NAMESPACE}"
+    pe "kubectl logs $POD_NAME -n ${NAMESPACE}"
     exit 1
 fi
 p "Local k8s cluster registered: $RESULT"
