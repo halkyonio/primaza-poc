@@ -77,10 +77,10 @@ public class ServiceDiscoveryJob {
     private boolean isServiceRunningInCluster(Service service, Cluster cluster) {
         try {
             String[] parts = service.endpoint.split(Pattern.quote(":"));
-            String serviceName = parts[0];
+            String protocol = parts[0];
             String servicePort = parts[1];
 
-            return kubernetesClientService.isServiceRunningInCluster(cluster, serviceName, servicePort);
+            return kubernetesClientService.isServiceRunningInCluster(cluster, protocol, servicePort);
         } catch (Exception ex) {
             LOG.error("Error trying to discovery the service " + service.id + " in the registered clusters", ex);
         }

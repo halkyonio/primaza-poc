@@ -112,7 +112,7 @@ jobs:
           ## the service endpoint should be: "postgresql:5432"
 
           # Next, we register the Postgresql service in Service Box
-          BODY="{\"name\": \"postgresql\", \"version\": \"11\", \"endpoint\": \"postgresql:5432\"}"
+          BODY="{\"name\": \"postgresql\", \"version\": \"11\", \"endpoint\": \"tcp:5432\"}"
           RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/json' --data '$BODY' -s -i localhost:8080/services")
           if [ "$RESULT" = *"500 Internal Server Error"* ]
           then
