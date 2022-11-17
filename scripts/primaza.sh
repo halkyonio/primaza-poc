@@ -21,7 +21,7 @@ NO_WAIT=true
 
 p "Ingress host is: ${INGRESS_HOST}"
 
-cd {PROJECT_DIR}
+cd ${PROJECT_DIR}
 
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0
 k wait -n ingress \
