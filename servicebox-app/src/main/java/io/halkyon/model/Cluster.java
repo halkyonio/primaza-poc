@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.Type;
 
@@ -26,8 +27,11 @@ public class Cluster extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+    @NotBlank(message = "Name must not be empty")
     public String name;
+    @NotBlank(message = "URL must not be empty")
     public String url;
+    @NotBlank(message = "Environment must not be empty")
     public String environment;
     @Lob
     @Type(type = "org.hibernate.type.TextType")
