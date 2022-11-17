@@ -17,24 +17,18 @@ IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
 PROJECT_NAME=primaza-poc
 PROJECT_DIR=servicebox-app
-CLONING_PRIMAZA=${CLONING_PRIMAZA:=false}
 GITHUB_REPO_PRIMAZA=https://github.com/halkyonio/primaza-poc.git
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=40}
 NO_WAIT=true
 
-if [ "${CLONING_PRIMAZA}" = true ]; then
-  pe "rm -rf ${PROJECT_NAME}"
-  pe "git clone ${GITHUB_REPO_PRIMAZA} && cd ${PROJECT_NAME}"
-fi
-
 pushd ${PROJECT_DIR}
 
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest 0
+pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest 0"
 pe "k wait -n ingress \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
@@ -72,17 +66,17 @@ done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
-kind get kubeconfig > local-kind-kubeconfig
+pe "kind get kubeconfig > local-kind-kubeconfig"
 pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
 
 RESULT=$(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 if [ "$RESULT" = *"500 Internal Server Error"* ]
 then
     p "Cluster failed to be saved in Service Box: $RESULT"
-    pe "k describe $POD_NAME -n ${NAMESPACE}"
-    pe "k logs $POD_NAME -n ${NAMESPACE}"
+    k describe $POD_NAME -n ${NAMESPACE}
+    k logs $POD_NAME -n ${NAMESPACE}
     exit 1
 fi
-p "Local k8s cluster registered: $RESULT"
+note "Local k8s cluster registered: $RESULT"
 
 popd
