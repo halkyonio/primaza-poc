@@ -49,7 +49,7 @@ pe "helm install --devel servicebox-app \
   --dependency-update \
   ./target/helm/kubernetes/servicebox-app \
   -n $NAMESPACE \
-  --set app.image=localhost:5000/${REGISTRY_GROUP}/servicebox-app:$VERSION 2>&1 1>/dev/null"
+  --set app.image=localhost:5000/${REGISTRY_GROUP}/servicebox-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
 pe "k wait -n $NAMESPACE \
   --for=condition=ready pod \
