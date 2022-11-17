@@ -2,9 +2,12 @@ package io.halkyon.resource.page;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -15,19 +18,18 @@ import io.halkyon.Templates;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.ClaimValidator;
 import io.halkyon.services.ClaimingServiceJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/claims")
 public class ClaimResource {
-    private final ClaimValidator claimValidator;
+    private final Validator validator;
     private final ClaimingServiceJob claimingService;
 
     @Inject
-    public ClaimResource(ClaimValidator claimValidator, ClaimingServiceJob claimingService){
-        this.claimValidator = claimValidator;
+    public ClaimResource(Validator validator, ClaimingServiceJob claimingService){
+        this.validator = validator;
         this.claimingService = claimingService;
     }
 
@@ -74,7 +76,7 @@ public class ClaimResource {
     @Consumes("application/x-www-form-urlencoded")
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
-        List<String> errors = claimValidator.validateForm(claim);
+        Set<ConstraintViolation<Claim>> errors = validator.validate(claim);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claim");
 
         if (errors.size() > 0) {

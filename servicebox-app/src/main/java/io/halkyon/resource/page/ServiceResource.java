@@ -2,9 +2,12 @@ package io.halkyon.resource.page;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -27,6 +30,9 @@ import io.quarkus.qute.TemplateInstance;
 public class ServiceResource {
 
     @Inject
+    Validator validator;
+
+    @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
 
     @GET
@@ -41,15 +47,21 @@ public class ServiceResource {
     @Consumes("application/x-www-form-urlencoded")
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Service service, @HeaderParam("HX-Request") boolean hxRequest) {
+        Set<ConstraintViolation<Service>> errors = validator.validate(service);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/services");
 
-        if (service.created == null) {
-            service.created = new Date(System.currentTimeMillis());
+        if (errors.size() > 0) {
+            response.withErrors(errors);
+        } else {
+            if (service.created == null) {
+                service.created = new Date(System.currentTimeMillis());
+            }
+
+            serviceDiscoveryJob.checkService(service);
+            service.persist();
+            response.withSuccessMessage(service.id);
         }
 
-        serviceDiscoveryJob.checkService(service);
-        service.persist();
-        response.withSuccessMessage(service.id);
         // Return as HTML the template rendering the item for HTMX
         return response.build();
     }

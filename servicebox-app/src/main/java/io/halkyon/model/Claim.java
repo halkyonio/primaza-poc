@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
@@ -27,21 +28,12 @@ public class Claim extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
+    @NotBlank(message = "Name must not be empty")
     @FormParam
 	public String name;
+    @NotBlank(message = "Service Requested must not be empty")
     @FormParam
     public String serviceRequested;
-
-    public Claim() {}
-    public Claim(String name, String serviceRequested, String description, String status, String owner, Date created) {
-        this.name = name;
-        this.serviceRequested = serviceRequested;
-        this.description = description;
-        this.status = status;
-        this.owner = owner;
-        this.created = created;
-    }
-
     @FormParam
     public String description;
     @FormParam

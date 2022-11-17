@@ -3,8 +3,12 @@ package io.halkyon.resource.page;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -27,6 +31,10 @@ import io.quarkus.qute.TemplateInstance;
 
 @Path("/credentials")
 public class CredentialResource {
+
+    @Inject
+    Validator validator;
+
     @GET
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
@@ -41,32 +49,35 @@ public class CredentialResource {
     @Consumes("application/x-www-form-urlencoded")
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form NewCredentialRequest request, @HeaderParam("HX-Request") boolean hxRequest) {
+        Set<ConstraintViolation<NewCredentialRequest>> errors = validator.validate(request);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/credentials");
-        Credential credential = new Credential();
-        credential.name = request.name;
-        credential.username = request.username;
-        credential.password = request.password;
-        credential.service = Service.findById(request.serviceId);
-        credential.params = new ArrayList<>();
-        if (request.params != null) {
-            for (String param : request.params) {
-                String[] nameValue = param.split("=");
-                if (nameValue.length == 2) {
-                    CredentialParameter paramEntity = new CredentialParameter();
-                    paramEntity.credential = credential;
-                    paramEntity.paramName = nameValue[0];
-                    paramEntity.paramValue = nameValue[1];
-                    credential.params.add(paramEntity);
+        if (!errors.isEmpty()) {
+            response.withErrors(errors);
+        } else {
+            Credential credential = new Credential();
+            credential.name = request.name;
+            credential.username = request.username;
+            credential.password = request.password;
+            credential.service = Service.findById(request.serviceId);
+            credential.created = new Date(System.currentTimeMillis());
+            credential.params = new ArrayList<>();
+            if (request.params != null) {
+                for (String param : request.params) {
+                    String[] nameValue = param.split("=");
+                    if (nameValue.length == 2) {
+                        CredentialParameter paramEntity = new CredentialParameter();
+                        paramEntity.credential = credential;
+                        paramEntity.paramName = nameValue[0];
+                        paramEntity.paramValue = nameValue[1];
+                        credential.params.add(paramEntity);
+                    }
                 }
             }
+
+            credential.persist();
+            response.withSuccessMessage(credential.id);
         }
 
-        if (credential.created == null) {
-            credential.created = new Date(System.currentTimeMillis());
-        }
-
-        credential.persist();
-        response.withSuccessMessage(credential.id);
         // Return as HTML the template rendering the item for HTMX
         return response.build();
     }
