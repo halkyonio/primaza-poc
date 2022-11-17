@@ -15,6 +15,10 @@ IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
 PROJECT_DIR=servicebox-app
 
+# Parameters to play the demo
+TYPE_SPEED=50
+NO_WAIT=true
+
 p "Ingress host is: ${INGRESS_HOST}"
 
 cd {PROJECT_DIR}
