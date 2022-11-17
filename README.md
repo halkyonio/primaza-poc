@@ -12,7 +12,8 @@ Table of Contents
 
 * [Primaza project](#primaza-project)
   * [How to play/demo](#how-to-playdemo)
-  * [Running the application locally](#running-the-application-locally)
+    * [Using Primaza on a k8s cluster](#using-primaza-on-a-k8s-cluster)
+    * [Running the application locally](#running-the-application-locally)
   * [Usage](#usage)
     * [Usage via curl](#usage-via-curl)
 
@@ -53,7 +54,56 @@ Such services are defined as `deployed` and will be used by the matching job lik
 Whenever a secret is populated including the URL to access the backend service and credential, then the claim status will change from `Pending` to `Bind`. This can be verified using the 
 UI `http://localhost:8080/claims`.
 
-## Running the application locally
+### Using Primaza on a k8s cluster
+
+In order to use Primaza on kubernetes, it is needed first to setup a cluster (kind, minikube, etc) and to install an ingress controller like a docker container registry.
+To simplify this process, you can use the following bash script able to setup such environment using [kind]() and [helm]().
+
+```bash
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0"
+```
+**Remark**: The kubernetes's version can be changed if you replace `latest` with one of the version supported by kind `1.25, etc` 
+
+Create a namespace and set the context
+```bash
+kubectl create namespace primaza
+kubectl config set-context --current --namespace=primaza
+```
+
+Next, build the Quarkus application and provide additional parameters used to build/push the image to the docker registry and to generate a helm chart
+```bash
+mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
+    -Dquarkus.container-image.push=true    \
+    -Dquarkus.container-image.registry=kind-registry:5000    \
+    -Dquarkus.container-image.group=local    \
+    -Dquarkus.container-image.tag=latest    \
+    -Dquarkus.container-image.insecure=true    \
+    -Dquarkus.kubernetes.ingress.host=primaza.<VM_IP>.nip.io
+```
+**Remark**: Don't forget to define the `<VM_IP>`
+
+Push the image to the kind container
+```bash
+kind load docker-image kind-registry:5000/local/servicebox-app
+```
+When this is done, you can install the helm chart populated by Quarkus
+```bash
+helm install --devel servicebox-app \
+  --dependency-update \
+  ./target/helm/kubernetes/servicebox-app \
+  -n primaza \
+  --set app.image=localhost:5000/local/servicebox-app:latest
+```
+
+To play with the local k8s cluster, you will have to create a [cluster](https://primaza.<VM_IP>.nip.io/clusters) where you will import the `kubeconfig` file
+which is available using this command `kind get kubeconfig > local-kind-kubeconfig`
+
+If you prefer to use our bash script playing all the commands defined previously, execute this command:
+```bash
+VM_IP=<VM_IP> ./scripts/primaza.sh
+```
+
+### Running the application locally
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
