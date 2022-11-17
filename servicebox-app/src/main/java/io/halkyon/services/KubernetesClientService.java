@@ -1,8 +1,9 @@
 package io.halkyon.services;
 
+import static io.halkyon.utils.StringUtils.equalsIgnoreCase;
+
 import javax.enterprise.context.ApplicationScoped;
 
-import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.client.Config;
@@ -27,12 +28,14 @@ public class KubernetesClientService {
 
     }
 
-    public boolean isServiceRunningInCluster(Cluster cluster, String serviceName, String servicePort) {
+    public boolean isServiceRunningInCluster(Cluster cluster, String protocol, String servicePort) {
         ServiceList services = getClientForCluster(cluster).services().list();
         for (Service service : services.getItems()) {
-            if (service.getMetadata().getName().equals(serviceName)) {
-                return service.getSpec().getPorts().stream()
-                        .anyMatch(p -> String.valueOf(p.getPort()).equals(servicePort));
+            boolean found = service.getSpec().getPorts().stream()
+                    .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), protocol)
+                            && String.valueOf(p.getPort()).equals(servicePort));
+            if (found) {
+                return true;
             }
         }
 
