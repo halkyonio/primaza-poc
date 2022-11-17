@@ -1,11 +1,7 @@
 package io.halkyon.resource.page;
 
-import io.halkyon.Templates;
-import io.halkyon.model.Service;
-import io.halkyon.services.ServiceDiscoveryJob;
-import io.halkyon.utils.AcceptedResponseBuilder;
-import io.quarkus.qute.TemplateInstance;
-import org.jboss.resteasy.annotations.Form;
+import java.sql.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -18,8 +14,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.Date;
-import java.util.List;
+
+import org.jboss.resteasy.annotations.Form;
+
+import io.halkyon.Templates;
+import io.halkyon.model.Service;
+import io.halkyon.services.ServiceDiscoveryJob;
+import io.halkyon.utils.AcceptedResponseBuilder;
+import io.quarkus.qute.TemplateInstance;
 
 @Path("/services")
 public class ServiceResource {
@@ -70,5 +72,23 @@ public class ServiceResource {
     @Path("/name/{name}")
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
         return io.halkyon.model.Service.findByName(name);
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/discovered")
+    public TemplateInstance listDiscoveredServices() {
+        List<Service> discoveredServices = Service.findDeployedServices();
+        return Templates.Services.listDiscovered(discoveredServices).data("items", discoveredServices.size());
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/discovered/polling")
+    public TemplateInstance pollingDiscoveredServices() {
+        List<Service> discoveredServices = Service.findDeployedServices();
+        return Templates.Services.listDiscoveredTable(discoveredServices).data("items", discoveredServices.size());
     }
 }

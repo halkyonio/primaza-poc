@@ -73,4 +73,13 @@ public class HomeResourceTest {
         // Go back button
         page.assertContentContains("Home");
     }
+
+    @Test
+    public void testShouldGoToDeployedServicesPage() {
+        page.goTo("/");
+        page.clickOn("home-deployed-services-btn-id");
+        page.assertPathIs("/services/discovered");
+        // Go back button
+        page.assertContentContains("Home");
+    }
 }

@@ -22,11 +22,14 @@ import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.ClusterNameMatcher;
+import io.halkyon.utils.WebPageExtension;
 import io.quarkus.scheduler.Scheduler;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
+@QuarkusTestResource(WebPageExtension.class)
 public class ServiceDiscoveryJobTest {
 
     @InjectMock
@@ -37,6 +40,8 @@ public class ServiceDiscoveryJobTest {
 
     @Inject
     Scheduler scheduler;
+
+    WebPageExtension.PageManager page;
 
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
@@ -68,6 +73,7 @@ public class ServiceDiscoveryJobTest {
                 .statusCode(200)
                 .body("deployed", is(true))
                 .body("cluster.name", is(cluster.name));
+        thenServiceIsInTheDeployedServicePage(service.name);
     }
 
     @Test
@@ -92,6 +98,7 @@ public class ServiceDiscoveryJobTest {
                 .statusCode(200)
                 .body("deployed", is(true))
                 .body("cluster.name", is(cluster.name));
+        thenServiceIsInTheDeployedServicePage(serviceName);
     }
 
     @Test
@@ -115,6 +122,12 @@ public class ServiceDiscoveryJobTest {
                 .statusCode(200)
                 .body("deployed", is(true))
                 .body("cluster.name", is("dummy-cluster-3"));
+        thenServiceIsInTheDeployedServicePage(service.name);
+    }
+
+    private void thenServiceIsInTheDeployedServicePage(String expectedServiceName) {
+        page.goTo("/services/discovered");
+        page.assertContentContains(expectedServiceName);
     }
 
     private void configureMockServiceFor(String clusterName, String serviceName, String servicePort) {
