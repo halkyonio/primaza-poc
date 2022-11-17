@@ -18,15 +18,13 @@ INGRESS_HOST=primaza.${VM_IP}.nip.io
 PROJECT_DIR=servicebox-app
 
 # Parameters to play the demo
-TYPE_SPEED=50
+TYPE_SPEED=10
 NO_WAIT=true
-
-p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
-p "Ingress host is: ${INGRESS_HOST}"
 
 pushd ${PROJECT_DIR}
 
-p "Current dir is: ${pwd}"
+p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
+p "Ingress host is: ${INGRESS_HOST}"
 
 pe "curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0"
 pe "k wait -n ingress \
