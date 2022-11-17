@@ -66,7 +66,7 @@ done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
-kind get kubeconfig > local-kind-kubeconfig
+pe "kind get kubeconfig > local-kind-kubeconfig"
 pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
 
 RESULT=$(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
