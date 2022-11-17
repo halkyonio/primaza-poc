@@ -58,21 +58,21 @@ pe "k wait -n ${NAMESPACE} \
 
 p "waiting till Primaza Application is running"
 POD_NAME=$(k get pod -l app.kubernetes.io/name=servicebox-app -n ${NAMESPACE} -o name)
-while [[ $(kubectl exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+while [[ $(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
   do sleep 1
 done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
 kind get kubeconfig > local-kind-kubeconfig
-pe "kubectl cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
+pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
 
-RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+RESULT=$(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 if [ "$RESULT" = *"500 Internal Server Error"* ]
 then
     p "Cluster failed to be saved in Service Box: $RESULT"
-    pe "kubectl describe $POD_NAME -n ${NAMESPACE}"
-    pe "kubectl logs $POD_NAME -n ${NAMESPACE}"
+    pe "k describe $POD_NAME -n ${NAMESPACE}"
+    pe "k logs $POD_NAME -n ${NAMESPACE}"
     exit 1
 fi
 p "Local k8s cluster registered: $RESULT"
