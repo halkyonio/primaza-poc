@@ -49,7 +49,7 @@ public class Service extends PanacheEntityBase {
     @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
     public List<Credential> credentials;
 
-    @ManyToOne(cascade = ALL)
+    @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
 
@@ -64,5 +64,7 @@ public class Service extends PanacheEntityBase {
         return findAll(Sort.ascending("name")).list();
     }
 
-
+    public static List<Service> findDeployedServices() {
+        return Service.find("deployed=true AND cluster != null").list();
+    }
 }
