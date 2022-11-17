@@ -18,7 +18,7 @@ INGRESS_HOST=primaza.${VM_IP}.nip.io
 PROJECT_DIR=servicebox-app
 
 # Parameters to play the demo
-TYPE_SPEED=10
+TYPE_SPEED=${TYPE_SPEED:=20}
 NO_WAIT=true
 
 pushd ${PROJECT_DIR}
