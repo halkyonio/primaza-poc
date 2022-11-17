@@ -15,11 +15,19 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
+PROJECT_NAME=primaza-poc
 PROJECT_DIR=servicebox-app
+CLONING_PRIMAZA=${CLONING_PRIMAZA:=false}
+GITHUB_REPO_PRIMAZA=https://github.com/halkyonio/primaza-poc.git
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=40}
 NO_WAIT=true
+
+if [ "${CLONING_PRIMAZA}" = true ]; then
+  pe "rm -rf ${PROJECT_NAME}"
+  pe "git clone ${GITHUB_REPO_PRIMAZA} && cd ${PROJECT_NAME}"
+fi
 
 pushd ${PROJECT_DIR}
 
