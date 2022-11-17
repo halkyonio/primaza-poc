@@ -73,10 +73,10 @@ RESULT=$(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- sh -c "curl -X
 if [ "$RESULT" = *"500 Internal Server Error"* ]
 then
     p "Cluster failed to be saved in Service Box: $RESULT"
-    pe "k describe $POD_NAME -n ${NAMESPACE}"
-    pe "k logs $POD_NAME -n ${NAMESPACE}"
+    k describe $POD_NAME -n ${NAMESPACE}
+    k logs $POD_NAME -n ${NAMESPACE}
     exit 1
 fi
-p "Local k8s cluster registered: $RESULT"
+note "Local k8s cluster registered: $RESULT"
 
 popd
