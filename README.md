@@ -57,7 +57,7 @@ UI `http://localhost:8080/claims`.
 ### Using Primaza on a k8s cluster
 
 In order to use Primaza on kubernetes, it is needed first to setup a cluster (kind, minikube, etc) and to install an ingress controller like a docker container registry.
-To simplify this process, you can use the following bash script able to setup such environment using [kind]() and [helm]().
+To simplify this process, you can use the following bash script able to setup such environment using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and [helm](https://helm.sh/docs/helm/helm_install/).
 
 ```bash
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0"
