@@ -13,12 +13,11 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
-TEMP_DIR=primaza-poc
+PROJECT_DIR=servicebox-app
 
 p "Ingress host is: ${INGRESS_HOST}"
 
-rm -rf ${TEMP_DIR}
-git clone https://github.com/halkyonio/primaza-poc.git && cd {TEMP_DIR}/servicebox-app
+cd {PROJECT_DIR}
 
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0
 k wait -n ingress \
@@ -41,7 +40,7 @@ kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/servicebox-app
 
 helm install --devel servicebox-app \
   --dependency-update \
-  ${TEMP_DIR}/servicebox-app/target/helm/kubernetes/servicebox-app \
+  ./target/helm/kubernetes/servicebox-app \
   -n $NAMESPACE \
   --set app.image=localhost:5000/${REGISTRY_GROUP}/servicebox-app:$VERSION 2>&1 1>/dev/null
 
