@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-source ./common.sh
-source ./play-demo.sh
+SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
+
+source ${SCRIPTS_DIR}/common.sh
+source ${SCRIPTS_DIR}/play-demo.sh
 
 ####################################
 ## Variables
@@ -19,9 +21,10 @@ PROJECT_DIR=servicebox-app
 TYPE_SPEED=50
 NO_WAIT=true
 
+p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-cd ${PROJECT_DIR}
+pushd ${PROJECT_DIR}
 
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0
 k wait -n ingress \
@@ -74,3 +77,5 @@ then
     exit 1
 fi
 echo "Local k8s cluster registered: $RESULT"
+
+popd
