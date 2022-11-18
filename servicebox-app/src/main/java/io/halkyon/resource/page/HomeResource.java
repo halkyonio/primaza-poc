@@ -10,9 +10,9 @@ import javax.ws.rs.Path;
 @Path("/home")
 public class HomeResource {
 
-    @ConfigProperty(name = "github.repo")
+    @ConfigProperty(name = "github.repo", defaultValue = "http://github.com/halkyonio/primaza-poc")
     String githubRepo;
-    @ConfigProperty(name = "git.sha.commit")
+    @ConfigProperty(name = "git.sha.commit", defaultValue = "6666")
     String gitShaCommit;
     @GET
     public TemplateInstance home() {
