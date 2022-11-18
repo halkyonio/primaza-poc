@@ -26,7 +26,7 @@ jobs:
           cache: maven
 
       - name: build with maven
-        run: mvn clean install
+        run: mvn clean install -Dgithub.repo=${{ github.repository }} -Dgit.sha.commit=${{ github.event.pull_request.head.sha }}
 
   verify-in-kubernetes:
     name: Verify in Kubernetes
