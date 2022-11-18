@@ -1,13 +1,16 @@
-package io.halkyon.services;
+package io.halkyon;
 
+import io.quarkus.qute.TemplateGlobal;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class RepositoryService {
+@TemplateGlobal
+public class ApplicationProperties {
+
     @ConfigProperty(name = "github.repo", defaultValue = "http://github.com/halkyonio/primaza-poc")
-    String githubRepo;
+    static String githubRepo;
     @ConfigProperty(name = "git.sha.commit", defaultValue = "666")
-    String gitShaCommit;
+    static String gitShaCommit;
 }
