@@ -71,7 +71,7 @@ jobs:
             -Dquarkus.helm.repository.url=http://localhost:8080/api/charts \
             -Dquarkus.helm.repository.type=CHARTMUSEUM \
             -Dgithub.repo=${{ github.repository }} \
-            -Dgit.sha.commit=$(git rev-parse --short HEAD)
+            -Dgit.sha.commit=${{ github.event.pull_request.head.sha }}
 
           # Install Helm repository
           helm repo add local http://localhost:8080
