@@ -1,13 +1,13 @@
 package io.halkyon.resource.page;
 
-import static io.halkyon.services.ClusterValidator.validateCluster;
-
 import java.io.IOException;
 import java.sql.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -23,14 +23,21 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.NewClusterRequest;
+import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
+import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/clusters")
 public class ClusterResource {
 
     @Inject
+    Validator validator;
+
+    @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
+    @Inject
+    ApplicationDiscoveryJob applicationDiscoveryJob;
 
     @GET
     @Path("/new")
@@ -54,33 +61,28 @@ public class ClusterResource {
     @Produces(MediaType.TEXT_HTML)
     public Response add(@MultipartForm NewClusterRequest clusterRequest, @HeaderParam("HX-Request") boolean hxRequest)
             throws IOException {
-        List<String> errors = validateCluster(clusterRequest);
-        Cluster cluster = new Cluster();
-        cluster.name = clusterRequest.name;
-        cluster.url = clusterRequest.url;
-        cluster.environment = clusterRequest.environment;
-        if (clusterRequest.kubeConfig != null) {
-            cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
-        }
+        Set<ConstraintViolation<NewClusterRequest>> errors = validator.validate(clusterRequest);
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters");
 
-        StringBuffer response = new StringBuffer();
-
-        if (cluster.created == null) {
-            cluster.created = new Date(System.currentTimeMillis());
-        }
-
-        serviceDiscoveryJob.checkCluster(cluster);
-        cluster.persist();
         if (errors.size() > 0) {
-            for(String error : errors) {
-                response.append("<div class=\"alert alert-danger\"><strong>Error! </strong>" + error + "</div>");
-            };
+            response.withErrors(errors);
         } else {
-            response.append("<div class=\"alert alert-success\">Cluster created successfully for id: " + cluster.id + "</div>");
+            Cluster cluster = new Cluster();
+            cluster.name = clusterRequest.name;
+            cluster.url = clusterRequest.url;
+            cluster.environment = clusterRequest.environment;
+            cluster.created = new Date(System.currentTimeMillis());
+            if (clusterRequest.kubeConfig != null) {
+                cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+            }
+            serviceDiscoveryJob.checkCluster(cluster);
+            cluster.persist();
+            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+            response.withSuccessMessage(cluster.id);
         }
 
         // Return as HTML the template rendering the item for HTMX
-        return Response.accepted(response.toString()).status(Response.Status.CREATED).header("Location", "/clusters").build();
+        return response.build();
     }
 
     @GET

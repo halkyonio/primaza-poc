@@ -1,8 +1,5 @@
 package io.halkyon;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
-
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.utils.WebPageExtension;
@@ -14,15 +11,6 @@ import io.quarkus.test.junit.QuarkusTest;
 public class HomeResourceTest {
 
     WebPageExtension.PageManager page;
-
-    @Test
-    public void testHelloEndpoint() {
-        given()
-          .when().get("/hello")
-          .then()
-             .statusCode(200)
-             .body(is("Hello from Primaza Service Box app"));
-    }
 
     @Test
     public void testShouldRedirectToHome() {
@@ -70,6 +58,24 @@ public class HomeResourceTest {
         page.assertPathIs("/credentials");
         // New button
         page.assertContentContains("New credential");
+        // Go back button
+        page.assertContentContains("Home");
+    }
+
+    @Test
+    public void testShouldGoToDeployedServicesPage() {
+        page.goTo("/");
+        page.clickOn("home-deployed-services-btn-id");
+        page.assertPathIs("/services/discovered");
+        // Go back button
+        page.assertContentContains("Home");
+    }
+
+    @Test
+    public void testShouldGoToApplicationsPage() {
+        page.goTo("/");
+        page.clickOn("home-applications-btn-id");
+        page.assertPathIs("/applications");
         // Go back button
         page.assertContentContains("Home");
     }

@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -23,15 +25,19 @@ public class Credential extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
+    @NotBlank
     public String name;
 
+    @NotNull
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
     public Service service;
 
+    @NotBlank
     public String username;
 
+    @NotBlank
     public String password;
 
     @OneToMany(mappedBy = "credential", cascade = CascadeType.ALL)

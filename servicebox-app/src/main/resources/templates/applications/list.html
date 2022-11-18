@@ -1,0 +1,9 @@
+{@java.lang.Integer items}
+{#include base}
+  {#title}Applications{/title}
+  {#body}
+  <div class="container pt-4" hx-get="/applications/polling" hx-trigger="every 5s">
+      {#include applications/listTable.html applications=applications items=items /}
+  </div>
+  {/body}
+{/include}

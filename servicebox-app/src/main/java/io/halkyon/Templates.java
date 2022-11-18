@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Templates {
 
-        @CheckedTemplate(basePath = "app")
-        public static class App {
+        @CheckedTemplate(basePath = "index")
+        public static class Index {
                 public static native TemplateInstance home();
         }
 
@@ -19,19 +19,19 @@ public class Templates {
                 public static native TemplateInstance form();
         }
 
-        @CheckedTemplate(basePath = "services")
+        @CheckedTemplate(basePath = "services", requireTypeSafeExpressions = false)
         public static class Services {
                 public static native TemplateInstance list(List<io.halkyon.model.Service> services);
                 public static native TemplateInstance item(io.halkyon.model.Service service);
                 public static native TemplateInstance form();
+                public static native TemplateInstance listDiscovered(List<io.halkyon.model.Service> services);
+                public static native TemplateInstance listDiscoveredTable(List<io.halkyon.model.Service> services);
         }
 
         @CheckedTemplate(basePath = "credentials", requireTypeSafeExpressions = false)
         public static class Credentials {
                 public static native TemplateInstance list(List<io.halkyon.model.Credential> credentials);
-
                 public static native TemplateInstance item(io.halkyon.model.Credential credential);
-
                 public static native TemplateInstance form();
         }
 
@@ -40,5 +40,11 @@ public class Templates {
                 public static native TemplateInstance list(List<io.halkyon.model.Cluster> clusters);
                 public static native TemplateInstance item(io.halkyon.model.Cluster cluster);
                 public static native TemplateInstance form();
+        }
+
+        @CheckedTemplate(basePath = "applications", requireTypeSafeExpressions = false)
+        public static class Applications {
+                public static native TemplateInstance list(List<io.halkyon.model.Application> applications);
+                public static native TemplateInstance listTable(List<io.halkyon.model.Application> applications);
         }
 }

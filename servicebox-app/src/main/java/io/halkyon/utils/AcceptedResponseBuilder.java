@@ -1,7 +1,8 @@
 package io.halkyon.utils;
 
-import java.util.List;
+import java.util.Set;
 
+import javax.validation.ConstraintViolation;
 import javax.ws.rs.core.Response;
 
 public final class AcceptedResponseBuilder {
@@ -17,9 +18,9 @@ public final class AcceptedResponseBuilder {
         this.location = location;
     }
 
-    public AcceptedResponseBuilder withErrors(List<String> errors) {
-        for (String error : errors) {
-            response.append(String.format(ERROR_MESSAGE_TEMPLATE, error));
+    public <T> AcceptedResponseBuilder withErrors(Set<ConstraintViolation<T>> errors) {
+        for (ConstraintViolation<?> error : errors) {
+            response.append(String.format(ERROR_MESSAGE_TEMPLATE, error.getMessage()));
         }
 
         return this;

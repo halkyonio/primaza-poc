@@ -1,0 +1,26 @@
+<div class="table-responsive">
+  <table class="table">
+      <thead>
+        <tr>
+            <th aria-valuetext="left">Name</th>
+            <th aria-valuetext="left">Version</th>
+            <th aria-valuetext="left">URL</th>
+            <th aria-valuetext="left">Cluster</th>
+        </tr>
+      </thead>
+      <tbody id="service-list">
+        {#for service in services}
+        <tr>
+            <td>{service.name}</td>
+            <td>{service.version}</td>
+            <td>TBD</td>
+            <td>{service.cluster.name}</td>
+        </tr>
+        {/for}
+      </tbody>
+  </table>
+</div>
+<!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
+<strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+<hr>
+<a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>

@@ -44,16 +44,19 @@ public class ServiceDiscoveryJob {
     @Transactional(Transactional.TxType.REQUIRED)
     public void checkCluster(Cluster cluster) {
         List<Service> services = Service.listAll();
+        boolean updated = false;
         for (Service service : services) {
             if (service.cluster == null && isServiceRunningInCluster(service, cluster)) {
                 service.deployed = true;
                 service.cluster = cluster;
                 cluster.services.add(service);
-                service.persist();
+                updated = true;
             }
         }
 
-        cluster.persist();
+        if (updated) {
+            cluster.persist();
+        }
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
@@ -75,8 +78,16 @@ public class ServiceDiscoveryJob {
     }
 
     private boolean isServiceRunningInCluster(Service service, Cluster cluster) {
+        if (service.endpoint == null) {
+            return false;
+        }
+
         try {
             String[] parts = service.endpoint.split(Pattern.quote(":"));
+            if (parts.length != 2) {
+                return false;
+            }
+
             String protocol = parts[0];
             String servicePort = parts[1];
 
