@@ -18,6 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
+import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
@@ -50,6 +51,8 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
         webClient.getCache().clear();
         webClient.getCache().setMaxSize(0);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
+        webClient.setIncorrectnessListener(new SilentIncorrectnessListener());
+        webClient.setJavaScriptErrorListener(new SilentJavaScriptErrorListener());
         // re-synchronize asynchronous XHR.
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setUseInsecureSSL(true);
