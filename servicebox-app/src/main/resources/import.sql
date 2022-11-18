@@ -10,5 +10,3 @@ INSERT INTO service(name, version, endpoint, deployed, created) VALUES ('postgre
 INSERT INTO service(name, version, endpoint, deployed, created) VALUES ('activemq-artemis',   '2.26',     'tcp:8161',     false,  PARSEDATETIME('2022-07-13 11:42:00','yyyy-MM-dd HH:mm:ss'));
 INSERT INTO service(name, version, endpoint, deployed, created) VALUES ('payment-api',        '1.1',      'http:8080',    true,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
 INSERT INTO service(name, version, endpoint, deployed, created) VALUES ('mariadb',            '10.9',     'tcp:3306',    true,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
-
-INSERT INTO cluster(name, url, environment, created) VALUES ('ocp4.11-node-1', 'https://10.0.2.10:6443', 'DEV', PARSEDATETIME('2022-10-18 20:02:01','yyyy-MM-dd HH:mm:ss'));
