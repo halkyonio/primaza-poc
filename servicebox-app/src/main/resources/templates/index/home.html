@@ -1,29 +1,38 @@
 {#include base}
   {#body}
-    <div class="container">
+    <div class="mt-4 p-4 text-white rounded" style="background-color:#1E88E5;">
       <h1>Welcome to Primaza</h1>
-      <p class="text-body">Click on one of the button of your choice to access the Primaza services !</p>
+      <p class="text-break fs-6">
+        To allow to bind a microservice/application with a service (Database, Broker, NoSQL, etc), different steps are needed.
+        As this PoC do not yet integrate all the systems which should be part of the final architecture, we will have to create some data manually.
+        The process to follow is pretty foward and can be summarized in a few steps:</br>
+        - Register a service</br>
+        - Wait till the service(s) will be discovered on the clusters and will become available</br>
+        - Create the service's credential</br>
+        - Populate a claim to request to bind a service</br>
+        - Select the deployment where the secret will be injected/mounted</br>
+        Enjoy !!
       </p>
-      <div class="container">
-        <div class="row gy-5">
-          <div class="col-2">
-            <div class="p-4 btn btn-primary"><a id="home-claims-btn-id" href="/claims" class="text-white">Claims</a></div>
-          </div>
-          <div class="col-2">
-            <div class="p-4 btn btn-primary" ><a id="home-services-btn-id" href="/services" class="text-white">Services</a></div>
-          </div>
-          <div class="col-2">
-            <div class="p-4 btn btn-primary" ><a id="home-deployed-services-btn-id" href="/services/discovered" class="text-white">Deployed Services</a></div>
-          </div>
-          <div class="col-2">
-            <div class="p-4 btn btn-primary" ><a id="home-clusters-btn-id" href="/clusters" class="text-white">Clusters</a></div>
-          </div>
-          <div class="col-2">
-            <div class="p-4 btn btn-primary" ><a id="home-applications-btn-id" href="/applications" class="text-white">Applications</a></div>
-          </div>
-          <div class="col-2">
-            <div class="p-4 btn btn-primary" ><a id="home-credentials-btn-id" href="/credentials" class="text-white">Credentials</a></div>
-          </div>
+    </div>
+    <div class="container mt-4 p-4 ">
+      <div class="row gy-5">
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-claims-btn-id" href="/claims" class="text-white">Claims</a></div>
+        </div>
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-services-btn-id" href="/services" class="text-white">Services</a></div>
+        </div>
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-deployed-services-btn-id" href="/services/discovered" class="text-white">Deployed Services</a></div>
+        </div>
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-clusters-btn-id" href="/clusters" class="text-white">Clusters</a></div>
+        </div>
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-applications-btn-id" href="/applications" class="text-white">Applications</a></div>
+        </div>
+        <div class="col-2">
+          <div class="p-4 btn" style="background-color:#3949AB;"><a id="home-credentials-btn-id" href="/credentials" class="text-white">Credentials</a></div>
         </div>
       </div>
     </div>
