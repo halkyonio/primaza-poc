@@ -3,6 +3,7 @@ package io.halkyon.model;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -42,6 +43,10 @@ public class Cluster extends PanacheEntityBase {
     @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
     public Set<Service> services = new HashSet<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
+    public Set<Application> applications = new HashSet<>();
+
     public static Cluster findByName(String name) {
         return find("name", name).firstResult();
     }
@@ -50,5 +55,9 @@ public class Cluster extends PanacheEntityBase {
         return findAll(Sort.ascending("name")).list();
     }
 
-
+    public Application getApplicationByNameAndNamespace(String appName, String appNamespace) {
+        return applications.stream().filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.name, appNamespace))
+                .findFirst()
+                .orElse(null);
+    }
 }

@@ -23,6 +23,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.NewClusterRequest;
+import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
@@ -35,6 +36,8 @@ public class ClusterResource {
 
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
+    @Inject
+    ApplicationDiscoveryJob applicationDiscoveryJob;
 
     @GET
     @Path("/new")
@@ -74,6 +77,7 @@ public class ClusterResource {
             }
             serviceDiscoveryJob.checkCluster(cluster);
             cluster.persist();
+            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
             response.withSuccessMessage(cluster.id);
         }
 

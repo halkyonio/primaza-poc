@@ -1,5 +1,6 @@
 package io.halkyon.utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -117,6 +118,11 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
         public void assertContentContains(String expectedContent) {
             String body = currentPage.getBody().asNormalizedText();
             assertTrue(body.contains(expectedContent), "Content: " + expectedContent + ", not found in body: " + body);
+        }
+
+        public void assertContentDoesNotContain(String expectedContent) {
+            String body = currentPage.getBody().asNormalizedText();
+            assertFalse(body.contains(expectedContent), "Content: " + expectedContent + ", was found in body: " + body);
         }
 
         private void refreshPageContent() {

@@ -1,0 +1,24 @@
+<div class="table-responsive">
+  <table class="table">
+      <thead>
+        <tr>
+            <th aria-valuetext="left">Name</th>
+            <th aria-valuetext="left">Image</th>
+            <th aria-valuetext="left">Cluster</th>
+        </tr>
+      </thead>
+      <tbody id="applications-list">
+        {#for application in applications}
+        <tr>
+            <td>{application.name}</td>
+            <td>{application.image}</td>
+            <td>{application.cluster.name}</td>
+        </tr>
+        {/for}
+      </tbody>
+  </table>
+</div>
+<!-- Showing the number of applications. -->
+<strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+<hr>
+<a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
