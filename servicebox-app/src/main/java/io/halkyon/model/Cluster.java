@@ -56,7 +56,8 @@ public class Cluster extends PanacheEntityBase {
     }
 
     public Application getApplicationByNameAndNamespace(String appName, String appNamespace) {
-        return applications.stream().filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.name, appNamespace))
+        return applications.stream()
+                .filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.namespace, appNamespace))
                 .findFirst()
                 .orElse(null);
     }
