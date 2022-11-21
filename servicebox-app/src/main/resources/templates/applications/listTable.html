@@ -3,6 +3,7 @@
       <thead>
         <tr>
             <th aria-valuetext="left">Name</th>
+            <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Image</th>
             <th aria-valuetext="left">Cluster</th>
         </tr>
@@ -11,6 +12,7 @@
         {#for application in applications}
         <tr>
             <td>{application.name}</td>
+            <td>{application.namespace}</td>
             <td>{application.image}</td>
             <td>{application.cluster.name}</td>
         </tr>
