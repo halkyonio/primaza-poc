@@ -5,8 +5,8 @@ import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -35,47 +35,83 @@ public class ClaimingServiceJobTest {
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
         pauseScheduler();
-        Claim postgresClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
+        Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
         createService("postgresqlClaimingServiceJobTest", "8", true);
         createService("MySQLClaimingServiceJobTest", "7.5", false);
-
+        // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
-        // - the claim "PostgresSQL" should change from "new" to "claimed"
-        // - the claim "MySQL" should increase the attempts to 2
-        // When we run the job again:
-        // Then:
-        // - the claim "mysql-demo" should increase the attempts to 3 and status should have changed to "error".
-        job.execute();
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + postgresClaim.name)
-                .then()
-                .statusCode(200)
-                .body("status", is(ClaimStatus.BIND.toString()))
-                .body("service.name", containsString("postgresql"));
+        // - the claim "PostgresSQL" should change from "new" to "pending", attempts still to 1
+        // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should increase the attempts to 2
 
-        for (int attempt = 1; attempt < maxAttempts; attempt++) {
+        job.execute();
+        Claim actualPostgresql = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + postgresqlClaim.name)
+                .then()
+                .statusCode(200).extract().as(Claim.class);
+
+        assertEquals(postgresqlClaim.name, actualPostgresql.name);
+        assertEquals(ClaimStatus.BIND.toString(),actualPostgresql.status);
+        assertEquals(1,actualPostgresql.attempts);
+
+        Claim actualMysql = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + mySqlClaim.name)
+                .then()
+                .statusCode(200).extract().as(Claim.class);
+
+        assertEquals(mySqlClaim.name, actualMysql.name);
+        assertEquals(ClaimStatus.PENDING.toString(),actualMysql.status);
+        assertEquals(2,actualMysql.attempts);
+
+        // When we repeat running the job again until reaching the maxAttempts:
+        // Then:
+        // - the claim "PostgresSQL" should not change (it's already binded)
+        // - the claim "mysql-demo" should increase the attempts to 3 and status is still Pending.
+        // We iterate from the number of attempts until the max attempts just for checking the "PENDING" status.
+        for (int attempt = 2; attempt < maxAttempts; attempt++) {
             job.execute();
-            given()
+            actualPostgresql = given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .get("/claims/name/" + postgresqlClaim.name)
+                    .then()
+                    .statusCode(200).extract().as(Claim.class);
+
+            assertEquals(postgresqlClaim.name, actualPostgresql.name);
+            assertEquals(ClaimStatus.BIND.toString(),actualPostgresql.status);
+            assertEquals(1,actualPostgresql.attempts);
+
+            actualMysql = given()
                     .contentType(MediaType.APPLICATION_JSON)
                     .get("/claims/name/" + mySqlClaim.name)
                     .then()
                     .statusCode(200)
-                    .body("status", is(ClaimStatus.PENDING.toString()))
-                    .body("attempts", is(attempt + 1));
+                    .extract().as(Claim.class);
+
+            assertEquals(mySqlClaim.name, actualMysql.name);
+            assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
+            assertEquals(3,actualMysql.attempts);
+
         }
 
+        // When the job runs again after reaching the maxAttempts:
+        // Then:
+        // - the claim "mysql-demo" should change the status to ERROR.
+
         job.execute();
-        // Because mysql service is not available:
-        given()
+
+        actualMysql = given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + mySqlClaim.name)
                 .then()
                 .statusCode(200)
-                .body("status", is(ClaimStatus.ERROR.toString()))
-                .body("attempts", is(maxAttempts));
+                .extract().as(Claim.class);
+
+        assertEquals(mySqlClaim.name, actualMysql.name);
+        assertEquals(ClaimStatus.ERROR.toString(), actualMysql.status);
+        assertEquals(maxAttempts,actualMysql.attempts);
     }
 
     @Test

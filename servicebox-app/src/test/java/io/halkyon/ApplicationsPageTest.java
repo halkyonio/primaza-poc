@@ -70,7 +70,7 @@ public class ApplicationsPageTest {
         page.goTo("/applications");
         page.assertContentDoesNotContain(prefix + "app");
         page.assertContentDoesNotContain(prefix + "image");
-        page.assertContentDoesNotContain(prefix + "cluster");
+        page.assertContentDoesNotContain(cluster.name);
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) {

@@ -1,16 +1,8 @@
 package io.halkyon;
 
-import static io.halkyon.utils.TestUtils.createClaim;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-
-import javax.ws.rs.core.MediaType;
-
+import io.halkyon.model.Claim;
+import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
@@ -18,27 +10,16 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import io.halkyon.model.Claim;
-import io.quarkus.test.junit.QuarkusTest;
+import javax.ws.rs.core.MediaType;
 
-import java.util.regex.Matcher;
+import static io.halkyon.utils.TestUtils.createClaim;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
 public class ClaimsEndpointTest {
-
-    @Test
-    public void testAddClaim(){
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"Oracle\", \"serviceRequested\": \"oracle-database\"}")
-                .when().post("/claims")
-                .then()
-                .statusCode(201)
-                .body(containsString("Oracle"))
-                .body("id", notNullValue())
-                .extract().body().jsonPath().getString("id");
-    }
 
     @Test
     public void testQueryClaimBody(){
@@ -63,49 +44,36 @@ public class ClaimsEndpointTest {
     public void testQueryUsingServiceRequestedToGetClaims(){
         final String claimName = "testQueryUsingServiceRequestedToGetClaims";
         createClaim(claimName, "Postgresql-5509");
-        given().queryParam("servicerequested","Postgresql-5509")
+        given().header("HX-Request","true").queryParam("servicerequested","Postgresql-5509")
                .when().get("/claims/filter")
                .then().body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
-    public void testAddClaimViaHtmxForm(){
+    public void claimCreatedViaForm(){
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
+        String claimName = "mysql-claim";
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", "ClaimsEndpointTest.testAddClaimViaHtmxForm")
-                .formParam("serviceRequested", "mysql:3306")
+                .formParam("name", claimName)
+                .formParam("serviceRequested","mysql-8.0.3")
+                .formParam("description","mysql claim for testing purposes")
                 .when().post("/claims")
                 .then()
                 .statusCode(201);
 
-        // TODO check the created date is not null
-    }
-
-    @Test
-    public void testClaimEntity() {
-        final String claimName = "testClaimEntity";
-        createClaim(claimName, "Postgresql-5509");
-
         Claim claim = given()
-                .when().get("/claims/name/" + claimName)
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + claimName)
                 .then()
                 .statusCode(200)
                 .extract().as(Claim.class);
 
-        //Delete the 'Postgresql':
-        given()
-                .when().delete("/claims/" + claim.id)
-                .then()
-                .statusCode(204);
-
-        //List all, 'Postgresql' should be missing now:
-        given()
-                .when().get("/claims")
-                .then()
-                .statusCode(200)
-                .body(not(containsString(claimName)));
+        assertNotNull(claim);
+        assertEquals(claim.name,claimName);
+        assertEquals(claim.serviceRequested, "mysql-8.0.3");
+        assertNotNull(claim.created);
     }
 
 }

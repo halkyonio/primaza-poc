@@ -1,12 +1,13 @@
 package io.halkyon.utils;
 
-import static io.restassured.RestAssured.given;
-
-import javax.ws.rs.core.MediaType;
-
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
+
+import javax.transaction.Transactional;
+import javax.ws.rs.core.MediaType;
+
+import static io.restassured.RestAssured.given;
 
 public final class TestUtils {
     private TestUtils() {
@@ -14,14 +15,20 @@ public final class TestUtils {
     }
 
     public static Cluster createCluster(String clusterName, String url) {
+        given()
+                .header("HX-Request", true)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("name", clusterName)
+                .multiPart("environment","PROD")
+                .multiPart("url", url)
+                .when().post("/clusters")
+                .then().statusCode(201);
+
         return given()
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"" + clusterName + "\", "
-                        + "\"environment\": \"PROD\", "
-                        + "\"url\": \"" + url + "\" }")
-                .when().post("/clusters")
-                .then().statusCode(201)
+                .get("/clusters/name/" + clusterName)
+                .then()
+                .statusCode(200)
                 .extract().as(Cluster.class);
     }
 
@@ -30,31 +37,53 @@ public final class TestUtils {
     }
 
     public static Service createService(String serviceName, String serviceVersion, String endpoint) {
-        return createService(serviceName, serviceVersion, endpoint, false);
+         return createService(serviceName, serviceVersion, endpoint, false);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean available) {
-        return given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"" + serviceName + "\", "
-                        + "\"version\": \"" + serviceVersion + "\", "
-                        + "\"endpoint\": \"" + endpoint + "\", "
-                        + "\"available\": \"" + available + "\" }")
+    @Transactional
+    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean deployed) {
+        given()
+                .header("HX-Request", true)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name",serviceName)
+                .formParam("version",serviceVersion)
+                .formParam("endpoint", endpoint )
                 .when().post("/services")
-                .then().statusCode(201)
+                .then().statusCode(201);
+
+        Service service = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/services/name/" + serviceName)
+                .then()
+                .statusCode(200)
                 .extract().as(Service.class);
+
+        if (deployed){
+            Service svc = Service.findById(service.id);
+            svc.deployed=deployed;
+            svc.persist();
+        }
+        return service;
     }
 
     public static Claim createClaim(String claimName, String serviceRequested) {
+        given()
+                .header("HX-Request", true)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name",claimName)
+                .formParam("serviceRequested",serviceRequested)
+                .formParam("status","new")
+                .formParam("description","claim for testing purposes")
+                .when().post("/claims")
+                .then()
+                .statusCode(201);
         return given()
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"" + claimName + "\", "
-                        + "\"serviceRequested\": \"" + serviceRequested + "\", "
-                        + "\"status\": \"new\"}")
-                .when().post("/claims")
-                .then().statusCode(201)
+                .get("/claims/name/" + claimName)
+                .then()
+                .statusCode(200)
                 .extract().as(Claim.class);
+
     }
+
 }
