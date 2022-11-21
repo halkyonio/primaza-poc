@@ -63,9 +63,9 @@ public class HomeResourceTest {
     }
 
     @Test
-    public void testShouldGoToDeployedServicesPage() {
+    public void testShouldGoToAvailableServicesPage() {
         page.goTo("/");
-        page.clickOn("home-deployed-services-btn-id");
+        page.clickOn("home-available-services-btn-id");
         page.assertPathIs("/services/discovered");
         // Go back button
         page.assertContentContains("Home");

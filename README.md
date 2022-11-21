@@ -45,11 +45,11 @@ To use `primaza`, it is needed to perform a couple of things like:
 - Register the backend service using the UI, REST endpoint `http://localhost:8080/services/new`
 - Create a claim to bind the backend service to your application `http://localhost:8080/claims/new`
 
-If a match exists between the `claim` request and a `service` deployed (aka a kubernetes endpoint has been created for the service), then you should be able to
+If a match exists between the `claim` request and a `service` available (aka a kubernetes endpoint has been created for the service), then you should be able to
 get the secret after a few moment :-)
 
 Primaza, according to the list of the registered services, will scan the different clusters to determine if the services are running according to the servie endpoint definition `protocol:port`.
-Such services are defined as `deployed` and will be used by the matching job like also to join the credentials created using the UI `http://localhost:8080/credentials/new`
+Such services are defined as `available` and will be used by the matching job like also to join the credentials created using the UI `http://localhost:8080/credentials/new`
 
 Whenever a secret is populated including the URL to access the backend service and credential, then the claim status will change from `Pending` to `Bind`. This can be verified using the 
 UI `http://localhost:8080/claims`.
@@ -133,7 +133,7 @@ Adding a service
 ```bash
 curl --header "Content-Type: application/json" \
 --request POST \
---data '{"name":"Oracle", "version": "3.11.2", "endpoint": "tcp:5672", "deployed": "false"}' \
+--data '{"name":"Oracle", "version": "3.11.2", "endpoint": "tcp:5672", "available": "false"}' \
 http://localhost:8080/services
 ```
 

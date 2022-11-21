@@ -68,7 +68,7 @@ public class ClaimingServiceJobTest {
         }
 
         job.execute();
-        // Because mysql service is not deployed:
+        // Because mysql service is not available:
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + mySqlClaim.name)

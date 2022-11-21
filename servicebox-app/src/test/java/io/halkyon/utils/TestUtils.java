@@ -25,22 +25,22 @@ public final class TestUtils {
                 .extract().as(Cluster.class);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, boolean deployed) {
-        return createService(serviceName, serviceVersion, "tcp:5672", deployed);
+    public static Service createService(String serviceName, String serviceVersion, boolean available) {
+        return createService(serviceName, serviceVersion, "tcp:5672", available);
     }
 
     public static Service createService(String serviceName, String serviceVersion, String endpoint) {
         return createService(serviceName, serviceVersion, endpoint, false);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean deployed) {
+    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean available) {
         return given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
                 .body("{\"name\": \"" + serviceName + "\", "
                         + "\"version\": \"" + serviceVersion + "\", "
                         + "\"endpoint\": \"" + endpoint + "\", "
-                        + "\"deployed\": \"" + deployed + "\" }")
+                        + "\"available\": \"" + available + "\" }")
                 .when().post("/services")
                 .then().statusCode(201)
                 .extract().as(Service.class);

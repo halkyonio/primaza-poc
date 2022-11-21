@@ -124,7 +124,7 @@ jobs:
           echo "Service installed in Service Box: $RESULT"
 
           SERVICE=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/services/name/postgresql")
-          if [ $(echo "$SERVICE" | jq -r '.deployed') = "true" ]
+          if [ $(echo "$SERVICE" | jq -r '.available') = "true" ]
           then
             echo "ServiceBox didn't discovery the Postgresql service: $SERVICE"
             exit 1

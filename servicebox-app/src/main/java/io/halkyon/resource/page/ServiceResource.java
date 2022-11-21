@@ -91,7 +91,7 @@ public class ServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered")
     public TemplateInstance listDiscoveredServices() {
-        List<Service> discoveredServices = Service.findDeployedServices();
+        List<Service> discoveredServices = Service.findAvailableServices();
         return Templates.Services.listDiscovered(discoveredServices).data("items", discoveredServices.size());
     }
 
@@ -100,7 +100,7 @@ public class ServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered/polling")
     public TemplateInstance pollingDiscoveredServices() {
-        List<Service> discoveredServices = Service.findDeployedServices();
+        List<Service> discoveredServices = Service.findAvailableServices();
         return Templates.Services.listDiscoveredTable(discoveredServices).data("items", discoveredServices.size());
     }
 }

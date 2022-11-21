@@ -45,7 +45,7 @@ public class Service extends PanacheEntityBase {
     @FormParam
     public String endpoint;
 
-    public Boolean deployed;
+    public Boolean available;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
@@ -66,7 +66,7 @@ public class Service extends PanacheEntityBase {
         return findAll(Sort.ascending("name")).list();
     }
 
-    public static List<Service> findDeployedServices() {
-        return Service.find("deployed=true AND cluster != null").list();
+    public static List<Service> findAvailableServices() {
+        return Service.find("available=true AND cluster != null").list();
     }
 }

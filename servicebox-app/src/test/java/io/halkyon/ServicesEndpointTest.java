@@ -18,7 +18,7 @@ public class ServicesEndpointTest {
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
-                .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
+                .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"available\": \"false\" }")
                 .when().post("/services")
                 .then()
                 .statusCode(201);
@@ -31,7 +31,7 @@ public class ServicesEndpointTest {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"RabbitMQ2\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
+                .body("{\"name\": \"RabbitMQ2\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"available\": \"false\" }")
                 .when().post("/services")
                 .then()
                 .statusCode(201);
@@ -43,7 +43,7 @@ public class ServicesEndpointTest {
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
-                .body("{\"name\": \"RabbitMQ3\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
+                .body("{\"name\": \"RabbitMQ3\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"available\": \"false\" }")
                 .when().post("/services")
                 .then()
                 .statusCode(201);
@@ -70,7 +70,7 @@ public class ServicesEndpointTest {
 
     @Test
     public void testCannotAddServiceWithSameNameAndVersion(){
-        String request = "{\"name\": \"RabbitMQ4\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }";
+        String request = "{\"name\": \"RabbitMQ4\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"available\": \"false\" }";
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept("application/json")
