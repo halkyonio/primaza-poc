@@ -14,8 +14,8 @@ import io.halkyon.model.Service;
 import io.quarkus.scheduler.Scheduled;
 
 /**
- * The service discovery job will loop over the registered services and clusters and check whether a service is deployed in
- * a cluster. If so, it will update the service entity deployed and cluster fields accordingly.
+ * The service discovery job will loop over the registered services and clusters and check whether a service is available in
+ * a cluster. If so, it will update the service entity available and cluster fields accordingly.
  */
 @ApplicationScoped
 public class ServiceDiscoveryJob {
@@ -47,7 +47,7 @@ public class ServiceDiscoveryJob {
         boolean updated = false;
         for (Service service : services) {
             if (service.cluster == null && isServiceRunningInCluster(service, cluster)) {
-                service.deployed = true;
+                service.available = true;
                 service.cluster = cluster;
                 cluster.services.add(service);
                 updated = true;
@@ -62,11 +62,11 @@ public class ServiceDiscoveryJob {
     @Transactional(Transactional.TxType.REQUIRED)
     public void checkService(Service service) {
         if (service.cluster == null || !isServiceRunningInCluster(service, service.cluster)) {
-            service.deployed = false;
+            service.available = false;
             List<Cluster> clusters = Cluster.listAll();
             for (Cluster cluster : clusters) {
                 if (isServiceRunningInCluster(service, cluster)) {
-                    service.deployed = true;
+                    service.available = true;
                     service.cluster = cluster;
                     cluster.services.add(service);
                     break;

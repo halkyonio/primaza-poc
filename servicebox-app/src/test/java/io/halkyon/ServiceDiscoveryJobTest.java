@@ -50,18 +50,18 @@ public class ServiceDiscoveryJobTest {
 
         // When we run the job once:
         // Then:
-        // - the service "ServiceDiscoveryJobTest" should keep the deployed flag to false because it's not deployed in any cluster yet
+        // - the service "ServiceDiscoveryJobTest" should keep the available flag to false because it's not available in any cluster yet
         // When we install the service in a cluster
         // And we run the job again.
         // Then:
-        // - the service "ServiceDiscoveryJobTest" should be updated with deployed=true and be linked to the cluster where was installed.
+        // - the service "ServiceDiscoveryJobTest" should be updated with available=true and be linked to the cluster where was installed.
         job.execute();
         given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/services/name/" + service.name)
                 .then()
                 .statusCode(200)
-                .body("deployed", is(false));
+                .body("available", is(false));
         Cluster cluster = createCluster("dummy-cluster-1", "master:port");
         configureMockServiceFor(cluster.name, "host", "1111");
 
@@ -71,9 +71,9 @@ public class ServiceDiscoveryJobTest {
                 .get("/services/name/" + service.name)
                 .then()
                 .statusCode(200)
-                .body("deployed", is(true))
+                .body("available", is(true))
                 .body("cluster.name", is(cluster.name));
-        thenServiceIsInTheDeployedServicePage(service.name);
+        thenServiceIsInTheAvailableServicePage(service.name);
     }
 
     @Test
@@ -96,9 +96,9 @@ public class ServiceDiscoveryJobTest {
                 .get("/services/name/" + serviceName)
                 .then()
                 .statusCode(200)
-                .body("deployed", is(true))
+                .body("available", is(true))
                 .body("cluster.name", is(cluster.name));
-        thenServiceIsInTheDeployedServicePage(serviceName);
+        thenServiceIsInTheAvailableServicePage(serviceName);
     }
 
     @Test
@@ -120,12 +120,12 @@ public class ServiceDiscoveryJobTest {
                 .get("/services/name/" + service.name)
                 .then()
                 .statusCode(200)
-                .body("deployed", is(true))
+                .body("available", is(true))
                 .body("cluster.name", is("dummy-cluster-3"));
-        thenServiceIsInTheDeployedServicePage(service.name);
+        thenServiceIsInTheAvailableServicePage(service.name);
     }
 
-    private void thenServiceIsInTheDeployedServicePage(String expectedServiceName) {
+    private void thenServiceIsInTheAvailableServicePage(String expectedServiceName) {
         page.goTo("/services/discovered");
         page.assertContentContains(expectedServiceName);
     }
