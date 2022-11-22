@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import io.halkyon.model.Claim;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
@@ -16,7 +17,7 @@ public class Templates {
         public static class Claims {
                 public static native TemplateInstance list(List<io.halkyon.model.Claim> claims);
                 public static native TemplateInstance table(List<io.halkyon.model.Claim> claims);
-                public static native TemplateInstance form();
+                public static native TemplateInstance form(Claim claim);
         }
 
         @CheckedTemplate(basePath = "services", requireTypeSafeExpressions = false)
