@@ -41,7 +41,7 @@ public final class TestUtils {
     }
 
     @Transactional
-    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean deployed) {
+    public static Service createService(String serviceName, String serviceVersion, String endpoint, boolean available) {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -58,9 +58,9 @@ public final class TestUtils {
                 .statusCode(200)
                 .extract().as(Service.class);
 
-        if (deployed){
+        if (available){
             Service svc = Service.findById(service.id);
-            svc.deployed=deployed;
+            svc.available=available;
             svc.persist();
         }
         return service;
