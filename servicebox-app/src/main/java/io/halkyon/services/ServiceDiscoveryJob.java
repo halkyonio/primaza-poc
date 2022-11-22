@@ -5,7 +5,11 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
+
+import javax.ws.rs.ClientErrorException;
 
 import org.jboss.logging.Logger;
 
@@ -37,7 +41,7 @@ public class ServiceDiscoveryJob {
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {
-            checkService(service);
+            checkIfServiceIsRunningInClusterAndPersist(service);
         }
     }
 
@@ -57,7 +61,7 @@ public class ServiceDiscoveryJob {
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void checkService(Service service) {
+    public void checkIfServiceIsRunningInClusterAndPersist(Service service) {
         if (service.cluster == null || !getServiceInCluster(service, service.cluster).isPresent()) {
             service.available = false;
             List<Cluster> clusters = Cluster.listAll();
@@ -67,7 +71,13 @@ public class ServiceDiscoveryJob {
                 }
             }
 
-            service.persist();
+            try {
+                service.persist();
+            } catch (PersistenceException e) {
+                if(e.getCause() instanceof ConstraintViolationException) {
+                    throw new ClientErrorException(e.getMessage(), 409);
+                }
+            }
         }
     }
 

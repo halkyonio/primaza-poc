@@ -16,7 +16,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -59,8 +58,10 @@ public class ServiceResource {
                 service.created = new Date(System.currentTimeMillis());
             }
 
-            serviceDiscoveryJob.checkService(service);
-            service.persist();
+            serviceDiscoveryJob.checkIfServiceIsRunningInClusterAndPersist(service);
+            if(service.id==null) {
+                service.persist();
+            }
             response.withSuccessMessage(service.id);
         }
 
