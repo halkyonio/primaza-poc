@@ -11,6 +11,7 @@ import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -86,7 +87,7 @@ public class ServiceResource {
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
         Service service = Service.findByName(name);
         if (service == null) {
-            throw new WebApplicationException("Service with name " + name + " does not exist.", 400);
+            throw new NotFoundException("Service with name " + name + " does not exist.");
         }
         return service;
     }

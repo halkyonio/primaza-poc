@@ -1,9 +1,13 @@
 package io.halkyon.resource.page;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import io.halkyon.Templates;
+import io.halkyon.model.Credential;
+import io.halkyon.model.CredentialParameter;
+import io.halkyon.model.Service;
+import io.halkyon.resource.requests.NewCredentialRequest;
+import io.halkyon.utils.AcceptedResponseBuilder;
+import io.quarkus.qute.TemplateInstance;
+import org.jboss.resteasy.annotations.Form;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -12,22 +16,17 @@ import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.annotations.Form;
-
-import io.halkyon.Templates;
-import io.halkyon.model.Credential;
-import io.halkyon.model.CredentialParameter;
-import io.halkyon.model.Service;
-import io.halkyon.resource.requests.NewCredentialRequest;
-import io.halkyon.utils.AcceptedResponseBuilder;
-import io.quarkus.qute.TemplateInstance;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Path("/credentials")
 public class CredentialResource {
@@ -99,6 +98,10 @@ public class CredentialResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public Credential findByName(@PathParam("name") String name) {
-        return Credential.findByName(name);
+        Credential credential = Credential.findByName(name);
+        if (credential == null) {
+            throw new NotFoundException("Credential with name " + name + " does not exist.");
+        }
+        return credential;
     }
 }

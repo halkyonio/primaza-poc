@@ -16,6 +16,7 @@ import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -91,7 +92,7 @@ public class ClusterResource {
     public Cluster findByName(@PathParam("name") String name) {
         Cluster cluster = Cluster.findByName(name);
         if (cluster == null) {
-            throw new WebApplicationException("Claim with name " + name + " does not exist.", 400);
+            throw new NotFoundException("Cluster with name " + name + " does not exist.");
         }
         return cluster;
     }
