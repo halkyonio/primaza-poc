@@ -1,5 +1,6 @@
 package io.halkyon.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -13,6 +14,7 @@ public final class AcceptedResponseBuilder {
 
     private final StringBuffer response = new StringBuffer();
     private final String location;
+    private Response.Status status;
 
     private AcceptedResponseBuilder(String location) {
         this.location = location;
@@ -22,17 +24,22 @@ public final class AcceptedResponseBuilder {
         for (ConstraintViolation<?> error : errors) {
             response.append(String.format(ERROR_MESSAGE_TEMPLATE, error.getMessage()));
         }
+        status = Response.Status.BAD_REQUEST;
 
         return this;
     }
 
     public AcceptedResponseBuilder withSuccessMessage(Long id) {
         response.append(String.format(SUCCESS_MESSAGE_TEMPLATE, id));
+        status = Response.Status.CREATED;
         return this;
     }
 
     public Response build() {
-        return Response.accepted(response.toString()).status(Response.Status.CREATED).header(LOCATION_HEADER, location).build();
+        return Response.status(status)
+                .entity(StandardCharsets.UTF_8.encode(response.toString()).array())
+                .header(LOCATION_HEADER, location)
+                .build();
     }
 
     public static AcceptedResponseBuilder withLocation(String location) {

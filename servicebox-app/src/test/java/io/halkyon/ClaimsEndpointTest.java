@@ -74,7 +74,8 @@ public class ClaimsEndpointTest {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"mysql-demo\", \"serviceRequested\": \"mysql:3306\"}")
+                .formParam("name", "ClaimsEndpointTest.testAddClaimViaHtmxForm")
+                .formParam("serviceRequested", "mysql:3306")
                 .when().post("/claims")
                 .then()
                 .statusCode(201);

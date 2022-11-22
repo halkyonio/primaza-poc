@@ -19,4 +19,12 @@
             }
         };
     });
+
+    // Error handling after validation errors
+    htmx.on("htmx:beforeSwap", function(evt) {
+        if(evt.detail.xhr.status === 400) {
+            // for validation errors, we want to swap the content to the #response element.
+            evt.detail.shouldSwap = true;
+        }
+    });
 })();

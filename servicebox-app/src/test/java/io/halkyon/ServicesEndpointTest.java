@@ -31,7 +31,9 @@ public class ServicesEndpointTest {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"RabbitMQ2\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"available\": \"false\" }")
+                .formParam("name", "RabbitMQ2")
+                .formParam("version", "3.11.2")
+                .formParam("endpoint", "tcp:5672")
                 .when().post("/services")
                 .then()
                 .statusCode(201);
