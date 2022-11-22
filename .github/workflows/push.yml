@@ -141,8 +141,8 @@ jobs:
           ## the service endpoint should be: "postgresql:5432"
 
           # Next, we register the Postgresql service in Service Box
-          BODY="{\"name\": \"postgresql\", \"version\": \"11\", \"endpoint\": \"tcp:5432\"}"
-          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/json' --data '$BODY' -s -i localhost:8080/services")
+          BODY="name=postgresql&version=11&endpoint=tcp:5432"
+          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' --data '$BODY' -s -i localhost:8080/services")
           if [ "$RESULT" = *"500 Internal Server Error"* ]
           then
             echo "Service failed to be saved in Service Box: $RESULT"
@@ -151,7 +151,7 @@ jobs:
           echo "Service installed in Service Box: $RESULT"
 
           SERVICE=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/services/name/postgresql")
-          if [ $(echo "$SERVICE" | jq -r '.available') = "true" ]
+          if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
           then
             echo "ServiceBox didn't discovery the Postgresql service: $SERVICE"
             exit 1

@@ -68,12 +68,17 @@ public class ClaimResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public io.halkyon.model.Claim findByName(@PathParam("name") String name) {
-        return io.halkyon.model.Claim.findByName(name);
+        Claim claim = Claim.findByName(name);
+        if (claim == null) {
+            throw new NotFoundException("Claim with name " + name + " does not exist.");
+        }
+        return claim;
+
     }
 
     @POST
     @Transactional
-    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form io.halkyon.model.Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
         Set<ConstraintViolation<Claim>> errors = validator.validate(claim);
