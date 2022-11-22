@@ -25,18 +25,18 @@ public class CredentialsPageTest {
         // add param a=1
         page.type("new-param-name", "a");
         page.type("new-param-value", "1");
-        page.clickOn("add-param-to-credential-button");
+        page.clickById("add-param-to-credential-button");
         // add param b=2
         page.type("new-param-name", "b");
         page.type("new-param-value", "2");
-        page.clickOn("add-param-to-credential-button");
+        page.clickById("add-param-to-credential-button");
         // set data
         page.select("credential_service", "postgresql-credential1");
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
         // submit credential
-        page.clickOn("new-credential-button");
+        page.clickById("new-credential-button");
 
         // then, the new credential should be listed:
         page.goTo("/credentials");
