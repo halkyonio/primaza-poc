@@ -100,11 +100,11 @@ public class ClaimResource {
     @GET
     @Path("/claim/{id}")
     @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML)
     public Object edit(@PathParam("id") Long id) {
-        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claim");
         Claim claim = Claim.findById(id);
         if (claim == null) {
-            return response.withErrors(null);
+            throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
         }
         return Templates.Claims.form(claim);
     }

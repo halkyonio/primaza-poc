@@ -1,4 +1,11 @@
 {@io.halkyon.model.Claim claim}
+<script>
+    htmx.on('htmx:responseError', function(evt) {
+        if(evt.detail.xhr.status === 404){
+            alert("Error: Claim resource dot not exist !)");
+        }
+    });
+</script>
 <tr>
     <td>{claim.name}</td>
     <td>{claim.description}</td>
