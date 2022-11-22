@@ -8,25 +8,25 @@
          <div class="form-group">
             <label class="control-label col-sm-2" for="name">Claim name:</label>
             <div class="col-sm-5">
-             <input class="form-control new-claim" type="text" name="name" placeholder="What do you want to claim ?">
+             <input class="form-control new-claim" type="text" name="name" value="{#if claim.name}{claim.name}{/if}" placeholder="What do you want to claim ?">
             </div>
          </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="description">Description:</label>
              <div class="col-sm-10">
-               <input class="form-control new-claim" type="text" name="description" placeholder="Describe me">
+               <input class="form-control new-claim" type="text" name="description" value="{#if claim.description}{claim.description}{/if}" placeholder="Describe me">
              </div>
          </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="owner">Owner:</label>
              <div class="col-sm-5">
-              <input class="form-control new-claim" type="text" name="owner" placeholder="Team/user owning the request">
+              <input class="form-control new-claim" type="text" name="owner" value="{#if claim.owner}{claim.owner}{/if}" placeholder="Team/user owning the request">
              </div>
          </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="serviceRequested" >Service requested:</label>
              <div class="col-sm-5">
-               <input class="form-control new-claim" type="text" name="serviceRequested" placeholder="Service requested">
+               <input class="form-control new-claim" type="text" value="{#if claim.serviceRequested}{claim.serviceRequested}{/if}" name="serviceRequested" placeholder="Service requested">
              </div>
          </div>
          </br>
