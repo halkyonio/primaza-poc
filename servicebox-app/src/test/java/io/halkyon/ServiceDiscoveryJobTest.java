@@ -6,9 +6,10 @@ import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -16,9 +17,9 @@ import javax.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
-import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.ClusterNameMatcher;
@@ -63,7 +64,7 @@ public class ServiceDiscoveryJobTest {
                 .statusCode(200)
                 .body("available", is(false));
         Cluster cluster = createCluster("dummy-cluster-1", "master:port");
-        configureMockServiceFor(cluster.name, "host", "1111");
+        configureMockServiceFor(cluster.name, "host", "1111", "ns1");
 
         job.execute();
         given()
@@ -81,7 +82,7 @@ public class ServiceDiscoveryJobTest {
         pauseScheduler();
         String serviceName = "ServiceDiscoveryJobTest2";
         Cluster cluster = createCluster("dummy-cluster-2", "master:port");
-        configureMockServiceFor(cluster.name, "host", "2222");
+        configureMockServiceFor(cluster.name, "host", "2222", "ns1");
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -105,7 +106,7 @@ public class ServiceDiscoveryJobTest {
     public void testShouldDiscoveryServiceWhenNewClusterIsCreated(){
         pauseScheduler();
         Service service = createService("ServiceDiscoveryJobTest3", "any", "host:3333");
-        configureMockServiceFor("dummy-cluster-3", "host", "3333");
+        configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -130,9 +131,11 @@ public class ServiceDiscoveryJobTest {
         page.assertContentContains(expectedServiceName);
     }
 
-    private void configureMockServiceFor(String clusterName, String serviceName, String servicePort) {
-        Mockito.when(mockKubernetesClientService.isServiceRunningInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(serviceName), eq(servicePort)))
-                .thenReturn(true);
+    private void configureMockServiceFor(String clusterName, String protocol, String servicePort, String serviceNamespace) {
+        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(protocol), eq(servicePort)))
+                .thenReturn(Optional.of(new ServiceBuilder()
+                        .withNewMetadata().withNamespace(serviceNamespace).endMetadata()
+                        .build()));
     }
 
     private void pauseScheduler() {

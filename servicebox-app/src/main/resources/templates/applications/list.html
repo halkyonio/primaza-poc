@@ -2,7 +2,7 @@
 {#include base}
   {#title}Applications{/title}
   {#body}
-  <div class="container pt-4" hx-get="/applications/polling" hx-trigger="every 5s">
+  <div id="applications_list_polling" class="container pt-4" hx-get="/applications/polling" enable-polling="true" hx-trigger="every 5s [document.getElementById('applications_list_polling').hasAttribute('enable-polling')]">
       {#include applications/listTable.html applications=applications items=items /}
   </div>
   {/body}

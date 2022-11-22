@@ -1,6 +1,8 @@
 package io.halkyon.model;
 
 import java.sql.Date;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -18,6 +20,7 @@ import javax.validation.constraints.NotBlank;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
+import io.halkyon.services.ClaimStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 
@@ -53,6 +56,10 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> listAll() {
         return findAll(Sort.ascending("name")).list();
+    }
+
+    public static List<Claim> listAvailable() {
+        return find("status=:status", Collections.singletonMap("status", ClaimStatus.BIND.toString())).list();
     }
 
     public static List<Claim> getClaims(String name, String serviceRequested) {

@@ -1,24 +1,39 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createCluster;
+import static io.halkyon.utils.TestUtils.createCredential;
+import static io.halkyon.utils.TestUtils.createService;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ClaimingServiceJob;
 import io.halkyon.services.KubernetesClientService;
+import io.halkyon.services.ServiceDiscoveryJob;
+import io.halkyon.utils.ApplicationNameMatcher;
+import io.halkyon.utils.ClaimNameMatcher;
 import io.halkyon.utils.ClusterNameMatcher;
+import io.halkyon.utils.SecretDataMatcher;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -35,7 +50,13 @@ public class ApplicationsPageTest {
     KubernetesClientService mockKubernetesClientService;
 
     @Inject
-    ApplicationDiscoveryJob job;
+    ApplicationDiscoveryJob applicationDiscoveryJob;
+
+    @Inject
+    ClaimingServiceJob claimingServiceJob;
+
+    @Inject
+    ServiceDiscoveryJob serviceDiscoveryJob;
 
     @Inject
     Scheduler scheduler;
@@ -45,32 +66,83 @@ public class ApplicationsPageTest {
         String prefix = "ApplicationsPageTest.testDiscoverApplications.";
         pauseScheduler();
         // create data
-        Cluster cluster = createCluster(prefix + "cluster", "host:port1");
-        configureMockApplicationFor(cluster, prefix + "app", "ns1", "image1");
+        Cluster cluster = createCluster(prefix + "cluster", "host:port");
+        configureMockApplicationFor(cluster.name, prefix + "app", "image1", "ns1");
         // test the job
-        job.execute();
+        applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
         page.goTo("/applications");
-        page.assertContentContains(prefix + "app");
-        page.assertContentContains("image1");
-        page.assertContentContains(prefix + "cluster");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(prefix + "app");
+            page.assertContentContains("image1");
+            page.assertContentContains(prefix + "cluster");
+        });
         // and cluster should have only one application
         assertEquals(1, Cluster.findByName(cluster.name).applications.size());
 
         // test the same application is not created again
-        job.execute();
+        applicationDiscoveryJob.execute();
         // the mocked application is ignored and cluster should still have only one application
         assertEquals(1, Cluster.findByName(cluster.name).applications.size());
 
         // test that uninstalled deployments are deleted in database
         configureMockApplicationWithEmptyFor(cluster);
         // test the job
-        job.execute();
+        applicationDiscoveryJob.execute();
         // now the deployment should NOT be listed in the page
         page.goTo("/applications");
-        page.assertContentDoesNotContain(prefix + "app");
-        page.assertContentDoesNotContain(prefix + "image");
-        page.assertContentDoesNotContain(cluster.name);
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentDoesNotContain(prefix + "app");
+        });
+    }
+
+    @Test
+    public void testBindApplication(){
+        pauseScheduler();
+        // names
+        String prefix = "ApplicationsPageTest.testBindApplication.";
+        String clusterName = prefix + "cluster";
+        String claimName = prefix + "claim";
+        String serviceName = prefix + "service";
+        String credentialName = prefix + "credential";
+        String appName = prefix + "app";
+        // mock data
+        configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
+        configureMockApplicationFor(clusterName, appName, "image2", "ns1");
+        // create data
+        Service service = createService(serviceName, "version", "testbind:1111");
+        createCredential(credentialName, service.id, "user1", "pass1");
+        createCluster(clusterName, "host:port");
+        serviceDiscoveryJob.execute(); // this action will change the service to available
+        createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.execute(); // this action will link the claim with the above service
+        // test the job to find applications
+        applicationDiscoveryJob.execute();
+        // now the deployment should be listed in the page
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(appName);
+        });
+
+        // click on bind button
+        page.clickByName("btn-application-bind");
+        // modal should be displayed
+        page.assertContentContains("Bind Application " + appName);
+        // select our claim
+        page.select("application_bind_claim", claimName);
+        // click on bind
+        page.clickById("application-bind-button");
+        // then secret should have been generated
+        verify(mockKubernetesClientService, times(1))
+                .mountSecretInApplication(argThat(new ApplicationNameMatcher(appName)),
+                        argThat(new ClaimNameMatcher(claimName)),
+                        argThat(new SecretDataMatcher("testbind://" + serviceName + ":1111", "user1", "pass1")));
+        // and application should have been rolled out.
+        verify(mockKubernetesClientService, times(1))
+                .rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) {
@@ -78,13 +150,20 @@ public class ApplicationsPageTest {
                 .thenReturn(Collections.emptyList());
     }
 
-    private void configureMockApplicationFor(Cluster cluster, String appName, String appNamespace, String appImage) {
-        Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(cluster.name))))
+    private void configureMockApplicationFor(String clusterName, String appName, String appImage, String appNamespace) {
+        Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(clusterName))))
                 .thenReturn(Arrays.asList(new DeploymentBuilder()
                         .withNewMetadata().withName(appName).withNamespace(appNamespace).endMetadata()
                         .withNewSpec().withNewTemplate().withNewSpec()
                         .addNewContainer().withImage(appImage).endContainer()
                         .endSpec().endTemplate().endSpec()
+                        .build()));
+    }
+
+    private void configureMockServiceFor(String clusterName, String protocol, String servicePort, String serviceNamespace) {
+        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(protocol), eq(servicePort)))
+                .thenReturn(Optional.of(new ServiceBuilder()
+                        .withNewMetadata().withNamespace(serviceNamespace).endMetadata()
                         .build()));
     }
 

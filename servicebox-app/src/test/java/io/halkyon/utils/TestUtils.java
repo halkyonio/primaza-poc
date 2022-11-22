@@ -1,13 +1,13 @@
 package io.halkyon.utils;
 
-import io.halkyon.model.Claim;
-import io.halkyon.model.Cluster;
-import io.halkyon.model.Service;
+import static io.restassured.RestAssured.given;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
 
-import static io.restassured.RestAssured.given;
+import io.halkyon.model.Claim;
+import io.halkyon.model.Cluster;
+import io.halkyon.model.Service;
 
 public final class TestUtils {
     private TestUtils() {
@@ -86,4 +86,14 @@ public final class TestUtils {
 
     }
 
+    public static void createCredential(String credentialName, long serviceId, String username, String password) {
+        given()
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", credentialName)
+                .formParam("serviceId", serviceId)
+                .formParam("username", username)
+                .formParam("password", password)
+                .when().post("/credentials")
+                .then().statusCode(201);
+    }
 }

@@ -1,5 +1,7 @@
 package io.halkyon;
 
+import io.halkyon.model.Application;
+import io.halkyon.model.Claim;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
@@ -46,5 +48,6 @@ public class Templates {
         public static class Applications {
                 public static native TemplateInstance list(List<io.halkyon.model.Application> applications);
                 public static native TemplateInstance listTable(List<io.halkyon.model.Application> applications);
+                public static native TemplateInstance bind(Application application, List<Claim> claims);
         }
 }
