@@ -37,7 +37,7 @@ public final class TestUtils {
     }
 
     public static Service createService(String serviceName, String serviceVersion, String endpoint) {
-         return createService(serviceName, serviceVersion, endpoint, false);
+        return createService(serviceName, serviceVersion, endpoint, false);
     }
 
     @Transactional

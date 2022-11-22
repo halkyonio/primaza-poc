@@ -1,8 +1,13 @@
 package io.halkyon.resource.page;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.util.Set;
+import io.halkyon.Templates;
+import io.halkyon.model.Cluster;
+import io.halkyon.resource.requests.NewClusterRequest;
+import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ServiceDiscoveryJob;
+import io.halkyon.utils.AcceptedResponseBuilder;
+import io.quarkus.qute.TemplateInstance;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -15,18 +20,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import io.halkyon.Templates;
-import io.halkyon.model.Cluster;
-import io.halkyon.resource.requests.NewClusterRequest;
-import io.halkyon.services.ApplicationDiscoveryJob;
-import io.halkyon.services.ServiceDiscoveryJob;
-import io.halkyon.utils.AcceptedResponseBuilder;
-import io.quarkus.qute.TemplateInstance;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.Set;
 
 @Path("/clusters")
 public class ClusterResource {
@@ -90,6 +89,10 @@ public class ClusterResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public Cluster findByName(@PathParam("name") String name) {
-        return Cluster.findByName(name);
+        Cluster cluster = Cluster.findByName(name);
+        if (cluster == null) {
+            throw new WebApplicationException("Claim with name " + name + " does not exist.", 400);
+        }
+        return cluster;
     }
 }

@@ -46,20 +46,19 @@ public class ServicesEndpointTest {
 
     public void serviceIsCreatedViaForm() {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
-        String rabbitMQ4 = "RabbitMQ2";
+        String rabbitMQ4 = "RabbitMQ4";
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", rabbitMQ4)
                 .formParam("version", "3.11.1")
                 .formParam("endpoint", "tcp:5672")
-                .formParam("deployed", false)
                 .when().post("/services")
                 .then().statusCode(201);
     }
 
 //    @Test
-    //TODO This test doesn't work passing by the ServiceResource#addmethod because the services it tries to persiste the service twice in the same transaction and a primary key violation constrain occurs
+    //TODO This test doesn't work passing by the ServiceResource#addmethod because the services it tries to persist the service twice in the same transaction and a primary key violation constrain occurs
     public void testCannotAddServiceWithSameNameAndVersion() {
         String serviceName = "RabbitMQ4";
         String serviceVersion = "3.11.2";

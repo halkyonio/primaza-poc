@@ -86,7 +86,7 @@ public class ServiceResource {
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
         Service service = Service.findByName(name);
         if (service == null) {
-            throw new WebApplicationException("Service with name " + name + " does not exist.", 404);
+            throw new WebApplicationException("Service with name " + name + " does not exist.", 400);
         }
         return service;
     }

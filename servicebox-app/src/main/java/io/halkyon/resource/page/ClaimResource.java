@@ -70,7 +70,7 @@ public class ClaimResource {
     public io.halkyon.model.Claim findByName(@PathParam("name") String name) {
         Claim claim = Claim.findByName(name);
         if (claim == null) {
-            throw new WebApplicationException("Claim with name " + name + " does not exist.", 404);
+            throw new WebApplicationException("Claim with name " + name + " does not exist.", 400);
         }
         return claim;
 
