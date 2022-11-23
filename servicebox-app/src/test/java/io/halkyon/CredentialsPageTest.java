@@ -4,6 +4,7 @@ import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Credential;
@@ -19,6 +20,7 @@ public class CredentialsPageTest {
     WebPageExtension.PageManager page;
 
     @Test
+    @DisabledOnIntegrationTest
     public void testCreateNewCredential(){
         createService("postgresql-credential1", "8", true);
         page.goTo("/credentials/new");

@@ -59,9 +59,7 @@ public final class TestUtils {
                 .extract().as(Service.class);
 
         if (available){
-            Service svc = Service.findById(service.id);
-            svc.available=available;
-            svc.persist();
+            Service.update("update from Service set available = true where id = ?1", service.id);
         }
         return service;
     }
