@@ -11,6 +11,7 @@ import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -57,8 +58,10 @@ public class ServiceResource {
                 service.created = new Date(System.currentTimeMillis());
             }
 
-            serviceDiscoveryJob.checkService(service);
-            service.persist();
+            serviceDiscoveryJob.checkIfServiceIsRunningInClusterAndPersist(service);
+            if(service.id==null) {
+                service.persist();
+            }
             response.withSuccessMessage(service.id);
         }
 
@@ -83,7 +86,11 @@ public class ServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
-        return io.halkyon.model.Service.findByName(name);
+        Service service = Service.findByName(name);
+        if (service == null) {
+            throw new NotFoundException("Service with name " + name + " does not exist.");
+        }
+        return service;
     }
 
     @GET
@@ -91,7 +98,7 @@ public class ServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered")
     public TemplateInstance listDiscoveredServices() {
-        List<Service> discoveredServices = Service.findDeployedServices();
+        List<Service> discoveredServices = Service.findAvailableServices();
         return Templates.Services.listDiscovered(discoveredServices).data("items", discoveredServices.size());
     }
 
@@ -100,7 +107,7 @@ public class ServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered/polling")
     public TemplateInstance pollingDiscoveredServices() {
-        List<Service> discoveredServices = Service.findDeployedServices();
+        List<Service> discoveredServices = Service.findAvailableServices();
         return Templates.Services.listDiscoveredTable(discoveredServices).data("items", discoveredServices.size());
     }
 }

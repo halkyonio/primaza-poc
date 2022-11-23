@@ -21,7 +21,7 @@ public class HomeResourceTest {
     @Test
     public void testShouldGoToClaimsPage() {
         page.goTo("/");
-        page.clickOn("home-claims-btn-id");
+        page.clickById("home-claims-btn-id");
         page.assertPathIs("/claims");
         // New button
         page.assertContentContains("New claim");
@@ -32,7 +32,7 @@ public class HomeResourceTest {
     @Test
     public void testShouldGoToServicesPage() {
         page.goTo("/");
-        page.clickOn("home-services-btn-id");
+        page.clickById("home-services-btn-id");
         page.assertPathIs("/services");
         // New button
         page.assertContentContains("New service");
@@ -43,7 +43,7 @@ public class HomeResourceTest {
     @Test
     public void testShouldGoToClustersPage() {
         page.goTo("/");
-        page.clickOn("home-clusters-btn-id");
+        page.clickById("home-clusters-btn-id");
         page.assertPathIs("/clusters");
         // New button
         page.assertContentContains("New cluster");
@@ -54,7 +54,7 @@ public class HomeResourceTest {
     @Test
     public void testShouldGoToCredentialsPage() {
         page.goTo("/");
-        page.clickOn("home-credentials-btn-id");
+        page.clickById("home-credentials-btn-id");
         page.assertPathIs("/credentials");
         // New button
         page.assertContentContains("New credential");
@@ -63,9 +63,9 @@ public class HomeResourceTest {
     }
 
     @Test
-    public void testShouldGoToDeployedServicesPage() {
+    public void testShouldGoToAvailableServicesPage() {
         page.goTo("/");
-        page.clickOn("home-deployed-services-btn-id");
+        page.clickById("home-available-services-btn-id");
         page.assertPathIs("/services/discovered");
         // Go back button
         page.assertContentContains("Home");
@@ -74,7 +74,7 @@ public class HomeResourceTest {
     @Test
     public void testShouldGoToApplicationsPage() {
         page.goTo("/");
-        page.clickOn("home-applications-btn-id");
+        page.clickById("home-applications-btn-id");
         page.assertPathIs("/applications");
         // Go back button
         page.assertContentContains("Home");

@@ -86,20 +86,12 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
             }
         }
 
-        public void clickOn(String elementId) {
-            try {
-                DomElement element = currentPage.getElementById(elementId);
-                currentPage = element.click();
-                if (element instanceof HtmlInput
-                        || element instanceof HtmlLink
-                        || element instanceof HtmlAnchor) {
-                    refreshPageContent();
-                }
-                waitUntilLoaded();
+        public void clickById(String elementId) {
+            clickOn(currentPage.getElementById(elementId));
+        }
 
-            } catch (IOException e) {
-                this.failure = e;
-            }
+        public void clickByName(String elementName) {
+            clickOn(currentPage.getElementByName(elementName));
         }
 
         public void type(String elementId, String value) {
@@ -128,9 +120,24 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
             assertFalse(body.contains(expectedContent), "Content: " + expectedContent + ", was found in body: " + body);
         }
 
-        private void refreshPageContent() {
+        public void refresh() {
             try {
-                currentPage.refresh();
+                currentPage = (HtmlPage) currentPage.refresh();
+            } catch (IOException e) {
+                this.failure = e;
+            }
+        }
+
+        private void clickOn(DomElement element) {
+            try {
+                currentPage = element.click();
+                if (element instanceof HtmlInput
+                        || element instanceof HtmlLink
+                        || element instanceof HtmlAnchor) {
+                    refresh();
+                }
+                waitUntilLoaded();
+
             } catch (IOException e) {
                 this.failure = e;
             }

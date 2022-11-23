@@ -1,11 +1,15 @@
 package io.halkyon.services;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
+
+import javax.ws.rs.ClientErrorException;
 
 import org.jboss.logging.Logger;
 
@@ -14,8 +18,8 @@ import io.halkyon.model.Service;
 import io.quarkus.scheduler.Scheduled;
 
 /**
- * The service discovery job will loop over the registered services and clusters and check whether a service is deployed in
- * a cluster. If so, it will update the service entity deployed and cluster fields accordingly.
+ * The service discovery job will loop over the registered services and clusters and check whether a service is available in
+ * a cluster. If so, it will update the service entity available and cluster fields accordingly.
  */
 @ApplicationScoped
 public class ServiceDiscoveryJob {
@@ -37,7 +41,7 @@ public class ServiceDiscoveryJob {
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {
-            checkService(service);
+            checkIfServiceIsRunningInClusterAndPersist(service);
         }
     }
 
@@ -46,10 +50,7 @@ public class ServiceDiscoveryJob {
         List<Service> services = Service.listAll();
         boolean updated = false;
         for (Service service : services) {
-            if (service.cluster == null && isServiceRunningInCluster(service, cluster)) {
-                service.deployed = true;
-                service.cluster = cluster;
-                cluster.services.add(service);
+            if (service.cluster == null && linkServiceWithCluster(service, cluster)) {
                 updated = true;
             }
         }
@@ -60,42 +61,47 @@ public class ServiceDiscoveryJob {
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void checkService(Service service) {
-        if (service.cluster == null || !isServiceRunningInCluster(service, service.cluster)) {
-            service.deployed = false;
+    public void checkIfServiceIsRunningInClusterAndPersist(Service service) {
+        if (service.cluster == null || !getServiceInCluster(service, service.cluster).isPresent()) {
+            service.available = false;
             List<Cluster> clusters = Cluster.listAll();
             for (Cluster cluster : clusters) {
-                if (isServiceRunningInCluster(service, cluster)) {
-                    service.deployed = true;
-                    service.cluster = cluster;
-                    cluster.services.add(service);
+                if (linkServiceWithCluster(service, cluster)) {
                     break;
                 }
             }
 
-            service.persist();
+            try {
+                service.persist();
+            } catch (PersistenceException e) {
+                if(e.getCause() instanceof ConstraintViolationException) {
+                    throw new ClientErrorException(e.getMessage(), 409);
+                }
+            }
         }
     }
 
-    private boolean isServiceRunningInCluster(Service service, Cluster cluster) {
-        if (service.endpoint == null) {
-            return false;
-        }
+    private boolean linkServiceWithCluster(Service service, Cluster cluster) {
+        Optional<io.fabric8.kubernetes.api.model.Service> serviceInCluster = getServiceInCluster(service, cluster);
+        if (serviceInCluster.isPresent()) {
+            service.available = true;
+            service.cluster = cluster;
+            service.namespace = serviceInCluster.get().getMetadata().getNamespace();
+            cluster.services.add(service);
 
-        try {
-            String[] parts = service.endpoint.split(Pattern.quote(":"));
-            if (parts.length != 2) {
-                return false;
-            }
-
-            String protocol = parts[0];
-            String servicePort = parts[1];
-
-            return kubernetesClientService.isServiceRunningInCluster(cluster, protocol, servicePort);
-        } catch (Exception ex) {
-            LOG.error("Error trying to discovery the service " + service.id + " in the registered clusters", ex);
+            return true;
         }
 
         return false;
+    }
+
+    private Optional<io.fabric8.kubernetes.api.model.Service> getServiceInCluster(Service service, Cluster cluster) {
+        try {
+            return kubernetesClientService.getServiceInCluster(cluster, service.getProtocol(), service.getPort());
+        } catch (Exception ex) {
+            LOG.error("Error trying to discovery the service " + service.name + " in the registered clusters", ex);
+        }
+
+        return Optional.empty();
     }
 }

@@ -4,6 +4,7 @@ import static javax.persistence.CascadeType.ALL;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,10 +16,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -42,10 +45,12 @@ public class Service extends PanacheEntityBase {
 
     /* in form of tcp:8080*/
     @NotBlank(message = "Service endpoint must not be empty")
+    @javax.validation.constraints.Pattern(regexp = "\\w+:\\d+", message = "Wrong format in service endpoint. It must be 'protocol:port'")
     @FormParam
     public String endpoint;
-
-    public Boolean deployed;
+    public String namespace;
+    public Boolean available;
+    public Date created;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
@@ -55,8 +60,21 @@ public class Service extends PanacheEntityBase {
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
 
-    @FormParam
-    public Date created;
+    @JsonIgnore
+    @Transient
+    public String getProtocol() {
+        return splitEndpoint()[0];
+    }
+
+    @JsonIgnore
+    @Transient
+    public String getPort() {
+        return splitEndpoint()[1];
+    }
+
+    private String[] splitEndpoint() {
+        return endpoint.split(Pattern.quote(":"));
+    }
 
     public static Service findByName(String name) {
         return find("name", name).firstResult();
@@ -66,7 +84,7 @@ public class Service extends PanacheEntityBase {
         return findAll(Sort.ascending("name")).list();
     }
 
-    public static List<Service> findDeployedServices() {
-        return Service.find("deployed=true AND cluster != null").list();
+    public static List<Service> findAvailableServices() {
+        return Service.find("available=true AND cluster != null").list();
     }
 }

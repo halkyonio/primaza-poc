@@ -30,6 +30,7 @@ public class ClaimingServiceJob {
     @ConfigProperty(name = "servicebox.claiming-service-job.max-attempts")
     int maxAttempts;
 
+
     /**
      * This method will be executed at every `${servicebox.claiming-service-job.poll-every}`.
      * First, it will collect the list of all available services, and then will loop over the new or pending claims to link
@@ -52,7 +53,7 @@ public class ClaimingServiceJob {
 
     private Map<String, Service> listAllAvailableServices() {
         Map<String, Service> services = new HashMap<>();
-        Service.list("deployed=true")
+        Service.list("available=true")
                 .stream().map(Service.class::cast)
                 .forEach(s -> {
                     // combination by service name + version

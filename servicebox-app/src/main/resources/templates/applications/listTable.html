@@ -6,6 +6,7 @@
             <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Image</th>
             <th aria-valuetext="left">Cluster</th>
+            <th aria-valuetext="left">Action</th>
         </tr>
       </thead>
       <tbody id="applications-list">
@@ -15,6 +16,19 @@
             <td>{application.namespace}</td>
             <td>{application.image}</td>
             <td>{application.cluster.name}</td>
+            <td>
+                <ul class="list-inline m-0">
+                    <li class="list-inline-item">
+                        <button hx-get="/applications/bind/{application.id}"
+                                hx-target="#app_bind_modal-container"
+                                hx-trigger="click"
+                                onclick="stopPolling()"
+                                name="btn-application-bind"
+                                class="btn btn-success btn-sm rounded-2"
+                                _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Bind</button>
+                    </li>
+                </ul>
+            </td>
         </tr>
         {/for}
       </tbody>
@@ -24,3 +38,25 @@
 <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
 <hr>
 <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
+<div id="app_bind_modal-container"></div>
+<script>
+function stopPolling() {
+   document.getElementById('applications_list_polling').removeAttribute("enable-polling");
+}
+
+function closeModal() {
+	var container = document.getElementById("app_bind_modal-container")
+	var backdrop = document.getElementById("app_bind_modal-container-backdrop")
+	var modal = document.getElementById("app_bind_modal")
+
+	modal.classList.remove("show")
+	backdrop.classList.remove("show")
+
+	setTimeout(function() {
+		container.removeChild(backdrop)
+		container.removeChild(modal)
+
+		document.getElementById('applications_list_polling').setAttribute("enable-polling", "true");
+	}, 200)
+}
+</script>

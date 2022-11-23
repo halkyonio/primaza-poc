@@ -6,86 +6,57 @@ import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.MediaType;
 
+import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.IsNot.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
 public class ServicesEndpointTest {
 
     @Test
-    public void testAddService(){
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"RabbitMQ\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/services")
-                .then()
-                .statusCode(201);
-
-    }
-
-    @Test
-    public void testAddServiceViaHtmxForm(){
+    public void serviceIsFoundByName() {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
+
+        String rabbitMQ4 = "RabbitMQ4";
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("{\"name\": \"RabbitMQ2\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
+                .formParam("name", rabbitMQ4)
+                .formParam("version", "3.11.2")
+                .formParam("endpoint", "tcp:5672")
                 .when().post("/services")
-                .then()
-                .statusCode(201);
-    }
-
-    @Test
-    public void testServiceEntity() {
-        final String path="/services";
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body("{\"name\": \"RabbitMQ3\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }")
-                .when().post("/services")
-                .then()
-                .statusCode(201);
+                .then().statusCode(201);
 
         Service service = given()
-                .when().get("/services/name/RabbitMQ3")
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/services/name/" + rabbitMQ4)
                 .then()
                 .statusCode(200)
                 .extract().as(Service.class);
 
-        //Delete the 'RabbitMQ':
-        given()
-                .when().delete(path + "/" + service.id)
-                .then()
-                .statusCode(204);
+        assertNotNull(service);
+        assertEquals(service.name, rabbitMQ4);
+        assertNotNull(service.created);
 
-        //List all, 'RabbitMQ3' should be missing now:
-        given()
-                .when().get(path)
-                .then()
-                .statusCode(200)
-                .body(not(containsString("RabbitMQ3")));
     }
 
     @Test
-    public void testCannotAddServiceWithSameNameAndVersion(){
-        String request = "{\"name\": \"RabbitMQ4\", \"version\": \"3.11.2\", \"endpoint\": \"tcp:5672\", \"deployed\": \"false\" }";
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body(request)
-                .when().post("/services")
-                .then()
-                .statusCode(201);
+    public void testCannotAddServiceWithSameNameAndVersion() {
+        String serviceName = "RabbitMQ2";
+        String serviceVersion = "3.11.0";
+        String endpoint = "tcp:5672";
+
+        createService(serviceName, serviceVersion, endpoint, false);
 
         given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept("application/json")
-                .body(request)
+                .header("HX-Request", true)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", serviceName)
+                .formParam("version", serviceVersion)
+                .formParam("endpoint", endpoint)
                 .when().post("/services")
-                .then()
-                .statusCode(409);
+                .then().statusCode(409);
     }
 
 }
