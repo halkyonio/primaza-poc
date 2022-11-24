@@ -2,6 +2,7 @@ package io.halkyon;
 
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
+import io.halkyon.model.Credential;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
@@ -34,7 +35,7 @@ public class Templates {
         public static class Credentials {
                 public static native TemplateInstance list(List<io.halkyon.model.Credential> credentials);
                 public static native TemplateInstance item(io.halkyon.model.Credential credential);
-                public static native TemplateInstance form();
+                public static native TemplateInstance form(Credential credential);
         }
 
         @CheckedTemplate(basePath = "clusters")

@@ -1,6 +1,7 @@
 package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
+import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
@@ -38,7 +39,7 @@ public class CredentialResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newCredential() {
-        return Templates.Credentials.form()
+        return Templates.Credentials.form(new Credential())
                 .data("services", Service.listAll())
                 .data("title","Credential form");
     }
@@ -79,6 +80,18 @@ public class CredentialResource {
 
         // Return as HTML the template rendering the item for HTMX
         return response.build();
+    }
+
+    @GET
+    @Path("/credential/{id}")
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML)
+    public Object edit(@PathParam("id") Long id) {
+        Credential credential = Credential.findById(id);
+        if (credential == null) {
+            throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
+        }
+        return Templates.Credentials.form(credential);
     }
 
     @GET
