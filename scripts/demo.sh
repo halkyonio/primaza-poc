@@ -28,7 +28,7 @@ fi
 
 pushd ${QUARKUS_APP_PATH}/${APP_DIR}
 
-pe "kubectl create namespace $NAMESPACE"
+pe "kubectl create ns $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -"
 
 pe "mvn quarkus:add-extension -Dextensions=\"quarkus-kubernetes-service-binding\""
 p "Remove the third party installations via templates (we'll install these services using Service Box :) )"
