@@ -22,7 +22,7 @@ GITHUB_REPO=https://github.com/quarkusio/quarkus-super-heroes
 TYPE_SPEED=${TYPE_SPEED:=40}
 NO_WAIT=true
 
-if [[ -d "${PROJECT_NAME}" ]]; then
+if [[ ! -d "${PROJECT_NAME}" ]]; then
   git clone ${GITHUB_REPO}
 fi
 
