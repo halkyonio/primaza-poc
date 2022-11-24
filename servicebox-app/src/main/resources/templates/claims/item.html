@@ -1,4 +1,11 @@
 {@io.halkyon.model.Claim claim}
+<script>
+    htmx.on('htmx:responseError', function(evt) {
+        if(evt.detail.xhr.status === 404){
+            alert("Error: Claim resource dot not exist !)");
+        }
+    });
+</script>
 <tr>
     <td>{claim.name}</td>
     <td>{claim.description}</td>
@@ -8,9 +15,16 @@
     <td>{claim.created}</td>
     <td>
         <ul class="list-inline m-0">
+            {#if claim.status is 'new' || claim.status is 'errors'}
             <li class="list-inline-item">
-                <button class="btn btn-success btn-sm rounded-2" type="button" title="Edit">Edit</button>
+                <a class="btn btn-success btn-sm rounded-2" type="button"
+                   title="Edit"
+                   href="/claims/claim/{claim.id}"
+                   hx-get="/claims/claim/{claim.id}"
+                   hx-swap="outerHTML"
+                   hx-target="#base">Edit</a>
             </li>
+            {/if}
             <li class="list-inline-item">
                 <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete">Delete</button>
             </li>

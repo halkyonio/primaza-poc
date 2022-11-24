@@ -37,7 +37,7 @@ public class ClaimResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.Claims.form().data("title","Claim form");
+        return Templates.Claims.form(new Claim()).data("title","Claim form");
     }
 
     @GET
@@ -100,6 +100,18 @@ public class ClaimResource {
 
         // Return as HTML the template rendering the item for HTMX
         return response.build();
+    }
+
+    @GET
+    @Path("/claim/{id}")
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML)
+    public Object edit(@PathParam("id") Long id) {
+        Claim claim = Claim.findById(id);
+        if (claim == null) {
+            throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
+        }
+        return Templates.Claims.form(claim);
     }
 
 }
