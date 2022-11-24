@@ -11,7 +11,7 @@ source ${SCRIPTS_DIR}/play-demo.sh
 VM_IP=${VM_IP:=127.0.0.1}
 NAMESPACE=app
 REGISTRY_GROUP=local
-REGISTRY=kind-registry:5000
+REGISTRY=localhost:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=superheroes.${VM_IP}.nip.io
 QUARKUS_APP_PATH="$HOME/quarkus-super-heroes"
@@ -28,7 +28,8 @@ fi
 
 pushd ${QUARKUS_APP_PATH}/${APP_DIR}
 
-pe "kubectl create ns $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -"
+pe "k create ns $NAMESPACE --dry-run=client -o yaml | k apply -f -"
+pe "k config set-context --current --namespace=${NAMESPACE}"
 
 pe "mvn quarkus:add-extension -Dextensions=\"quarkus-kubernetes-service-binding\""
 p "Remove the third party installations via templates (we'll install these services using Service Box :) )"
@@ -54,5 +55,6 @@ p "Package the application and build the image"
 pe "mvn clean package -DskipTests \
   -Dquarkus.container-image.push=true \
   -Dquarkus.container-image.registry=$REGISTRY \
+  -Dquarkus.container-image.insecure=true \
   -Dquarkus.kubernetes.namespace=$NAMESPACE \
   -Dquarkus.kubernetes.deploy=true"
