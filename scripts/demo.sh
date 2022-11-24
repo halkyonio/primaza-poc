@@ -71,8 +71,7 @@ pe "mvn clean package -DskipTests \
   -Dquarkus.container-image.registry=$REGISTRY \
   -Dquarkus.container-image.insecure=true \
   -Dquarkus.kubernetes.namespace=$NAMESPACE \
-  -Dquarkus.kubernetes.deploy=true \
-  -Dservicebox.discovery-application-job.poll-every=1m"
+  -Dquarkus.kubernetes.deploy=true"
 
 pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
 pe "helm install postgresql bitnami/postgresql \
