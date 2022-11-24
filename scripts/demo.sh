@@ -14,7 +14,7 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=superheroes.${VM_IP}.nip.io
-PROJECT_NAME=quarkus-super-heroes
+PROJECT_NAME="$HOME/quarkus-super-heroes"
 PROJECT_DIR=rest-heroes
 GITHUB_REPO=https://github.com/quarkusio/quarkus-super-heroes
 
