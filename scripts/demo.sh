@@ -35,8 +35,8 @@ fi
 if [[ "$1" == "clean" ]]; then
   pe "helm uninstall postgresql -n ${DB_NAMESPACE} || true"
   pe "k delete -f ${QUARKUS_APP_PATH}/${APP_DIR}/target/kubernetes/kubernetes.yml -n ${NAMESPACE} || true"
-  pe "k delete ns -n ${NAMESPACE} || true"
-  pe "k delete ns -n ${DB_NAMESPACE} || true"
+  pe "k delete ns ${NAMESPACE} || true"
+  pe "k delete ns ${DB_NAMESPACE} || true"
   exit 0
 fi
 
