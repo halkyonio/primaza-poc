@@ -10,7 +10,6 @@ source ${SCRIPTS_DIR}/play-demo.sh
 ####################################
 VM_IP=${VM_IP:=127.0.0.1}
 NAMESPACE=app
-REGISTRY_GROUP=local
 REGISTRY=localhost:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=superheroes.${VM_IP}.nip.io
@@ -18,12 +17,27 @@ QUARKUS_APP_PATH="$HOME/quarkus-super-heroes"
 APP_DIR=rest-heroes
 GITHUB_REPO=https://github.com/quarkusio/quarkus-super-heroes
 
+# Database credential
+DB_NAMESPACE=db
+USERNAME=superman
+PASSWORD=superman
+TYPE=postgresql
+DATABASE_NAME=database
+
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=200}
 NO_WAIT=true
 
 if [[ ! -d "${QUARKUS_APP_PATH}" ]]; then
   git clone ${GITHUB_REPO} ${QUARKUS_APP_PATH}
+fi
+
+if [[ "$1" == "clean" ]]; then
+  pe "helm uninstall postgresql -n ${DB_NAMESPACE}"
+  pe "k delete -f ${QUARKUS_APP_PATH}/${APP_DIR}/target/kubernetes/kubernetes.yml -n ${NAMESPACE}"
+  pe "k delete ns -n ${NAMESPACE}"
+  pe "k delete ns -n ${DB_NAMESPACE}"
+  exit 0
 fi
 
 pushd ${QUARKUS_APP_PATH}/${APP_DIR}
@@ -58,3 +72,10 @@ pe "mvn clean package -DskipTests \
   -Dquarkus.container-image.insecure=true \
   -Dquarkus.kubernetes.namespace=$NAMESPACE \
   -Dquarkus.kubernetes.deploy=true"
+
+pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
+pe "helm install postgresql bitnami/postgresql \
+    --create-namespace -n ${DB_NAMESPACE} \
+    --version 11.9.1 \
+    --set auth.username=${USERNAME} \
+    --set auth.password=${PASSWORD}"
