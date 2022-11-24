@@ -14,19 +14,19 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=superheroes.${VM_IP}.nip.io
-PROJECT_NAME="$HOME/quarkus-super-heroes"
-PROJECT_DIR=rest-heroes
+QUARKUS_APP_PATH="$HOME/quarkus-super-heroes"
+APP_DIR=rest-heroes
 GITHUB_REPO=https://github.com/quarkusio/quarkus-super-heroes
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=200}
 NO_WAIT=true
 
-if [[ ! -d "${PROJECT_NAME}" ]]; then
-  git clone ${GITHUB_REPO}
+if [[ ! -d "${QUARKUS_APP_PATH}" ]]; then
+  git clone ${GITHUB_REPO} ${QUARKUS_APP_PATH}
 fi
 
-pushd ${PROJECT_NAME}/${PROJECT_DIR}
+pushd ${QUARKUS_APP_PATH}/${APP_DIR}
 
 pe "kubectl create namespace $NAMESPACE"
 
