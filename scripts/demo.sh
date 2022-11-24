@@ -19,7 +19,7 @@ PROJECT_DIR=rest-heroes
 GITHUB_REPO=https://github.com/quarkusio/quarkus-super-heroes
 
 # Parameters to play the demo
-TYPE_SPEED=${TYPE_SPEED:=40}
+TYPE_SPEED=${TYPE_SPEED:=200}
 NO_WAIT=true
 
 if [[ ! -d "${PROJECT_NAME}" ]]; then
