@@ -53,6 +53,6 @@ EOF"
 p "Package the application and build the image"
 pe "mvn clean package -DskipTests \
   -Dquarkus.container-image.push=true \
-  -Dquarkus.container-image.registry=$KIND_REGISTRY \
+  -Dquarkus.container-image.registry=$REGISTRY \
   -Dquarkus.kubernetes.namespace=$NAMESPACE \
   -Dquarkus.kubernetes.deploy=true"
