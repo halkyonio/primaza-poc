@@ -24,6 +24,7 @@ public class BindApplicationService {
     public void bindApplication(Application application, Claim claim) {
         Credential credential = getFirstCredentialFromService(claim.service);
         String url = generateUrlByClaimService(application, claim);
+        Claim.update("update from Claim set url = ?1, credential = ?2 where id = ?3",url,credential,claim.id);
         if (credential != null && url != null) {
             // scenario is supported
             createSecretForApplication(application, claim, credential, url);

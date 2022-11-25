@@ -4,9 +4,11 @@ import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createCredential;
 import static io.halkyon.utils.TestUtils.createService;
+import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -18,7 +20,9 @@ import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
 
+import io.halkyon.model.Claim;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -135,6 +139,24 @@ public class ApplicationsPageTest {
         page.select("application_bind_claim", claimName);
         // click on bind
         page.clickById("application-bind-button");
+
+        //Verify the Claim has been updated with service credential and url
+        Claim actualClaim = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + claimName)
+                .then()
+                .statusCode(200)
+                .extract().as(Claim.class);
+
+        assertNotNull(actualClaim.credential);
+        assertEquals("user1", actualClaim.credential.username);
+        assertEquals("pass1",actualClaim.credential.password);
+
+        //protocol://service_name:port
+        assertNotNull(actualClaim.url);
+        assertEquals("testbind://" + serviceName + ":1111",actualClaim.url);
+
+
         // then secret should have been generated
         verify(mockKubernetesClientService, times(1))
                 .mountSecretInApplication(argThat(new ApplicationNameMatcher(appName)),
