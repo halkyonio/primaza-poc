@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+#
+# Usage:
+# ./scripts/create_cluster_entity.sh
+#
+# To use a different context
+# CONTEXT_TO_USE=my-ctx ./scripts/create_cluster_entity.sh
+#
+# To create the cluster record on a Primaza server which is not localhost:8080
+# PRIMAZA_URL=myprimaza:8080 ./scripts/create_cluster_entity.sh
+#
+
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
 source ${SCRIPTS_DIR}/common.sh
