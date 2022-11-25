@@ -55,25 +55,45 @@ public class CredentialResource {
             response.withErrors(errors);
         } else {
             Credential credential = new Credential();
-            credential.name = request.name;
-            credential.username = request.username;
-            credential.password = request.password;
-            credential.service = Service.findById(request.serviceId);
-            credential.created = new Date(System.currentTimeMillis());
-            credential.params = new ArrayList<>();
-            if (request.params != null) {
-                for (String param : request.params) {
-                    String[] nameValue = param.split("=");
-                    if (nameValue.length == 2) {
-                        CredentialParameter paramEntity = new CredentialParameter();
-                        paramEntity.credential = credential;
-                        paramEntity.paramName = nameValue[0];
-                        paramEntity.paramValue = nameValue[1];
-                        credential.params.add(paramEntity);
+            if (request.id != null) {
+                credential.id = request.id;
+                credential.name = request.name;
+                credential.username = request.username;
+                credential.password = request.password;
+                credential.service = Service.findById(request.serviceId);
+                credential.params = new ArrayList<>();
+                if (request.params != null) {
+                    for (String param : request.params) {
+                        String[] nameValue = param.split("=");
+                        if (nameValue.length == 2) {
+                            CredentialParameter paramEntity = new CredentialParameter();
+                            paramEntity.credential = credential;
+                            paramEntity.paramName = nameValue[0];
+                            paramEntity.paramValue = nameValue[1];
+                            credential.params.add(paramEntity);
+                        }
+                    }
+                }
+            } else {
+                credential.name = request.name;
+                credential.username = request.username;
+                credential.password = request.password;
+                credential.service = Service.findById(request.serviceId);
+                credential.created = new Date(System.currentTimeMillis());
+                credential.params = new ArrayList<>();
+                if (request.params != null) {
+                    for (String param : request.params) {
+                        String[] nameValue = param.split("=");
+                        if (nameValue.length == 2) {
+                            CredentialParameter paramEntity = new CredentialParameter();
+                            paramEntity.credential = credential;
+                            paramEntity.paramName = nameValue[0];
+                            paramEntity.paramValue = nameValue[1];
+                            credential.params.add(paramEntity);
+                        }
                     }
                 }
             }
-
             credential.persist();
             response.withSuccessMessage(credential.id);
         }
@@ -91,7 +111,10 @@ public class CredentialResource {
         if (credential == null) {
             throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
         }
-        return Templates.Credentials.form(credential);
+        //return Templates.Credentials.form(credential);
+        return Response
+                  .ok(Templates.Credentials.form(credential).render())
+                  .build();
     }
 
     @GET
