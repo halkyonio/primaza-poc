@@ -1,7 +1,6 @@
 package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
-import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
@@ -55,8 +54,8 @@ public class CredentialResource {
             response.withErrors(errors);
         } else {
             Credential credential;
-            if (request.credId != null && request.credId != 0) {
-                credential = Credential.findById(request.credId);
+            if (request.id != null && request.id != 0) {
+                credential = Credential.findById(request.id);
                 if (credential != null ) {
                     credential.name = request.name;
                     credential.username = request.username;
@@ -78,7 +77,7 @@ public class CredentialResource {
                     credential.persist();
                     response.withUpdateSuccessMessage(credential.id);
                 } else {
-                    throw new NotFoundException(String.format("Credential not found for id: %d%n", request.credId));
+                    throw new NotFoundException(String.format("Credential not found for id: %d%n", request.id));
                 }
             } else {
                 credential = new Credential();
