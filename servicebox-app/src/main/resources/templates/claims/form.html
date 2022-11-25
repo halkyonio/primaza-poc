@@ -30,9 +30,9 @@
                <select id="claim_service" class="form-control new-credential" name="serviceRequested" required placeholder="Select the service to claim">
                {#for service in services}
                    {#if claim.service && claim.service.id == service.id}
-                     <option value="{service.id}" selected>{service.name}</option>
+                     <option value="{service.name}-{service.version}" selected>{service.name}-{service.version}</option>
                    {#else}
-                     <option value="{service.id}">{service.name}</option>
+                     <option value="{service.name}-{service.version}">{service.name}-{service.version}</option>
                    {/if}
                {/for}
                </select>
