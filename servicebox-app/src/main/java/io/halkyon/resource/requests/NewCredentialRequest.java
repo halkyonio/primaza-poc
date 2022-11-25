@@ -10,7 +10,7 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 public class NewCredentialRequest {
 
     @FormParam
-    public Long id;
+    public Long credId;
 
     @NotBlank
     @FormParam
