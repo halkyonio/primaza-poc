@@ -118,10 +118,8 @@ public class CredentialResource {
         if (credential == null) {
             throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
         }
-        //return Templates.Credentials.form(credential);
-        return Response
-                  .ok(Templates.Credentials.form(credential).render())
-                  .build();
+        return Templates.Credentials.form(credential)
+                .data("services", Service.listAll());
     }
 
     @GET
