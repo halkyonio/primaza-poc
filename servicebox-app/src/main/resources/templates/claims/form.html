@@ -3,7 +3,7 @@
   {#title}Claim{/title}
   {#body}
      <div class="container" id="form">
-       <h1>Claims</h1>
+       <h1>New Claim</h1>
        <form class="form-horizontal" action="/claims" hx-post="/claims" hx-target="#response" method="POST" hx-swap="innerHTML">
          <div class="form-group">
             <label class="control-label col-sm-2" for="name">Claim name:</label>
@@ -26,7 +26,16 @@
          <div class="form-group">
              <label class="control-label col-sm-2" for="serviceRequested" >Service requested:</label>
              <div class="col-sm-5">
-               <input class="form-control new-claim" type="text" value="{#if claim.serviceRequested}{claim.serviceRequested}{/if}" name="serviceRequested" placeholder="Service requested">
+               <!--<input class="form-control new-claim" type="text" value="{#if claim.serviceRequested}{claim.serviceRequested}{/if}" name="serviceRequested" placeholder="Service requested">-->
+               <select id="claim_service" class="form-control new-credential" name="serviceRequested" required placeholder="Select the service to claim">
+               {#for service in services}
+                   {#if claim.service && claim.service.id == service.id}
+                     <option value="{service.name}-{service.version}" selected>{service.name}-{service.version}</option>
+                   {#else}
+                     <option value="{service.name}-{service.version}">{service.name}-{service.version}</option>
+                   {/if}
+               {/for}
+               </select>
              </div>
          </div>
          </br>
