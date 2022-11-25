@@ -14,6 +14,7 @@ Table of Contents
   * [How to play/demo](#how-to-playdemo)
     * [Using Primaza on a k8s cluster](#using-primaza-on-a-k8s-cluster)
     * [Running the application locally](#running-the-application-locally)
+  * [Demo time](#demo-time)
   * [Usage](#usage)
     * [Usage via curl](#usage-via-curl)
 
@@ -109,6 +110,30 @@ You can run your application in dev mode that enables live coding using:
 ```shell script
 cd servicebox-app
 ./mvnw compile quarkus:dev
+```
+
+## Demo time
+
+To play with Primaza, you can use the following scenario 
+
+- Launch `primaza` locally and open your browser at the address `http://localhgost:8080/home`
+- Register a Service
+- Go to the screen of the `available` services. It should be empty as no backend service currently exist
+- Install a database backend service (e.g Postgresql)
+- Go back to the screen of the `available services`. It should be there
+- Create for the registered service a credential
+- Install the Quarkus SuperHero application
+
+Everything is in place to claim a Service !
+- Create a claim for the registered Service
+- Bind the claim to the application (using the bind button part of the application screen)
+- Do a search using kubectl that a secret has been populated within the namespace of the demo app
+- Do the same to check if deployment has been updated
+- Access the Quarkus Super Hero app ;-)
+
+The process to install the Quarkus super hero and postgresql DB has been automated and can be installed using this command:
+```bash
+./scripts/demo.sh 
 ```
 
 ## Usage
