@@ -37,7 +37,9 @@ public class ClaimResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.Claims.form(new Claim()).data("title","Claim form");
+        return Templates.Claims.form(new Claim())
+                .data("services",Service.listAll())
+                .data("title","Claim form");
     }
 
     @GET
