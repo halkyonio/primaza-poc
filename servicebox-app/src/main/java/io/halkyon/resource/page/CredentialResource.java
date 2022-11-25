@@ -54,28 +54,55 @@ public class CredentialResource {
         if (!errors.isEmpty()) {
             response.withErrors(errors);
         } else {
-            Credential credential = new Credential();
-            credential.name = request.name;
-            credential.username = request.username;
-            credential.password = request.password;
-            credential.service = Service.findById(request.serviceId);
-            credential.created = new Date(System.currentTimeMillis());
-            credential.params = new ArrayList<>();
-            if (request.params != null) {
-                for (String param : request.params) {
-                    String[] nameValue = param.split("=");
-                    if (nameValue.length == 2) {
-                        CredentialParameter paramEntity = new CredentialParameter();
-                        paramEntity.credential = credential;
-                        paramEntity.paramName = nameValue[0];
-                        paramEntity.paramValue = nameValue[1];
-                        credential.params.add(paramEntity);
+            Credential credential;
+            if (request.credId != null && request.credId != 0) {
+                credential = Credential.findById(request.credId);
+                if (credential != null ) {
+                    credential.name = request.name;
+                    credential.username = request.username;
+                    credential.password = request.password;
+                    credential.service = Service.findById(request.serviceId);
+                    credential.params = new ArrayList<>();
+                    if (request.params != null) {
+                        for (String param : request.params) {
+                            String[] nameValue = param.split("=");
+                            if (nameValue.length == 2) {
+                                CredentialParameter paramEntity = new CredentialParameter();
+                                paramEntity.credential = credential;
+                                paramEntity.paramName = nameValue[0];
+                                paramEntity.paramValue = nameValue[1];
+                                credential.params.add(paramEntity);
+                            }
+                        }
+                    }
+                    credential.persist();
+                    response.withUpdateSuccessMessage(credential.id);
+                } else {
+                    throw new NotFoundException(String.format("Credential not found for id: %d%n", request.credId));
+                }
+            } else {
+                credential = new Credential();
+                credential.name = request.name;
+                credential.username = request.username;
+                credential.password = request.password;
+                credential.service = Service.findById(request.serviceId);
+                credential.created = new Date(System.currentTimeMillis());
+                credential.params = new ArrayList<>();
+                if (request.params != null) {
+                    for (String param : request.params) {
+                        String[] nameValue = param.split("=");
+                        if (nameValue.length == 2) {
+                            CredentialParameter paramEntity = new CredentialParameter();
+                            paramEntity.credential = credential;
+                            paramEntity.paramName = nameValue[0];
+                            paramEntity.paramValue = nameValue[1];
+                            credential.params.add(paramEntity);
+                        }
                     }
                 }
+                credential.persist();
+                response.withSuccessMessage(credential.id);
             }
-
-            credential.persist();
-            response.withSuccessMessage(credential.id);
         }
 
         // Return as HTML the template rendering the item for HTMX
@@ -91,7 +118,8 @@ public class CredentialResource {
         if (credential == null) {
             throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
         }
-        return Templates.Credentials.form(credential);
+        return Templates.Credentials.form(credential)
+                .data("services", Service.listAll());
     }
 
     @GET
