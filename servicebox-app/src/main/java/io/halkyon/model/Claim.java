@@ -1,13 +1,10 @@
 package io.halkyon.model;
 
-import java.sql.Date;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.halkyon.services.ClaimStatus;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Sort;
+import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,12 +14,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-
-import org.jboss.resteasy.annotations.jaxrs.FormParam;
-
-import io.halkyon.services.ClaimStatus;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Sort;
+import java.sql.Date;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 public class Claim extends PanacheEntityBase {
@@ -49,6 +47,11 @@ public class Claim extends PanacheEntityBase {
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
     public Integer attempts = 0;
+
+    @JsonManagedReference
+    @OneToOne
+    public Credential credential;
+    public String url;
 
     public static Claim findByName(String name) {
         return find("name", name).firstResult();
