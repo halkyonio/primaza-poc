@@ -16,6 +16,7 @@
     </div>
     <div class="container mt-4 p-4 ">
       <div class="row gy-5">
+        <!-- Clusters -->
         <div class="col-xl-2 col-md-6 mb-4">
           <div class="card border-0 shadow" style="background-color:#00897B;">
             <div class="card-body text-center">
@@ -27,6 +28,7 @@
       </div>
       <hr/>
       <div class="row gy-5">
+        <!-- Register services -->
         <div class="col-xl-2 col-md-6 mb-4">
           <div class="card border-0 shadow" style="background-color:#3949AB;">
             <div class="card-body text-center">
@@ -36,54 +38,10 @@
           </div>
         </div>
         <div class="col-sm-1 d-flex align-items-center justify-content-center">
-          <div class="card border-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-            </svg>
-          </div>
+           <div class="card border-0">
+             <i class="bi bi-plus-lg"></i>
+           </div>
         </div>
-        <div class="col-xl-2 col-md-6 mb-4">
-          <div class="card border-0 shadow" style="background-color:#3949AB;">
-            <div class="card-body text-center">
-              <a id="home-available-services-btn-id" class="card-title mb-0 btn text-white" href="/services/discovered">Discover</a>
-              <div class="card-text text-opacity-50 text-white fst-italic">the services available on the clusters</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-1 d-flex align-items-center justify-content-center">
-          <div class="card border-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-            </svg>
-          </div>
-        </div>
-        <div class="col-xl-2 col-md-6 mb-4">
-          <div class="card border-0 shadow" style="background-color:#3949AB;">
-            <div class="card-body text-center">
-              <a id="home-claims-btn-id" class="card-title mb-0 btn text-white" href="/claims">Claim</a>
-              <div class="card-text text-opacity-50 text-white fst-italic">A request to bind a service</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-1 d-flex align-items-center justify-content-center">
-          <div class="card border-0 d-flex align-items-center justify-content-center">
-            <!--<i class="bi bi-arrow-right"></i>-->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-            </svg>
-          </div>
-        </div>
-        <div class="col-xl-2 col-md-6 mb-4">
-          <div class="card border-0 shadow" style="background-color:#3949AB;">
-            <div class="card-body text-center">
-              <a id="home-applications-btn-id" class="card-title mb-0 btn text-white" href="/applications">Application</a>
-              <div class="card-text text-opacity-50 text-white fst-italic">available on the clusters</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr/>
-      <div class="row gy-5">
         <div class="col-xl-2 col-md-6 mb-4">
           <div class="card border-0 shadow" style="background-color:#D32F2F;">
             <div class="card-body text-center">
@@ -92,7 +50,48 @@
             </div>
           </div>
         </div>
+        <!-- Some words -->
+        <div class="col-sm-1 d-flex align-items-center justify-content-center">
+          <div class="card border-0">
+              and
+          </div>
+        </div>
+        <!-- Discover the services -->
+        <div class="col-xl-2 col-md-6 mb-4">
+          <div class="card border-0 shadow" style="background-color:#3949AB;">
+            <div class="card-body text-center">
+              <a id="home-available-services-btn-id" class="card-title mb-0 btn text-white" href="/services/discovered">Discover</a>
+              <div class="card-text text-opacity-50 text-white fst-italic">the services available on the clusters</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+      <hr/>
+      <div class="row gy-5">
+        <!-- Claiming -->
+        <div class="col-xl-2 col-md-6 mb-4">
+          <div class="card border-0 shadow" style="background-color:#3949AB;">
+            <div class="card-body text-center">
+              <a id="home-claims-btn-id" class="card-title mb-0 btn text-white" href="/claims">Claim</a>
+              <div class="card-text text-opacity-50 text-white fst-italic">to bind an Application to a backend service</div>
+            </div>
+          </div>
+        </div>
+        <!-- Arrow -->
+        <div class="col-sm-1 d-flex align-items-center justify-content-center">
+          <div class="card border-0 d-flex align-items-center justify-content-center">
+                and check
+          </div>
+        </div>
+        <!-- Application available on the Clusters -->
+        <div class="col-xl-2 col-md-6 mb-4">
+          <div class="card border-0 shadow" style="background-color:#3949AB;">
+            <div class="card-body text-center">
+              <a id="home-applications-btn-id" class="card-title mb-0 btn text-white" href="/applications">Application</a>
+              <div class="card-text text-opacity-50 text-white fst-italic">binded on the cluster(s)</div>
+            </div>
+          </div>
+        </div>
+      </div>
   {/body}
 {/include}
