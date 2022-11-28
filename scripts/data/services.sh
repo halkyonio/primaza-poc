@@ -4,7 +4,7 @@
 # Usage:
 # ./scripts/data/services.sh
 #
-# To create the records on a Primaza server which is not localhost:8080
+# To create the records on a different Primaza server which is not localhost:8080
 # PRIMAZA_URL=myprimaza:8080 ./scripts/data/services.sh
 #
 
