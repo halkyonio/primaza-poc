@@ -2,10 +2,10 @@
 
 #
 # Usage:
-# ./scripts/data/services.sh
+# ./scripts/data/credentials.sh
 #
 # To create the records on a Primaza server which is not localhost:8080
-# PRIMAZA_URL=myprimaza:8080 ./scripts/data/services.sh
+# PRIMAZA_URL=myprimaza:8080 ./scripts/data/credentials.sh
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
@@ -22,14 +22,11 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=postgresql&version=14.5&endpoint=tcp:5432"
-  "name=postgresql&version=11.5&endpoint=tcp:5432"
-  "name=mysql&version=8.0.&endpoint=tcp:3306"
-  "name=activemq-artemis&version=2.26&endpoint=tcp:8161"
-  "name=mariadb&version=10.9&endpoint=tcp:3306"
+  "serviceId=1&name=user&username=superman&password=superman&params="
+  "serviceId=3&name=admin&username=supermario&password=supermario&params="
 )
 
 for i in "${arr[@]}"
 do
-  pe "curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\" -o /dev/null"
+  pe "curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\" -o /dev/null"
 done
