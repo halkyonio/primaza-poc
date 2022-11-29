@@ -2,19 +2,19 @@
 
 #
 # Usage:
-# ./scripts/create_cluster_entity.sh
+# ./scripts/data/cluster.sh
 #
 # To use a different context
-# CONTEXT_TO_USE=my-ctx ./scripts/create_cluster_entity.sh
+# CONTEXT_TO_USE=my-ctx ./scripts/data/cluster.sh
 #
 # To create the cluster record on a Primaza server which is not localhost:8080
-# PRIMAZA_URL=myprimaza:8080 ./scripts/create_cluster_entity.sh
+# PRIMAZA_URL=myprimaza:8080 ./scripts/data/cluster.sh
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
-source ${SCRIPTS_DIR}/common.sh
-source ${SCRIPTS_DIR}/play-demo.sh
+source ${SCRIPTS_DIR}/../common.sh
+source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
 TYPE_SPEED=200
