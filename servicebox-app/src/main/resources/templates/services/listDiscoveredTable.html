@@ -13,7 +13,7 @@
         <tr>
             <td>{service.name}</td>
             <td>{service.version}</td>
-            <td>TBD</td>
+            <td>{service.protocol}://{service.name}.{service.namespace}</td>
             <td>{service.cluster.name}</td>
         </tr>
         {/for}
