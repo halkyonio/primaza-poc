@@ -46,7 +46,7 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/bind/{id}")
     public TemplateInstance bindApplicationModal(@PathParam("id") long applicationId) {
-        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable());
+        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable()).data("claims", Claim.listAll());
     }
 
     @Transactional
