@@ -33,7 +33,7 @@ public class CredentialsPageTest {
         page.type("new-param-value", "2");
         page.clickById("add-param-to-credential-button");
         // set data
-        page.select("credential_service", "postgresql-credential1");
+        page.select("credential_service", "postgresql-credential1-8");
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
