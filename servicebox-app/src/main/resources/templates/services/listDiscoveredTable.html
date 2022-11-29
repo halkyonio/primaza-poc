@@ -5,6 +5,7 @@
             <th aria-valuetext="left">Name</th>
             <th aria-valuetext="left">Version</th>
             <th aria-valuetext="left">URL</th>
+            <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Cluster</th>
         </tr>
       </thead>
@@ -14,6 +15,7 @@
             <td>{service.name}</td>
             <td>{service.version}</td>
             <td>{service.protocol}://{service.name}.{service.namespace}:{service.port}.</td>
+            <td>{service.namespace}</td>
             <td>{service.cluster.name}</td>
         </tr>
         {/for}
