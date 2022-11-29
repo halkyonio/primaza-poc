@@ -38,11 +38,9 @@ public class KubernetesClientService {
      */
     public Optional<Service> getServiceInCluster(Cluster cluster, String protocol, String servicePort) {
         var r = getClientForCluster(cluster).services().inAnyNamespace();
-        String[] nss = {"default","kube-system","ingress"};
-        //String[] nss = {"db"};
+        String[] nss = cluster.namespaces.split(",");
         for (var ns : nss) {
             r = (MixedOperation<Service, ServiceList, ServiceResource<Service>>) r.withoutField("metadata.namespace", ns);
-            //r = (MixedOperation<Service, ServiceList, ServiceResource<Service>>) r.withField("metadata.namespace", ns);
         }
         ServiceList services = r.list();
         for (Service service : services.getItems()) {

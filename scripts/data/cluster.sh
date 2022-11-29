@@ -31,4 +31,10 @@ p "Kind server: ${KIND_URL}"
 
 CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 p "Creating a Primaza DEV cluster for local kind usage ..."
-curl -X POST -H 'Content-Type: multipart/form-data' -F name=${CONTEXT_TO_USE} -F environment=DEV -F url=${KIND_URL} -F kubeConfig="${CFG}" -s -i ${PRIMAZA_URL}/clusters
+curl -X POST -H 'Content-Type: multipart/form-data' \
+  -F namespaces="default,kube-system,ingress"\
+  -F name=${CONTEXT_TO_USE}\
+  -F environment=DEV\
+  -F url=${KIND_URL}\
+  -F kubeConfig="${CFG}"\
+  -s -i ${PRIMAZA_URL}/clusters
