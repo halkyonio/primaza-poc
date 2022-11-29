@@ -9,20 +9,15 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.EnvFromSource;
-import io.fabric8.kubernetes.api.model.EnvFromSourceBuilder;
-import io.fabric8.kubernetes.api.model.PodSpec;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceList;
-import io.fabric8.kubernetes.api.model.VolumeBuilder;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
+import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
@@ -39,9 +34,17 @@ public class KubernetesClientService {
 
     /**
      * Check whether a service with <protocol>:<port> is running in the cluster.
+     * Exclude the services installed under listed namespaces
      */
     public Optional<Service> getServiceInCluster(Cluster cluster, String protocol, String servicePort) {
-        ServiceList services = getClientForCluster(cluster).services().list();
+        var r = getClientForCluster(cluster).services().inAnyNamespace();
+        String[] nss = {"default","kube-system","ingress"};
+        //String[] nss = {"db"};
+        for (var ns : nss) {
+            r = (MixedOperation<Service, ServiceList, ServiceResource<Service>>) r.withoutField("metadata.namespace", ns);
+            //r = (MixedOperation<Service, ServiceList, ServiceResource<Service>>) r.withField("metadata.namespace", ns);
+        }
+        ServiceList services = r.list();
         for (Service service : services.getItems()) {
             boolean found = service.getSpec().getPorts().stream()
                     .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), protocol)
