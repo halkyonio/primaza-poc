@@ -9,6 +9,7 @@ import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
+import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.inject.Inject;
@@ -66,7 +67,7 @@ public class ClusterResource {
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@MultipartForm NewClusterRequest clusterRequest, @HeaderParam("HX-Request") boolean hxRequest) {
+    public Response add(@Form NewClusterRequest clusterRequest) {
         Set<ConstraintViolation<NewClusterRequest>> errors = validator.validate(clusterRequest);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters");
 
