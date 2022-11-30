@@ -15,7 +15,6 @@ import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.FilterWatchListMultiDeletable;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
@@ -35,7 +34,7 @@ public class KubernetesClientService {
         for (var ns : nss) {
             r = (MixedOperation<Deployment, DeploymentList, RollableScalableResource<Deployment>>) r.withoutField("metadata.namespace", ns);
         }
-        return (List<Deployment>) r.list();
+        return r.list().getItems();
 //        return getClientForCluster(cluster).apps().deployments().list().getItems();
     }
 
