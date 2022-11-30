@@ -72,8 +72,8 @@ public class ClusterResource {
             response.withErrors(errors);
         } else {
             Cluster cluster;
-            if (clusterRequest.id != null && clusterRequest.id != 0) {
-                cluster = Cluster.findById(clusterRequest.id);
+            if (clusterRequest.getLongId() != null && clusterRequest.getLongId() != 0) {
+                cluster = Cluster.findById(clusterRequest.getLongId());
                 if (cluster != null) {
                     cluster.name = clusterRequest.name;
                     cluster.url = clusterRequest.url;
