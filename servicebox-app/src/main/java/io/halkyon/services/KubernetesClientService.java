@@ -11,7 +11,6 @@ import javax.enterprise.context.ApplicationScoped;
 
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -34,7 +33,7 @@ public class KubernetesClientService {
         var r = getClientForCluster(cluster).apps().deployments().inAnyNamespace();
         String[] nss = cluster.namespaces.split(",");
         for (var ns : nss) {
-            r = (FilterWatchListMultiDeletable<Deployment, DeploymentList>) r.withoutField("metadata.namespace", ns);
+            r = (MixedOperation<Deployment, DeploymentList, RollableScalableResource<Deployment>>) r.withoutField("metadata.namespace", ns);
         }
         return (List<Deployment>) r.list();
 //        return getClientForCluster(cluster).apps().deployments().list().getItems();
