@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.validation.constraints.NotBlank;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -35,7 +36,6 @@ public class ClusterRequest {
     @PartType(MediaType.APPLICATION_OCTET_STREAM)
     public InputStream kubeConfig;
 
-    @FormParam
     public String getKubeConfig() throws IOException {
         return String.valueOf(this.kubeConfig.readAllBytes());
     }
