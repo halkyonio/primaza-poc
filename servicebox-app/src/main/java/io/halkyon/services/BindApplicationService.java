@@ -76,6 +76,6 @@ public class BindApplicationService {
     }
     
     private String ToBase64(String content) {
-        return ToBase64(content.getBytes());
+        return Base64.getEncoder().encodeToString(content.getBytes());
     }
 }
