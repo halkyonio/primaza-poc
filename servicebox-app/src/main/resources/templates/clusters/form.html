@@ -41,7 +41,7 @@
          <div class="form-group">
              <label class="control-label col-sm-2" for="clusterUrl">Kube Config:</label>
              <div class="col-sm-5">
-                 {#if ! cluster.kubeConfig}
+                 {#if ! cluster.id}
                    <input id="clusterKubeConfig" class="form-control new-cluster" type="file" name="kubeConfig" placeholder="Set the cluster kube configuration">
                  {#else}
                    <textarea id="clusterKubeConfig" class="form-control rounded-0 new-cluster" rows="15" name="kubeConfig">{#if cluster.kubeConfig}{cluster.kubeConfig}{/if}</textarea>

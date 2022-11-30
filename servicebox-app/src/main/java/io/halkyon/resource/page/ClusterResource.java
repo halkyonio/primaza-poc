@@ -2,14 +2,11 @@ package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
-import io.halkyon.model.Credential;
-import io.halkyon.model.Service;
-import io.halkyon.resource.requests.NewClusterRequest;
+import io.halkyon.resource.requests.ClusterRequest;
 import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
-import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.inject.Inject;
@@ -67,8 +64,8 @@ public class ClusterResource {
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@Form NewClusterRequest clusterRequest) {
-        Set<ConstraintViolation<NewClusterRequest>> errors = validator.validate(clusterRequest);
+    public Response add(@MultipartForm ClusterRequest clusterRequest) throws IOException {
+        Set<ConstraintViolation<ClusterRequest>> errors = validator.validate(clusterRequest);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters");
 
         if (errors.size() > 0) {
@@ -82,14 +79,8 @@ public class ClusterResource {
                     cluster.url = clusterRequest.url;
                     cluster.namespaces = clusterRequest.namespaces;
                     cluster.environment = clusterRequest.environment;
+                    cluster.kubeConfig = clusterRequest.getKubeConfig();
                     cluster.created = new Date(System.currentTimeMillis());
-                    if (clusterRequest.kubeConfig != null) {
-                        try {
-                            cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
                 } else {
                     throw new NotFoundException(String.format("Cluster not found for id: %d%n", clusterRequest.id));
                 }

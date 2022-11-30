@@ -1,14 +1,16 @@
 package io.halkyon.resource.requests;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.validation.constraints.NotBlank;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
-public class NewClusterRequest {
+public class ClusterRequest {
 
     @FormParam
     public Long id;
@@ -32,4 +34,9 @@ public class NewClusterRequest {
     @FormParam
     @PartType(MediaType.APPLICATION_OCTET_STREAM)
     public InputStream kubeConfig;
+
+    @FormParam
+    public String getKubeConfig() throws IOException {
+        return String.valueOf(this.kubeConfig.readAllBytes());
+    }
 }
