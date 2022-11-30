@@ -102,8 +102,8 @@ public class ClusterResource {
                 response.withSuccessMessage(cluster.id);
             }
             cluster.persist();
-            //serviceDiscoveryJob.checkCluster(cluster);
-            //applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+            serviceDiscoveryJob.checkCluster(cluster);
+            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
         }
 
         // Return as HTML the template rendering the item for HTMX

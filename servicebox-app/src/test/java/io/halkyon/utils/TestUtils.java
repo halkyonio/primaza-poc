@@ -20,6 +20,7 @@ public final class TestUtils {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("name", clusterName)
                 .multiPart("environment","PROD")
+                .multiPart("namespaces","kube-system,ingress")
                 .multiPart("url", url)
                 .when().post("/clusters")
                 .then().statusCode(201);
