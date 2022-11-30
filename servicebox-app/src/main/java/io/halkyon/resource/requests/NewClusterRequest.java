@@ -9,6 +9,10 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 public class NewClusterRequest {
+
+    @FormParam
+    public Long id;
+
     @NotBlank
     @FormParam
     public String name;

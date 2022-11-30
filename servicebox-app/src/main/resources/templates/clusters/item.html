@@ -7,7 +7,13 @@
     <td>
         <ul class="list-inline m-0">
             <li class="list-inline-item">
-                <button class="btn btn-success btn-sm rounded-2" type="button" title="Edit">Edit</button>
+                <button class="btn btn-success btn-sm rounded-2" type="button"
+                        title="Edit"
+                        href="/clusters/cluster/{cluster.id}"
+                        hx-get="/clusters/cluster/{cluster.id}"
+                        hx-swap="outerHTML"
+                        hx-target="#base"
+                        hx-replace-url="/clusters/new">Edit</button>
             </li>
             <li class="list-inline-item">
                 <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete"

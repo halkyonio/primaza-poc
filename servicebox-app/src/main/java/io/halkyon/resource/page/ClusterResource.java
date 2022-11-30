@@ -2,6 +2,8 @@ package io.halkyon.resource.page;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.Credential;
+import io.halkyon.model.Service;
 import io.halkyon.resource.requests.NewClusterRequest;
 import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
@@ -35,7 +37,8 @@ public class ClusterResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newClusterForm() {
-        return Templates.Clusters.form().data("title","Cluster form");
+        return Templates.Clusters.form(new Cluster())
+                .data("title","Cluster form");
     }
 
     @GET
@@ -47,31 +50,68 @@ public class ClusterResource {
                 .data("all", true);
     }
 
+    @GET
+    @Path("/cluster/{id}")
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML)
+    public Object edit(@PathParam("id") Long id) {
+        Cluster cluster = Cluster.findById(id);
+        if (cluster == null) {
+            throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
+        }
+        return Templates.Clusters.form(cluster);
+    }
+
     @POST
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@MultipartForm NewClusterRequest clusterRequest, @HeaderParam("HX-Request") boolean hxRequest)
-            throws IOException {
+    public Response add(@MultipartForm NewClusterRequest clusterRequest, @HeaderParam("HX-Request") boolean hxRequest) {
         Set<ConstraintViolation<NewClusterRequest>> errors = validator.validate(clusterRequest);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters");
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            Cluster cluster = new Cluster();
-            cluster.name = clusterRequest.name;
-            cluster.url = clusterRequest.url;
-            cluster.namespaces = clusterRequest.namespaces;
-            cluster.environment = clusterRequest.environment;
-            cluster.created = new Date(System.currentTimeMillis());
-            if (clusterRequest.kubeConfig != null) {
-                cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+            Cluster cluster;
+            if (clusterRequest.id != null && clusterRequest.id != 0) {
+                cluster = Cluster.findById(clusterRequest.id);
+                if (cluster != null) {
+                    cluster.name = clusterRequest.name;
+                    cluster.url = clusterRequest.url;
+                    cluster.namespaces = clusterRequest.namespaces;
+                    cluster.environment = clusterRequest.environment;
+                    cluster.created = new Date(System.currentTimeMillis());
+                    if (clusterRequest.kubeConfig != null) {
+                        try {
+                            cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    throw new NotFoundException(String.format("Cluster not found for id: %d%n", clusterRequest.id));
+                }
+                response.withUpdateSuccessMessage(cluster.id);
+            } else {
+                cluster = new Cluster();
+                cluster.name = clusterRequest.name;
+                cluster.url = clusterRequest.url;
+                cluster.namespaces = clusterRequest.namespaces;
+                cluster.environment = clusterRequest.environment;
+                cluster.created = new Date(System.currentTimeMillis());
+                if (clusterRequest.kubeConfig != null) {
+                    try {
+                        cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                response.withSuccessMessage(cluster.id);
             }
-            serviceDiscoveryJob.checkCluster(cluster);
             cluster.persist();
-            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
-            response.withSuccessMessage(cluster.id);
+            //serviceDiscoveryJob.checkCluster(cluster);
+            //applicationDiscoveryJob.syncApplicationsInCluster(cluster);
         }
 
         // Return as HTML the template rendering the item for HTMX
