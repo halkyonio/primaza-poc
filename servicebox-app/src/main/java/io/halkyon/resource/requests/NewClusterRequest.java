@@ -19,6 +19,10 @@ public class NewClusterRequest {
 
     @NotBlank
     @FormParam
+    public String namespaces;
+
+    @NotBlank
+    @FormParam
     public String environment;
 
     @FormParam

@@ -70,6 +70,7 @@ public class ClusterResource {
             Cluster cluster = new Cluster();
             cluster.name = clusterRequest.name;
             cluster.url = clusterRequest.url;
+            cluster.namespaces = clusterRequest.namespaces;
             cluster.environment = clusterRequest.environment;
             cluster.created = new Date(System.currentTimeMillis());
             if (clusterRequest.kubeConfig != null) {
