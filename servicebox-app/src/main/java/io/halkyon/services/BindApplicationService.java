@@ -1,5 +1,6 @@
 package io.halkyon.services;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,11 +39,11 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
-        secretData.put("url", url);
-        secretData.put("username", credential.username);
-        secretData.put("password", credential.password);
+        secretData.put("url", ToBase64(url));
+        secretData.put("username", ToBase64(credential.username));
+        secretData.put("password", ToBase64(credential.password));
         for (CredentialParameter param : credential.params) {
-            secretData.put(param.paramName, param.paramValue);
+            secretData.put(param.paramName, ToBase64(param.paramValue));
         }
 
         kubernetesClientService.mountSecretInApplication(application, claim, secretData);
@@ -72,5 +73,9 @@ public class BindApplicationService {
         // TODO: rule 4: app + service running on a standalone machine. https://github.com/halkyonio/primaza-poc/discussions/135
 
         return null;
+    }
+    
+    private String ToBase64(String content) {
+        return ToBase64(content.getBytes());
     }
 }
