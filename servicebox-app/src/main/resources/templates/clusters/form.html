@@ -3,18 +3,29 @@
   {#title}Cluster{/title}
   {#body}
      <div class="container" id="form">
-       <h1>Clusters</h1>
-       <form class="form-horizontal" enctype="multipart/form-data" action="/clusters" hx-post="/clusters" hx-target="#response" method="POST" hx-swap="innerHTML">
+      <h1>{#if !cluster.id}New{#else}Update{/if} Cluster</h1>
+       <form class="form-horizontal" enctype="multipart/form-data" action="/clusters"
+             hx-post="/clusters"
+             hx-target="#response"
+             hx-swap="innerHTML"
+             method="POST">
+         <input type="hidden" id="cluster_id" name="id" value="{#if cluster.id}{cluster.id}{#else}0{/if}">
          <div class="form-group">
             <label class="control-label col-sm-2" for="clusterName">Cluster name:</label>
             <div class="col-sm-5">
-             <input id="clusterName" class="form-control new-cluster" type="text" name="name" placeholder="Set the cluster name">
+             <input id="clusterName" class="form-control new-cluster" type="text" name="name" value="{#if cluster.name}{cluster.name}{/if}" placeholder="Set the cluster name">
             </div>
          </div>
+           <div class="form-group">
+               <label class="control-label col-sm-2" for="clusterName">Namespaces: </label>
+               <div class="col-sm-5">
+                   <input id="clusterNamespaces" class="form-control new-cluster" type="text" name="namespaces" value="{#if cluster.namespaces}{cluster.namespaces}{#else}default,kube-system,ingress{/if}" placeholder="List of namespaces separated with a coma to be excluded from the search">
+               </div>
+           </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="clusterUrl">URL:</label>
              <div class="col-sm-5">
-              <input id="clusterUrl" class="form-control new-cluster" type="text" name="url" placeholder="Set the cluster URL">
+              <input id="clusterUrl" class="form-control new-cluster" type="text" name="url" value="{#if cluster.url}{cluster.url}{/if}" placeholder="Set the cluster URL">
              </div>
          </div>
          <div class="form-group">
@@ -30,7 +41,11 @@
          <div class="form-group">
              <label class="control-label col-sm-2" for="clusterUrl">Kube Config:</label>
              <div class="col-sm-5">
-                 <input id="clusterKubeConfig" class="form-control new-cluster" name="kubeConfig" placeholder="Set the cluster kube configuration" type="file">
+                 {#if ! cluster.id}
+                   <input id="clusterKubeConfig" class="form-control new-cluster" type="file" name="kubeConfig" placeholder="Set the cluster kube configuration">
+                 {#else}
+                   <textarea id="clusterKubeConfig" class="form-control rounded-0 new-cluster" rows="15" name="kubeConfig">{#if cluster.kubeConfig}{cluster.kubeConfig}{/if}</textarea>
+                 {/if}
              </div>
          </div>
          </br>
