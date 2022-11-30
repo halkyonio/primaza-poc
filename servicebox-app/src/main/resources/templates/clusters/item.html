@@ -10,7 +10,11 @@
                 <button class="btn btn-success btn-sm rounded-2" type="button" title="Edit">Edit</button>
             </li>
             <li class="list-inline-item">
-                <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete">Delete</button>
+                <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete"
+                        hx-delete="/clusters/{cluster.id}"
+                        hx-confirm="Are you sure ?"
+                        hx-target="#base"
+                        hx-swap="innerHTML swap:1s">Delete</button>
             </li>
         </ul>
     </td>

@@ -81,9 +81,10 @@ public class ClusterResource {
     @DELETE
     @Path("/{id}")
     @Transactional
-    public Response delete(@PathParam("id") Long id) {
+    public TemplateInstance delete(@PathParam("id") Long id) {
         Cluster.deleteById(id);
-        return Response.ok("Cluster id: " + Long.toString(id) + " deleted").build();
+        return Templates.Clusters.list(Cluster.listAll())
+                .data("items", Cluster.count());
     }
 
     @GET
