@@ -112,6 +112,7 @@ public class ServiceDiscoveryJobTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("name", "dummy-cluster-3")
                 .multiPart("environment", "TEST")
+                .multiPart("namespaces","kube-system,ingress")
                 .multiPart("url", "master:port")
                 .when().post("/clusters")
                 .then()

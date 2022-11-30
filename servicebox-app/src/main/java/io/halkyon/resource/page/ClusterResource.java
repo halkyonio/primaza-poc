@@ -72,8 +72,8 @@ public class ClusterResource {
             response.withErrors(errors);
         } else {
             Cluster cluster;
-            if (clusterRequest.id != null && clusterRequest.id != 0) {
-                cluster = Cluster.findById(clusterRequest.id);
+            if (clusterRequest.getLongId() != null && clusterRequest.getLongId() != 0) {
+                cluster = Cluster.findById(clusterRequest.getLongId());
                 if (cluster != null) {
                     cluster.name = clusterRequest.name;
                     cluster.url = clusterRequest.url;
@@ -102,8 +102,8 @@ public class ClusterResource {
                 response.withSuccessMessage(cluster.id);
             }
             cluster.persist();
-            //serviceDiscoveryJob.checkCluster(cluster);
-            //applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+            serviceDiscoveryJob.checkCluster(cluster);
+            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
         }
 
         // Return as HTML the template rendering the item for HTMX

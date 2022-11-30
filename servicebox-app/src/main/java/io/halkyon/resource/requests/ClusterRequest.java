@@ -12,7 +12,7 @@ import org.jboss.resteasy.annotations.providers.multipart.PartType;
 public class ClusterRequest {
 
     @FormParam
-    public Long id;
+    public String id;
 
     @NotBlank
     @FormParam
@@ -35,6 +35,14 @@ public class ClusterRequest {
     public InputStream kubeConfig;
 
     public String getKubeConfig() throws IOException {
-        return String.valueOf(this.kubeConfig.readAllBytes());
+        return new String(this.kubeConfig.readAllBytes());
+    }
+
+    public Long getLongId() {
+        if ( id != null) {
+            return Long.valueOf(id);
+        } else {
+            return null;
+        }
     }
 }
