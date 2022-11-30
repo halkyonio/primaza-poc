@@ -12,9 +12,11 @@ import javax.enterprise.context.ApplicationScoped;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.FilterWatchListMultiDeletable;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
@@ -29,7 +31,13 @@ public class KubernetesClientService {
      * TODO: For OpenShift, we should support DeploymentConfig: https://github.com/halkyonio/primaza-poc/issues/136
      */
     public List<Deployment> getDeploymentsInCluster(Cluster cluster) {
-        return getClientForCluster(cluster).apps().deployments().list().getItems();
+        var r = getClientForCluster(cluster).apps().deployments().inAnyNamespace();
+        String[] nss = cluster.namespaces.split(",");
+        for (var ns : nss) {
+            r = (FilterWatchListMultiDeletable<Deployment, DeploymentList>) r.withoutField("metadata.namespace", ns);
+        }
+        return (List<Deployment>) r.list();
+//        return getClientForCluster(cluster).apps().deployments().list().getItems();
     }
 
     /**
