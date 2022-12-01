@@ -12,6 +12,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.halkyon.model.Application;
+import io.halkyon.model.Cluster;
+import io.halkyon.services.BindApplicationService;
 import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
@@ -26,6 +29,9 @@ import io.quarkus.qute.TemplateInstance;
 public class ClaimResource {
     private final Validator validator;
     private final ClaimingServiceJob claimingService;
+
+    @Inject
+    BindApplicationService bindService;
 
     @Inject
     public ClaimResource(Validator validator, ClaimingServiceJob claimingService){
@@ -114,6 +120,16 @@ public class ClaimResource {
             throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
         }
         return Templates.Claims.form(claim);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public TemplateInstance delete(@PathParam("id") Long id) {
+        Claim claim = Claim.findById(id);
+        bindService.unBindApplication(Application.findById(claim.applicationId), claim);
+        Claim.deleteById(id);
+        return showList(Claim.listAll());
     }
 
 }
