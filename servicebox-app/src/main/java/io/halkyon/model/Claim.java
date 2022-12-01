@@ -44,7 +44,7 @@ public class Claim extends PanacheEntityBase {
     @FormParam
     public Date created;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
+    @JoinColumn(name = "service_id", referencedColumnName = "id", updatable = false)
     public Service service;
     public Integer attempts = 0;
 
