@@ -48,6 +48,10 @@ public class Service extends PanacheEntityBase {
     @javax.validation.constraints.Pattern(regexp = "\\w+:\\d+", message = "Wrong format in service endpoint. It must be 'protocol:port'")
     @FormParam
     public String endpoint;
+
+    @FormParam
+    public String externalEndpoint;
+
     public String namespace;
     public Boolean available;
     public Date created;
