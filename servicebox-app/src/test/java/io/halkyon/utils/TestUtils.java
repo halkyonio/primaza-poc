@@ -10,9 +10,7 @@ import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 
 public final class TestUtils {
-    private TestUtils() {
-
-    }
+    private TestUtils() {}
 
     public static Cluster createCluster(String clusterName, String url) {
         given()
