@@ -24,7 +24,7 @@ p "Primaza server: ${PRIMAZA_URL}"
 declare -a arr=(
   "name=postgresql&version=14.5&endpoint=tcp:5432"
   "name=postgresql&version=11.5&endpoint=tcp:5432"
-  "name=mysql&version=8.0.&endpoint=tcp:3306"
+  "name=mysql&version=8.0&endpoint=tcp:3306"
   "name=activemq-artemis&version=2.26&endpoint=tcp:8161"
   "name=mariadb&version=10.9&endpoint=tcp:3306"
 )
