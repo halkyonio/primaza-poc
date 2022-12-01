@@ -8,13 +8,13 @@ import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
+
+import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
 
 @ApplicationScoped
 public class BindApplicationService {
@@ -39,7 +39,7 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
-        secretData.put("url", ToBase64(url));
+        secretData.put("url", ToBase64(removeSchemeFromUrl(url)));
         secretData.put("username", ToBase64(credential.username));
         secretData.put("password", ToBase64(credential.password));
         for (CredentialParameter param : credential.params) {

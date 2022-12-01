@@ -1,8 +1,13 @@
 package io.halkyon.utils;
 
-public final class StringUtils {
-    private StringUtils() {
+import java.net.URI;
 
+public final class StringUtils {
+    private StringUtils() {}
+
+    public static String removeSchemeFromUrl(String URL) {
+        URI uri = URI.create(URL);
+        return (uri.getHost() + ":" + URL;
     }
 
     public static boolean equalsIgnoreCase(String left, String right) {
