@@ -43,8 +43,9 @@ public class Claim extends PanacheEntityBase {
     public String owner;
     @FormParam
     public Date created;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "service_id", referencedColumnName = "id", updatable = false)
+    // TODO: To be discussed: This is ot because we will delete a Claim that the service bound should be deleted and its credential
+    // @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
     public Integer attempts = 0;
 
