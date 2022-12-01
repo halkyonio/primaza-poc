@@ -6,13 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 import java.util.Collections;
@@ -43,7 +37,8 @@ public class Claim extends PanacheEntityBase {
     public String owner;
     @FormParam
     public Date created;
-    @OneToOne(cascade = CascadeType.ALL)
+    // TODO: To be discussed and adapted if needed. This is not because we will delete a Claim that the service bound should be deleted and its credential
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
     public Integer attempts = 0;
