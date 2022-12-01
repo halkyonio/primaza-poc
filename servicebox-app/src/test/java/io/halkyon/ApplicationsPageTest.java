@@ -159,7 +159,7 @@ public class ApplicationsPageTest {
 
 
         // then secret should have been generated
-        String url = "testbind://" + serviceName + ":1111";
+        String url = serviceName + ":1111";
         String urlBase64 = Base64.getEncoder().encodeToString(url.getBytes());
         String userBase64 = Base64.getEncoder().encodeToString("user1".getBytes());
         String pwdBase64 = Base64.getEncoder().encodeToString("pass1".getBytes());
