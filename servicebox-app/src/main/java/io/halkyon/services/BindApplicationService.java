@@ -22,6 +22,12 @@ public class BindApplicationService {
     @Inject
     KubernetesClientService kubernetesClientService;
 
+    public void unBindApplication(Application application, Claim claim) {
+        unMountSecretVolumeEnvInApplication(application, claim);
+        deleteSecretInNamespace(application, claim);
+        rolloutApplication(application);
+    }
+
     public void bindApplication(Application application, Claim claim) {
         Credential credential = getFirstCredentialFromService(claim.service);
         String url = generateUrlByClaimService(application, claim);
@@ -35,6 +41,14 @@ public class BindApplicationService {
 
     private void rolloutApplication(Application application) {
         kubernetesClientService.rolloutApplication(application);
+    }
+
+    private void deleteSecretInNamespace(Application application, Claim claim) {
+        kubernetesClientService.deleteSecretInNamespace(application, claim);
+    }
+
+    private void unMountSecretVolumeEnvInApplication(Application application, Claim claim) {
+        kubernetesClientService.unMountSecretVolumeEnvInApplication(application, claim);
     }
 
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import io.fabric8.kubernetes.api.builder.VisitableBuilder;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentList;
@@ -59,6 +60,57 @@ public class KubernetesClientService {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Deleting the Kubernetes Secret
+     */
+    public void deleteSecretInNamespace(Application application, Claim claim) {
+        KubernetesClient client = getClientForCluster(application.cluster);
+        String secretName = application.name + "-" + claim.name;
+        client.secrets()
+              .inNamespace(application.namespace)
+              .delete(new SecretBuilder()
+                      .withNewMetadata()
+                      .withName(secretName)
+                      .withNamespace(application.namespace)
+                      .endMetadata().build());
+    }
+
+    /**
+     * Add the secret into the specified cluster and namespace.
+     */
+    public void unMountSecretVolumeEnvInApplication(Application application, Claim claim) {
+        KubernetesClient client = getClientForCluster(application.cluster);
+        String secretName = application.name + "-" + claim.name;
+
+        // Get the Deployment resource
+        Deployment deployment = client.apps().deployments()
+                .inNamespace(application.namespace)
+                .withName(application.name)
+                .get();
+
+        // Remove the Secret, volume to mount the secret and env
+        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
+        pod.getVolumes().remove(new SecretBuilder()
+                .withNewMetadata()
+                .withName(secretName)
+                .withNamespace(application.namespace)
+                .endMetadata().build());
+        pod.getVolumes().remove(new VolumeBuilder()
+                .withName(secretName)
+                .withNewSecret()
+                .withSecretName(secretName)
+                .endSecret()
+                .build());
+
+        for (Container container : pod.getContainers()) {
+            container.getEnvFrom().removeIf(e -> e.getSecretRef() != null
+                    && Objects.equals(e.getSecretRef().getName(), secretName));
+        }
+
+        // Update deployment
+        client.apps().deployments().createOrReplace(deployment);
     }
 
     /**

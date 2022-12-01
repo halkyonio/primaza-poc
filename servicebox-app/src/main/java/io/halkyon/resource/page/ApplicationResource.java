@@ -56,6 +56,8 @@ public class ApplicationResource {
     public Response doBindApplication(@PathParam("id") long applicationId, @FormParam("claimId") long claimId) {
         Application application = Application.findById(applicationId);
         Claim claim = Claim.findById(claimId);
+        claim.applicationId = applicationId;
+        claim.persist();
         bindService.bindApplication(application, claim);
         return Response.ok().build();
     }

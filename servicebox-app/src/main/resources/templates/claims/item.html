@@ -25,9 +25,15 @@
                    hx-target="#base">Edit</a>
             </li>
             {/if}
+            {#if claim.status is 'bind'}
             <li class="list-inline-item">
-                <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete">Delete</button>
+                <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete"
+                        hx-delete="/claims/{claim.id}"
+                        hx-confirm="Are you sure ?"
+                        hx-target="#base"
+                        hx-swap="innerHTML swap:1s">Delete</button>
             </li>
+            {/if}
         </ul>
     </td>
 </tr>
