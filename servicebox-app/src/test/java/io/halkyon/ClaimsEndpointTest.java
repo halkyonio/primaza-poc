@@ -76,4 +76,22 @@ public class ClaimsEndpointTest {
         assertNotNull(claim.created);
     }
 
+    @Test
+    public void testDeleteUnBoundClaim(){
+        final String claimName = "testDeleteBoundClaim";
+        Claim claim = createClaim(claimName, "Postgresql-5509");
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + claimName)
+                .then()
+                .statusCode(200)
+                .extract().as(Claim.class);
+
+        given().header("HX-Request","true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .when().delete("/claims/"+claim.id)
+                .then()
+                .statusCode(200);
+    }
+
 }
