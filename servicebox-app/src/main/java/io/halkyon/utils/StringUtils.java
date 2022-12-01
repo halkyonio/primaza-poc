@@ -7,7 +7,7 @@ public final class StringUtils {
 
     public static String removeSchemeFromUrl(String URL) {
         URI uri = URI.create(URL);
-        return (uri.getHost() + ":" + URL;
+        return uri.getHost() + ":" + String.valueOf(uri.getPort());
     }
 
     public static boolean equalsIgnoreCase(String left, String right) {
