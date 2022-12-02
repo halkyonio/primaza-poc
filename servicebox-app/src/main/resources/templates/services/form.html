@@ -32,7 +32,18 @@
          <div class="form-group">
              <label class="control-label col-sm-2" for="endpoint">Endpoint:</label>
              <div class="col-sm-5">
-              <input class="form-control new-service" type="text" name="endpoint" placeholder="protocol:port (e.g. tcp:5432)">
+              <input id="endpoint_input" class="form-control new-service" type="text" name="endpoint"
+                     onclick="clearInput('external_endpoint_input')"
+                     placeholder="protocol:port (e.g. tcp:5432)">
+             </div>
+         </div>
+           OR
+         <div class="form-group">
+             <label class="control-label col-sm-2" for="endpoint">External endpoint:</label>
+             <div class="col-sm-5">
+                 <input id="external_endpoint_input" class="form-control new-service" type="text" name="externalEndpoint"
+                        onclick="clearInput('endpoint_input')"
+                        placeholder="myservice.my.org">
              </div>
          </div>
          </br>
@@ -51,3 +62,8 @@
      </div>
   {/body}
 {/include}
+<script>
+function clearInput(id) {
+    document.getElementById(id).value = "";
+}
+</script>
