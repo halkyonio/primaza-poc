@@ -37,8 +37,8 @@ public class ClaimingServiceJobTest {
         pauseScheduler();
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
-        createService("postgresqlClaimingServiceJobTest", "8", true);
-        createService("MySQLClaimingServiceJobTest", "7.5", false);
+        createService("postgresqlClaimingServiceJobTest", "8", "SQL", true);
+        createService("MySQLClaimingServiceJobTest", "7.5", "SQL",false);
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:

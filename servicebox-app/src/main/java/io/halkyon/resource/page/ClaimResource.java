@@ -44,7 +44,7 @@ public class ClaimResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
         return Templates.Claims.form(new Claim())
-                .data("services",Service.listAll())
+                .data("services",Service.findAvailableServices())
                 .data("title","Claim form");
     }
 

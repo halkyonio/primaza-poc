@@ -40,7 +40,7 @@ public class ServiceResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance service() {
-        return Templates.Services.form().data("title","Service form");
+        return Templates.Services.form(new Service()).data("title","Service form");
     }
 
     @POST
