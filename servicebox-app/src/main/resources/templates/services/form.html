@@ -21,11 +21,12 @@
              <label class="control-label col-sm-2" for="type" >Type :</label>
          <div class="col-sm-5">
              <select id="service_type" class="form-control new-service" name="type" required placeholder="Select the type ?">
-                <option value="SQL" selected>Any</option>
-                <option value="SQL" {#if service.type == "SQL"}selected{/if}>SQL</option>
-                <option value="SQL" {#if service.type == "NoSQL"}selected{/if}>NoSQL</option>
-                <option value="SQL" {#if service.type == "Broker"}selected{/if}>Broker</option>
-                <option value="SQL" {#if service.type == "Api"}selected{/if}>Api</option>
+                <option value="any" selected>Any</option>
+                <option value="postgresql" {#if service.type == "postgresql"}selected{/if}>Postgresql</option>
+                <option value="mysql" {#if service.type == "mysql"}selected{/if}>MySQL</option>
+                <option value="mariadb" {#if service.type == "mariadb"}selected{/if}>mariadb</option>
+                <option value="activemq" {#if service.type == "activemq"}selected{/if}>ActiveMQ</option>
+                <option value="api" {#if service.type == "api"}selected{/if}>Api</option>
              </select>
          </div>
          </div>
