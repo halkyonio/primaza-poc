@@ -107,7 +107,6 @@ public class KubernetesClientService {
                 .accept(PodSpecBuilder.class, podSpec -> { podSpec.removeMatchingFromVolumes(v -> secretName.equals(v.getName()));})
                 .build();
 
-
 /*        for (Container container : pod.getContainers()) {
             container.getEnvFrom().removeIf(e -> e.getSecretRef() != null
                     && Objects.equals(e.getSecretRef().getName(), secretName));
