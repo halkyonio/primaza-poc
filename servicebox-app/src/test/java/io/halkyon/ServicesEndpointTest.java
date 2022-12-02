@@ -24,6 +24,7 @@ public class ServicesEndpointTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", rabbitMQ4)
                 .formParam("version", "3.11.2")
+                .formParam("type", "Broker")
                 .formParam("endpoint", "tcp:5672")
                 .when().post("/services")
                 .then().statusCode(201);
@@ -45,15 +46,17 @@ public class ServicesEndpointTest {
     public void testCannotAddServiceWithSameNameAndVersion() {
         String serviceName = "RabbitMQ2";
         String serviceVersion = "3.11.0";
+        String serviceType= "Broker";
         String endpoint = "tcp:5672";
 
-        createService(serviceName, serviceVersion, endpoint, false);
+        createService(serviceName, serviceVersion, serviceType, endpoint, false);
 
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", serviceName)
                 .formParam("version", serviceVersion)
+                .formParam("type", serviceType)
                 .formParam("endpoint", endpoint)
                 .when().post("/services")
                 .then().statusCode(409);

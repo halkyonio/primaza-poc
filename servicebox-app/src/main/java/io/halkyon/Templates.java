@@ -1,9 +1,6 @@
 package io.halkyon;
 
-import io.halkyon.model.Application;
-import io.halkyon.model.Claim;
-import io.halkyon.model.Cluster;
-import io.halkyon.model.Credential;
+import io.halkyon.model.*;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
@@ -27,7 +24,7 @@ public class Templates {
         public static class Services {
                 public static native TemplateInstance list(List<io.halkyon.model.Service> services);
                 public static native TemplateInstance item(io.halkyon.model.Service service);
-                public static native TemplateInstance form();
+                public static native TemplateInstance form(Service service);
                 public static native TemplateInstance listDiscovered(List<io.halkyon.model.Service> services);
                 public static native TemplateInstance listDiscoveredTable(List<io.halkyon.model.Service> services);
         }

@@ -117,7 +117,7 @@ public class ApplicationsPageTest {
         configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
-        Service service = createService(serviceName, "version", "testbind:1111");
+        Service service = createService(serviceName, "version", "type", "testbind:1111");
         createCredential(credentialName, service.id, "user1", "pass1");
         createCluster(clusterName, "host:port");
         serviceDiscoveryJob.execute(); // this action will change the service to available

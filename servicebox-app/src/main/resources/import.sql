@@ -4,9 +4,8 @@ INSERT INTO claim(name, description, owner, serviceRequested, status, created) V
 INSERT INTO claim(name, description, owner, serviceRequested, status, created) VALUES ('mariadb-demo ',        'Dummy Java Maria DB ',                   'snowdrop r&d team',          'mariadb-10.9',       'new',      PARSEDATETIME('2022-10-18 14:45:10','yyyy-MM-dd HH:mm:ss'));
 INSERT INTO claim(name, description, owner, serviceRequested, status, created) VALUES ('postgresql-13 ',       'Quarkus Primaza & Postgresql',           'snowdrop & devtools teams',  'postgresql-13.5',    'new',      PARSEDATETIME('2022-10-18 20:02:01','yyyy-MM-dd HH:mm:ss'));
 
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('mysql',              '8.0.3',    'tcp:3306',     false,   PARSEDATETIME('2022-10-08 10:30:00','yyyy-MM-dd HH:mm:ss'));
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('postgresql',         '11.5',     'tcp:5432',     false,   PARSEDATETIME('2022-05-20 07:30:00','yyyy-MM-dd HH:mm:ss'));
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('postgresql',         '14.5',     'tcp:5432',     false,   PARSEDATETIME('2022-05-20 07:30:00','yyyy-MM-dd HH:mm:ss'));
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('activemq-artemis',   '2.26',     'tcp:8161',     false,   PARSEDATETIME('2022-07-13 11:42:00','yyyy-MM-dd HH:mm:ss'));
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('payment-api',        '1.1',      'http:8080',    false,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
-INSERT INTO service(name, version, endpoint, available, created) VALUES ('mariadb',            '10.9',     'tcp:3306',     false,    PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
+INSERT INTO service(name, version, type, endpoint, available, created) VALUES ('mysql',              '8.0.3', 'SQL',    'tcp:3306',     false,   PARSEDATETIME('2022-10-08 10:30:00','yyyy-MM-dd HH:mm:ss'));
+INSERT INTO service(name, version, type, endpoint, available, created) VALUES ('postgresql',         '14.5',  'SQL',    'tcp:5432',     false,   PARSEDATETIME('2022-05-20 07:30:00','yyyy-MM-dd HH:mm:ss'));
+INSERT INTO service(name, version, type, endpoint, available, created) VALUES ('activemq-artemis',   '2.26',  'Broker', 'tcp:8161',     false,   PARSEDATETIME('2022-07-13 11:42:00','yyyy-MM-dd HH:mm:ss'));
+INSERT INTO service(name, version, type, endpoint, available, created) VALUES ('payment-api',        '1.1',   'Api',    'http:8080',    false,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
+INSERT INTO service(name, version, type, endpoint, available, created) VALUES ('mariadb',            '10.9',  'SQL',    'tcp:3306',     false,   PARSEDATETIME('2022-02-23 21:26:00','yyyy-MM-dd HH:mm:ss'));
