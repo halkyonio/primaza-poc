@@ -14,7 +14,6 @@ REGISTRY=localhost:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=atomic-fruits.${VM_IP}.nip.io
 QUARKUS_APP_PATH="$HOME/atomic-fruits-service"
-APP_DIR=atomic-fruits
 GITHUB_REPO=https://github.com/aureamunoz/atomic-fruits-service
 
 # Database credential
