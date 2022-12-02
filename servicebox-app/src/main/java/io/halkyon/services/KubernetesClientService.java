@@ -9,9 +9,9 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import io.fabric8.kubernetes.api.builder.VisitableBuilder;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -36,7 +36,6 @@ public class KubernetesClientService {
             r = (MixedOperation<Deployment, DeploymentList, RollableScalableResource<Deployment>>) r.withoutField("metadata.namespace", ns);
         }
         return r.list().getItems();
-//        return getClientForCluster(cluster).apps().deployments().list().getItems();
     }
 
     /**
@@ -91,7 +90,7 @@ public class KubernetesClientService {
                 .get();
 
         // Remove the Secret, volume to mount the secret and env
-        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
+/*        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
         pod.getVolumes().remove(new SecretBuilder()
                 .withNewMetadata()
                 .withName(secretName)
@@ -102,12 +101,17 @@ public class KubernetesClientService {
                 .withNewSecret()
                 .withSecretName(secretName)
                 .endSecret()
-                .build());
+                .build());*/
+        Deployment newDeployment = new DeploymentBuilder(deployment)
+                .accept(ContainerBuilder.class, container -> {container.getEnvFrom().removeIf(e -> e.getSecretRef() != null && Objects.equals(e.getSecretRef().getName(), secretName));})
+                .accept(PodSpecBuilder.class, podSpec -> { podSpec.removeMatchingFromVolumes(v -> secretName.equals(v.getName()));})
+                .build();
 
-        for (Container container : pod.getContainers()) {
+
+/*        for (Container container : pod.getContainers()) {
             container.getEnvFrom().removeIf(e -> e.getSecretRef() != null
                     && Objects.equals(e.getSecretRef().getName(), secretName));
-        }
+        }*/
 
         // Update deployment
         client.apps().deployments().createOrReplace(deployment);
