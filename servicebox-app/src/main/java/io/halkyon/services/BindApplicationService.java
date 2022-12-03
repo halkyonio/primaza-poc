@@ -53,7 +53,8 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
-        secretData.put("url", ToBase64(removeSchemeFromUrl(url)));
+        secretData.put("type",ToBase64(claim.type));
+        secretData.put("uri", ToBase64(removeSchemeFromUrl(url)));
         secretData.put("username", ToBase64(credential.username));
         secretData.put("password", ToBase64(credential.password));
         for (CredentialParameter param : credential.params) {

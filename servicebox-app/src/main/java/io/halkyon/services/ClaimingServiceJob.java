@@ -79,6 +79,7 @@ public class ClaimingServiceJob {
 
         } else {
             claim.status = ClaimStatus.BIND.toString();
+            claim.type = service.type;
             claim.service = service;
         }
 

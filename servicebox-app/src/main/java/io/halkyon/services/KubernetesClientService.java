@@ -89,28 +89,10 @@ public class KubernetesClientService {
                 .withName(application.name)
                 .get();
 
-        // Remove the Secret, volume to mount the secret and env
-/*        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
-        pod.getVolumes().remove(new SecretBuilder()
-                .withNewMetadata()
-                .withName(secretName)
-                .withNamespace(application.namespace)
-                .endMetadata().build());
-        pod.getVolumes().remove(new VolumeBuilder()
-                .withName(secretName)
-                .withNewSecret()
-                .withSecretName(secretName)
-                .endSecret()
-                .build());*/
+        // Remove the Volume pointing to the Secret
         Deployment newDeployment = new DeploymentBuilder(deployment)
-                .accept(ContainerBuilder.class, container -> {container.getEnvFrom().removeIf(e -> e.getSecretRef() != null && Objects.equals(e.getSecretRef().getName(), secretName));})
                 .accept(PodSpecBuilder.class, podSpec -> { podSpec.removeMatchingFromVolumes(v -> secretName.equals(v.getName()));})
                 .build();
-
-/*        for (Container container : pod.getContainers()) {
-            container.getEnvFrom().removeIf(e -> e.getSecretRef() != null
-                    && Objects.equals(e.getSecretRef().getName(), secretName));
-        }*/
 
         // Update deployment
         client.apps().deployments().createOrReplace(deployment);
@@ -146,15 +128,6 @@ public class KubernetesClientService {
                 .withSecretName(secretName)
                 .endSecret()
                 .build());
-
-        // Add secret values as env var values
-        for (Container container : pod.getContainers()) {
-            container.getEnvFrom().removeIf(e -> e.getSecretRef() != null
-                    && Objects.equals(e.getSecretRef().getName(), secretName));
-            container.getEnvFrom().add(new EnvFromSourceBuilder()
-                    .withNewSecretRef(secretName, false)
-                    .build());
-        }
 
         // update deployment
         client.apps().deployments().createOrReplace(deployment);
