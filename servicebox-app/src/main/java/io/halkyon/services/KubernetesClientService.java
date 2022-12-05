@@ -25,6 +25,8 @@ import io.halkyon.model.Cluster;
 
 @ApplicationScoped
 public class KubernetesClientService {
+
+    private static String SERVICE_BINDING_PATH = "/binding";
     /**
      * Get the deployments that are installed in the cluster.
      * TODO: For OpenShift, we should support DeploymentConfig: https://github.com/halkyonio/primaza-poc/issues/136
@@ -120,6 +122,23 @@ public class KubernetesClientService {
                 .withName(application.name)
                 .get();
 
+        /**
+         * Add a volumeMount to the container able to mount the path to
+         * access the secret under "/SERVICE_BINDING_PATH/secretName"
+         *
+         * Pass as ENV the property "SERVICE_BINDING_PATH"
+         * pointing to the mount dir (e.g /binding)
+         */
+        DeploymentBuilder newDeployment = new DeploymentBuilder(deployment)
+                .accept(ContainerBuilder.class, container -> {
+                    container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_PATH + "/" + secretName).endVolumeMount();
+                    container.buildEnvFrom().removeIf(e -> e.getSecretRef() != null && Objects.equals(e.getSecretRef().getName(), secretName));
+                  })
+                .accept();
+
+        /**
+         * Mount the secret as a Volume
+         */
         PodSpec pod = deployment.getSpec().getTemplate().getSpec();
         pod.getVolumes().removeIf(v -> Objects.equals(secretName, v.getName()));
         pod.getVolumes().add(new VolumeBuilder()
