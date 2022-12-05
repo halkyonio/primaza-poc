@@ -19,12 +19,17 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class KubernetesClientService {
+
+    private static String SERVICE_BINDING_PATH = "/bindings";
+    private static Logger LOG = Logger.getLogger(KubernetesClientService.class);
     /**
      * Get the deployments that are installed in the cluster.
      * TODO: For OpenShift, we should support DeploymentConfig: https://github.com/halkyonio/primaza-poc/issues/136
@@ -104,7 +109,9 @@ public class KubernetesClientService {
     public void mountSecretInApplication(Application application, Claim claim, Map<String, String> secretData) {
         KubernetesClient client = getClientForCluster(application.cluster);
 
-        // create secret
+        /**
+         * Create the secret containing the key/value defined according to the workload projection spec
+         */
         String secretName = application.name + "-" + claim.name;
         client.secrets().create(new SecretBuilder()
                 .withNewMetadata()
@@ -114,23 +121,39 @@ public class KubernetesClientService {
                 .withData(secretData)
                 .build());
 
-        // add volume in the deployment
+        /**
+         * Get the Deployment resource to be updated
+         */
         Deployment deployment = client.apps().deployments()
                 .inNamespace(application.namespace)
                 .withName(application.name)
                 .get();
 
-        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
-        pod.getVolumes().removeIf(v -> Objects.equals(secretName, v.getName()));
-        pod.getVolumes().add(new VolumeBuilder()
-                .withName(secretName)
-                .withNewSecret()
-                .withSecretName(secretName)
-                .endSecret()
-                .build());
+        /**
+         * Add a volumeMount to the container able to mount the path to
+         * access the secret under "/SERVICE_BINDING_PATH/secretName"
+         *
+         * Pass as ENV the property "SERVICE_BINDING_PATH"
+         * pointing to the mount dir (e.g /bindings)
+         *
+         * Mount the secret
+         */
+        Deployment newDeployment = new DeploymentBuilder(deployment)
+                .accept(ContainerBuilder.class, container -> {
+                    container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_PATH + "/" + secretName).endVolumeMount();
+                    container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_ROOT", e.getName()));
+                    container.addNewEnv().withName("SERVICE_BINDING_ROOT").withValue(SERVICE_BINDING_PATH).endEnv();
+                  })
+                .accept(PodSpecBuilder.class, podSpec ->  {
+                    podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
+                    podSpec.addNewVolume().withName(secretName).withNewSecret().withSecretName(secretName).endSecret().endVolume();
+                  })
+                .build();
+
+        LOG.info(Serialization.asYaml(newDeployment));
 
         // update deployment
-        client.apps().deployments().createOrReplace(deployment);
+        client.apps().deployments().createOrReplace(newDeployment);
     }
 
     /**
