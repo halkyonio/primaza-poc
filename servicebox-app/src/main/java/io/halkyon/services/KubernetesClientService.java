@@ -19,6 +19,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
@@ -145,6 +146,8 @@ public class KubernetesClientService {
                     podSpec.addNewVolume().withNewSecret().withSecretName(secretName).endSecret().endVolume();
                   })
                 .build();
+
+        System.out.println(Serialization.asYaml(newDeployment));
 
         // update deployment
         client.apps().deployments().createOrReplace(newDeployment);
