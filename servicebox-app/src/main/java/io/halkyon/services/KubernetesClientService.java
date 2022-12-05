@@ -28,7 +28,7 @@ import org.jboss.logging.Logger;
 @ApplicationScoped
 public class KubernetesClientService {
 
-    private static String SERVICE_BINDING_PATH = "/binding";
+    private static String SERVICE_BINDING_PATH = "/bindings";
     private static Logger LOG = Logger.getLogger(KubernetesClientService.class);
     /**
      * Get the deployments that are installed in the cluster.
@@ -134,7 +134,7 @@ public class KubernetesClientService {
          * access the secret under "/SERVICE_BINDING_PATH/secretName"
          *
          * Pass as ENV the property "SERVICE_BINDING_PATH"
-         * pointing to the mount dir (e.g /binding)
+         * pointing to the mount dir (e.g /bindings)
          *
          * Mount the secret
          */
@@ -142,7 +142,7 @@ public class KubernetesClientService {
                 .accept(ContainerBuilder.class, container -> {
                     container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_PATH + "/" + secretName).endVolumeMount();
                     container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_ROOT", e.getName()));
-                    container.addNewEnv().withName("SERVICE_BINDING_ROOT").withValue(SERVICE_BINDING_PATH + "/" + secretName).endEnv();
+                    container.addNewEnv().withName("SERVICE_BINDING_ROOT").withValue(SERVICE_BINDING_PATH).endEnv();
                   })
                 .accept(PodSpecBuilder.class, podSpec ->  {
                     podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
