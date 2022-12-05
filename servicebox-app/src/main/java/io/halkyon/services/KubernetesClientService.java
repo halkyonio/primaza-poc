@@ -23,11 +23,13 @@ import io.fabric8.kubernetes.client.utils.Serialization;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class KubernetesClientService {
 
     private static String SERVICE_BINDING_PATH = "/binding";
+    private static Logger LOG = Logger.getLogger(KubernetesClientService.class);
     /**
      * Get the deployments that are installed in the cluster.
      * TODO: For OpenShift, we should support DeploymentConfig: https://github.com/halkyonio/primaza-poc/issues/136
@@ -143,11 +145,11 @@ public class KubernetesClientService {
                   })
                 .accept(PodSpecBuilder.class, podSpec ->  {
                     podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
-                    podSpec.addNewVolume().withNewSecret().withSecretName(secretName).endSecret().endVolume();
+                    podSpec.addNewVolume().withName(secretName).withNewSecret().withSecretName(secretName).endSecret().endVolume();
                   })
                 .build();
 
-        System.out.println(Serialization.asYaml(newDeployment));
+        LOG.info(Serialization.asYaml(newDeployment));
 
         // update deployment
         client.apps().deployments().createOrReplace(newDeployment);
