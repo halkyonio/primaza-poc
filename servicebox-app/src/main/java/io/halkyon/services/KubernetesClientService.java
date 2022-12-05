@@ -106,7 +106,9 @@ public class KubernetesClientService {
     public void mountSecretInApplication(Application application, Claim claim, Map<String, String> secretData) {
         KubernetesClient client = getClientForCluster(application.cluster);
 
-        // create secret
+        /**
+         * Create the secret containing the key/value defined according to the workload projection spec
+         */
         String secretName = application.name + "-" + claim.name;
         client.secrets().create(new SecretBuilder()
                 .withNewMetadata()
@@ -116,7 +118,9 @@ public class KubernetesClientService {
                 .withData(secretData)
                 .build());
 
-        // add volume in the deployment
+        /**
+         * Get the Deployment resource to be updated
+         */
         Deployment deployment = client.apps().deployments()
                 .inNamespace(application.namespace)
                 .withName(application.name)
@@ -128,28 +132,22 @@ public class KubernetesClientService {
          *
          * Pass as ENV the property "SERVICE_BINDING_PATH"
          * pointing to the mount dir (e.g /binding)
+         *
+         * Mount the secret
          */
-        DeploymentBuilder newDeployment = new DeploymentBuilder(deployment)
+        Deployment newDeployment = new DeploymentBuilder(deployment)
                 .accept(ContainerBuilder.class, container -> {
                     container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_PATH + "/" + secretName).endVolumeMount();
                     container.buildEnvFrom().removeIf(e -> e.getSecretRef() != null && Objects.equals(e.getSecretRef().getName(), secretName));
                   })
-                .accept();
-
-        /**
-         * Mount the secret as a Volume
-         */
-        PodSpec pod = deployment.getSpec().getTemplate().getSpec();
-        pod.getVolumes().removeIf(v -> Objects.equals(secretName, v.getName()));
-        pod.getVolumes().add(new VolumeBuilder()
-                .withName(secretName)
-                .withNewSecret()
-                .withSecretName(secretName)
-                .endSecret()
-                .build());
+                .accept(PodSpecBuilder.class, podSpec ->  {
+                    podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
+                    podSpec.addNewVolume().withNewSecret().withSecretName(secretName).endSecret().endVolume();
+                  })
+                .build();
 
         // update deployment
-        client.apps().deployments().createOrReplace(deployment);
+        client.apps().deployments().createOrReplace(newDeployment);
     }
 
     /**
