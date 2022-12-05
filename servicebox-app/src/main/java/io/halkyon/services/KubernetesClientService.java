@@ -141,8 +141,8 @@ public class KubernetesClientService {
         Deployment newDeployment = new DeploymentBuilder(deployment)
                 .accept(ContainerBuilder.class, container -> {
                     container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_PATH + "/" + secretName).endVolumeMount();
-                    container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_PATH", e.getName()));
-                    container.addNewEnv().withName("SERVICE_BINDING_PATH").withValue(SERVICE_BINDING_PATH + "/" + secretName).endEnv();
+                    container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_ROOT", e.getName()));
+                    container.addNewEnv().withName("SERVICE_BINDING_ROOT").withValue(SERVICE_BINDING_PATH + "/" + secretName).endEnv();
                   })
                 .accept(PodSpecBuilder.class, podSpec ->  {
                     podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
