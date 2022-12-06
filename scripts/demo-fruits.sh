@@ -54,7 +54,8 @@ pe "helm install postgresql bitnami/postgresql \
 p "Package the application and build the image"
 pe "mvn clean package -DskipTests \
   -Dquarkus.container-image.push=true \
-  -Dquarkus.container-image.registry=$REGISTRY \
+  -Dquarkus.container-image.registry=${REGISTRY} \
   -Dquarkus.container-image.insecure=true \
-  -Dquarkus.kubernetes.namespace=$NAMESPACE \
-  -Dquarkus.kubernetes.deploy=true"
+  -Dquarkus.kubernetes.namespace=${NAMESPACE} \
+  -Dquarkus.kubernetes.deploy=true \
+  -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST}"
