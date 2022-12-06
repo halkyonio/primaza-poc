@@ -56,6 +56,9 @@ public class Service extends PanacheEntityBase {
     @FormParam
     public String externalEndpoint;
 
+    @FormParam
+    public String database;
+
     public String namespace;
     public Boolean available;
     public Date created;

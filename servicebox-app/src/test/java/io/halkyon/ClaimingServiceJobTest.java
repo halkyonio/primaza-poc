@@ -37,8 +37,8 @@ public class ClaimingServiceJobTest {
         pauseScheduler();
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
-        createService("postgresqlClaimingServiceJobTest", "8", "postgresql", true);
-        createService("MySQLClaimingServiceJobTest", "7.5", "mysql",false);
+        createService("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", true);
+        createService("MySQLClaimingServiceJobTest", "7.5", "mysql", "demo", false);
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
@@ -46,7 +46,9 @@ public class ClaimingServiceJobTest {
         // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should increase the attempts to 2
 
         job.execute();
-        Claim actualPostgresql = given()
+        Claim actualPostgresql
+
+                = given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name)
                 .then()

@@ -47,7 +47,7 @@ public class ServiceDiscoveryJobTest {
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
         pauseScheduler();
-        Service service = createService("ServiceDiscoveryJobTest", "Api", "any", "host:1111");
+        Service service = createService("ServiceDiscoveryJobTest", "Api", "any", "demo", "host:1111");
 
         // When we run the job once:
         // Then:
@@ -106,7 +106,7 @@ public class ServiceDiscoveryJobTest {
     @Test
     public void testShouldDiscoveryServiceWhenNewClusterIsCreated(){
         pauseScheduler();
-        Service service = createService("ServiceDiscoveryJobTest3", "Api", "any", "host:3333");
+        Service service = createService("ServiceDiscoveryJobTest3", "Api", "any", "demo", "host:3333");
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
         given()
                 .header("HX-Request", true)
