@@ -21,7 +21,6 @@ DB_NAMESPACE=db
 USERNAME=healthy
 PASSWORD=healthy
 TYPE=postgresql
-DATABASE_NAME=fruits-database
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=200}
