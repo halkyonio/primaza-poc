@@ -57,6 +57,7 @@ public class BindApplicationService {
         secretData.put("uri", ToBase64(removeSchemeFromUrl(url)));
         secretData.put("host", ToBase64(getHostFromUrl(url)));
         secretData.put("port", ToBase64(getPortFromUrl(url)));
+        secretData.put("database", ToBase64(claim.database));
         secretData.put("username", ToBase64(credential.username));
         secretData.put("password", ToBase64(credential.password));
         for (CredentialParameter param : credential.params) {

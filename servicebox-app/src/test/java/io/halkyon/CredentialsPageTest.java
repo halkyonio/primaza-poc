@@ -22,7 +22,7 @@ public class CredentialsPageTest {
     @Test
     @DisabledOnIntegrationTest
     public void testCreateNewCredential(){
-        createService("postgresql-credential1", "8", "postgresql",true);
+        createService("postgresql-credential1", "8", "postgresql", "demo", true);
         page.goTo("/credentials/new");
         // add param a=1
         page.type("new-param-name", "a");

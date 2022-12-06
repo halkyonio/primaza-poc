@@ -48,8 +48,9 @@ public class ServicesEndpointTest {
         String serviceVersion = "3.11.0";
         String serviceType= "Broker";
         String endpoint = "tcp:5672";
+        String database = "demo";
 
-        createService(serviceName, serviceVersion, serviceType, endpoint, false);
+        createService(serviceName, serviceVersion, serviceType, database, endpoint, false);
 
         given()
                 .header("HX-Request", true)

@@ -19,16 +19,22 @@
          </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="type" >Type :</label>
-         <div class="col-sm-5">
-             <select id="service_type" class="form-control new-service" name="type" required placeholder="Select the type ?">
-                <option value="any" selected>Any</option>
-                <option value="postgresql" {#if service.type == "postgresql"}selected{/if}>Postgresql</option>
-                <option value="mysql" {#if service.type == "mysql"}selected{/if}>MySQL</option>
-                <option value="mariadb" {#if service.type == "mariadb"}selected{/if}>mariadb</option>
-                <option value="activemq" {#if service.type == "activemq"}selected{/if}>ActiveMQ</option>
-                <option value="api" {#if service.type == "api"}selected{/if}>Api</option>
-             </select>
+             <div class="col-sm-5">
+                 <select id="service_type" class="form-control new-service" name="type" required placeholder="Select the type ?">
+                    <option value="any" selected>Any</option>
+                    <option value="postgresql" {#if service.type == "postgresql"}selected{/if}>Postgresql</option>
+                    <option value="mysql" {#if service.type == "mysql"}selected{/if}>MySQL</option>
+                    <option value="mariadb" {#if service.type == "mariadb"}selected{/if}>mariadb</option>
+                    <option value="activemq" {#if service.type == "activemq"}selected{/if}>ActiveMQ</option>
+                    <option value="api" {#if service.type == "api"}selected{/if}>Api</option>
+                 </select>
+             </div>
          </div>
+         <div class="form-group">
+              <label class="control-label col-sm-2" for="owner">Database:</label>
+              <div class="col-sm-5">
+              <input class="form-control new-service" type="text" name="database" value="{#if service.database}{service.database}{/if}" placeholder="Database to access to">
+              </div>
          </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="endpoint">Endpoint:</label>

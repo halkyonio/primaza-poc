@@ -31,22 +31,23 @@ public final class TestUtils {
                 .extract().as(Cluster.class);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, boolean available) {
-        return createService(serviceName, serviceVersion, serviceType,"tcp:5672", available);
+    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, boolean available) {
+        return createService(serviceName, serviceVersion, serviceType, database,"tcp:5672", available);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, String endpoint) {
-        return createService(serviceName, serviceVersion, serviceType, endpoint, false);
+    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, String endpoint) {
+        return createService(serviceName, serviceVersion, serviceType, database, endpoint, false);
     }
 
     @Transactional
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, String endpoint, boolean available) {
+    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, String endpoint, boolean available) {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name",serviceName)
                 .formParam("version",serviceVersion)
                 .formParam("type",serviceType)
+                .formParam("database",database)
                 .formParam("endpoint", endpoint )
                 .when().post("/services")
                 .then().statusCode(201);
