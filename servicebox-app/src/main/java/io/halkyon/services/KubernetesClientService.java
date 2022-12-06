@@ -96,7 +96,13 @@ public class KubernetesClientService {
 
         // Remove the Volume pointing to the Secret
         Deployment newDeployment = new DeploymentBuilder(deployment)
-                .accept(PodSpecBuilder.class, podSpec -> { podSpec.removeMatchingFromVolumes(v -> secretName.equals(v.getName()));})
+                .accept(ContainerBuilder.class, container -> {
+                    container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_ROOT", e.getName()));
+                })
+                .accept(PodSpecBuilder.class, podSpec -> {
+                    podSpec.removeMatchingFromVolumes(v -> secretName.equals(v.getName()));
+                    podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
+                })
                 .build();
 
         // Update deployment
