@@ -22,7 +22,7 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "serviceId=1&name=user&username=superman&password=superman&params="
+  "serviceId=1&name=user&username=healthy&password=healthy&params="
   "serviceId=3&name=admin&username=supermario&password=supermario&params="
 )
 
