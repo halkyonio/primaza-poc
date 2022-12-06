@@ -22,7 +22,7 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=postgresql&version=14.5&type=postgresql&database=demo-db&endpoint=tcp:5432"
+  "name=postgresql&version=14.5&type=postgresql&database=postgres&endpoint=tcp:5432"
   "name=mysql&version=8.0&type=mysql&database=demo-db&endpoint=tcp:3306"
   "name=activemq-artemis&version=2.26&type=activemq&database=demo-db&endpoint=tcp:8161"
   "name=mariadb&version=10.9&type=mariadb&database=demo-db&endpoint=tcp:3306"
