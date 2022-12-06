@@ -14,7 +14,7 @@ import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 
-import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
+import static io.halkyon.utils.StringUtils.*;
 
 @ApplicationScoped
 public class BindApplicationService {
@@ -55,6 +55,8 @@ public class BindApplicationService {
         Map<String, String> secretData = new HashMap<>();
         secretData.put("type",ToBase64(claim.type));
         secretData.put("uri", ToBase64(removeSchemeFromUrl(url)));
+        secretData.put("host", ToBase64(getHostFromUrl(url)));
+        secretData.put("port", ToBase64(getPortFromUrl(url)));
         secretData.put("username", ToBase64(credential.username));
         secretData.put("password", ToBase64(credential.password));
         for (CredentialParameter param : credential.params) {

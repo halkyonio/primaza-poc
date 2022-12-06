@@ -10,6 +10,16 @@ public final class StringUtils {
         return uri.getHost() + ":" + String.valueOf(uri.getPort());
     }
 
+    public static String getHostFromUrl(String URL) {
+        URI uri = URI.create(URL);
+        return uri.getHost();
+    }
+
+    public static String getPortFromUrl(String URL) {
+        URI uri = URI.create(URL);
+        return String.valueOf(uri.getPort());
+    }
+
     public static boolean equalsIgnoreCase(String left, String right) {
         if (left == null && right == null) {
             return true;
