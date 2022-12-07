@@ -45,7 +45,7 @@ pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-i
    -Dquarkus.container-image.insecure=true \
    -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
    -Dlog.level=INFO \
-   -Dgit.sha.commit=$(git rev-parse --short HEAD) \
+   -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
    -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
 
 pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/servicebox-app"
