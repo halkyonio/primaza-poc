@@ -98,7 +98,7 @@ public class KubernetesClientService {
         Deployment newDeployment = new DeploymentBuilder(deployment)
                 .accept(ContainerBuilder.class, container -> {
                     container.removeMatchingFromEnv(e -> Objects.equals("SERVICE_BINDING_ROOT", e.getName()));
-                    container.removeMatchingFromVolumeMounts(v -> Objects.equals(secretName, v.getName()));my
+                    container.removeMatchingFromVolumeMounts(v -> Objects.equals(secretName, v.getName()));
                 })
                 .accept(PodSpecBuilder.class, podSpec -> {
                     podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
