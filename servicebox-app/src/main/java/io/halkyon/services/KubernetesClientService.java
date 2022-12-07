@@ -105,7 +105,7 @@ public class KubernetesClientService {
                 })
                 .build();
 
-        LOG.debug(Serialization.asYaml(newDeployment));
+        LOG.warn(Serialization.asYaml(newDeployment));
 
         // Update deployment
         client.apps().deployments().createOrReplace(newDeployment);
@@ -158,7 +158,7 @@ public class KubernetesClientService {
                   })
                 .build();
 
-        LOG.debug(Serialization.asYaml(newDeployment));
+        LOG.warn(Serialization.asYaml(newDeployment));
 
         // update deployment
         client.apps().deployments().createOrReplace(newDeployment);
