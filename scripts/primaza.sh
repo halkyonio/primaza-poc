@@ -44,6 +44,7 @@ pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-i
    -Dquarkus.container-image.tag=${IMAGE_VERSION} \
    -Dquarkus.container-image.insecure=true \
    -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
+   -Dlog.level=debug \
    -Dgit.sha.commit=$(git rev-parse --short HEAD) \
    -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
 
