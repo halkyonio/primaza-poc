@@ -1,5 +1,6 @@
 package io.halkyon.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.halkyon.services.ClaimStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -9,11 +10,7 @@ import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -42,6 +39,9 @@ public class Claim extends PanacheEntityBase {
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
     public Integer attempts = 0;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    public Application application;
 
     // Id of the application which is bound to a claim
     public Long applicationId;

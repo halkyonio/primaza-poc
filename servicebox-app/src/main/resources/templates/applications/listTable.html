@@ -6,6 +6,8 @@
             <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Image</th>
             <th aria-valuetext="left">Cluster</th>
+            <th aria-valuetext="left">Claim status</th>
+            <th aria-valuetext="left">New Action</th>
             <th aria-valuetext="left">Action</th>
         </tr>
       </thead>
@@ -16,16 +18,44 @@
             <td>{application.namespace}</td>
             <td>{application.image}</td>
             <td>{application.cluster.name}</td>
+            <td>{#if application.claim != null}{application.claim.status}{#else}unknown{/if}</td>
+            <td>
+                <button class="btn btn-success btn-sm rounded-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#myModal">Claim</button>
+                <!-- Modal -->
+                <div id="myModal" class="modal fade show" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Modal Header</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Some text in the modal.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
             <td>
                 <ul class="list-inline m-0">
                     <li class="list-inline-item">
                         <button hx-get="/applications/bind/{application.id}"
                                 hx-target="#app_bind_modal-container"
                                 hx-trigger="click"
+                                _="on htmx:afterOnLoad wait 10ms
+                                   then
+                                     add .show to #app_bind_modal
+                                   then
+                                     add .show to #app_bind_modal-container-backdrop"
                                 onclick="stopPolling()"
                                 name="btn-application-bind"
-                                class="btn btn-success btn-sm rounded-2"
-                                _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Bind</button>
+                                class="btn btn-success btn-sm rounded-2">Bind</button>
                     </li>
                 </ul>
             </td>

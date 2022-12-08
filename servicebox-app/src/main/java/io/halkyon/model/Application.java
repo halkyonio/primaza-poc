@@ -2,20 +2,27 @@ package io.halkyon.model;
 
 import static javax.persistence.CascadeType.ALL;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Application extends PanacheEntity {
     public String name;
     public String namespace;
     public String image;
+    public String url;
 
     @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
+
+    @OneToOne(mappedBy = "application")
+    public Claim claim;
 }
