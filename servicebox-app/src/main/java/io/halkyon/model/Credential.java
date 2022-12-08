@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -33,6 +34,11 @@ public class Credential extends PanacheEntityBase {
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
     public Service service;
+
+    @JsonBackReference(value = "claim-credential")
+    @OneToOne
+    @JoinColumn(name = "claim_id")
+    public Claim claim;
 
     @NotBlank
     public String username;
