@@ -117,7 +117,7 @@ jobs:
           quarkus.kubernetes.deployment-target=kubernetes
           EOF
 
-          # install application
+          # deploy super-heroes application in kind cluster
           mvn clean package -DskipTests \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=$KIND_REGISTRY \
