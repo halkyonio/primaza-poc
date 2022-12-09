@@ -97,23 +97,5 @@ public class ClaimsEndpointTest {
                 .statusCode(200);
     }
 
-    @Test
-    public void givenBidirectionRelation_whenUsingJacksonReferenceAnnotationWithSerialization_thenCorrect() throws JsonProcessingException, JsonProcessingException, JsonProcessingException {
-        final Claim claim = new Claim();
-        claim.name="claim-name";
-        claim.applicationId=1L;
-        claim.description="a claim for test";
-
-        final Credential credential = new Credential();
-        credential.name="credential name";
-        credential.username="username";
-        credential.password="password";
-
-        claim.credential=credential;
-
-
-        final String claimJson = new ObjectMapper().writeValueAsString(claim);
-        final String credentialJson = new ObjectMapper().writeValueAsString(credential);
-    }
 
 }
