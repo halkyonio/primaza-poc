@@ -154,7 +154,7 @@ jobs:
           # Next, we register the Postgresql service in Service Box
           .github/register_service_in_service_box.sh postgresql 11 tcp:5432 $TYPE
 
-          # And finally the credentials
+          # We create the credentials for the PostgreSQL service recently registered
           .github/register_service_credential_in_service_box.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
 
       - name: Register claim
