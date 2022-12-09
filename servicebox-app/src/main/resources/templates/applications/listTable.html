@@ -20,23 +20,31 @@
             <td>{application.cluster.name}</td>
             <td>{#if application.claim != null}{application.claim.status}{#else}unknown{/if}</td>
             <td>
-                <button class="btn btn-success btn-sm rounded-2"
+                <button id="button1" class="btn btn-success btn-sm rounded-2"
                         data-bs-toggle="modal"
                         data-bs-target="#myModal">Claim</button>
-                <!-- Modal -->
-                <div id="myModal" class="modal fade show" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="myModal" data-backdrop="false" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" role="dialog">
                     <div class="modal-dialog">
-                        <!-- Modal content-->
                         <div class="modal-content">
                             <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Modal Header</h4>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p>Some text in the modal.</p>
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="recipient-name" class="col-form-label">Service requested:</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="message-text" class="col-form-label">Found:</label>
+                                        <textarea class="form-control" id="message-text"></textarea>
+                                    </div>
+                                </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Next</button>
                             </div>
                         </div>
                     </div>
