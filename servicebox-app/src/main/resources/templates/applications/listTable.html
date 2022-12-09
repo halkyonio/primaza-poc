@@ -6,6 +6,8 @@
             <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Image</th>
             <th aria-valuetext="left">Cluster</th>
+            <th aria-valuetext="left">Claim status</th>
+            <th aria-valuetext="left">New Action</th>
             <th aria-valuetext="left">Action</th>
         </tr>
       </thead>
@@ -16,16 +18,52 @@
             <td>{application.namespace}</td>
             <td>{application.image}</td>
             <td>{application.cluster.name}</td>
+            <td>{#if application.claim != null}{application.claim.status}{#else}unknown{/if}</td>
+            <td>
+                <button id="button1" class="btn btn-success btn-sm rounded-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#myModal">Claim</button>
+                <div class="modal fade" id="myModal" data-backdrop="false" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="recipient-name" class="col-form-label">Service requested:</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="message-text" class="col-form-label">Found:</label>
+                                        <textarea class="form-control" id="message-text"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
             <td>
                 <ul class="list-inline m-0">
                     <li class="list-inline-item">
                         <button hx-get="/applications/bind/{application.id}"
                                 hx-target="#app_bind_modal-container"
                                 hx-trigger="click"
+                                _="on htmx:afterOnLoad wait 10ms
+                                   then
+                                     add .show to #app_bind_modal
+                                   then
+                                     add .show to #app_bind_modal-container-backdrop"
                                 onclick="stopPolling()"
                                 name="btn-application-bind"
-                                class="btn btn-success btn-sm rounded-2"
-                                _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Bind</button>
+                                class="btn btn-success btn-sm rounded-2">Bind</button>
                     </li>
                 </ul>
             </td>

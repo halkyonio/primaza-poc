@@ -4,12 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -56,8 +51,10 @@ public class ApplicationResource {
     public Response doBindApplication(@PathParam("id") long applicationId, @FormParam("claimId") long claimId) {
         Application application = Application.findById(applicationId);
         Claim claim = Claim.findById(claimId);
-        claim.applicationId = applicationId;
+        claim.application = application;
         claim.persist();
+        application.claim = claim;
+        application.persist();
         bindService.bindApplication(application, claim);
         return Response.ok().build();
     }
