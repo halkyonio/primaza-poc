@@ -127,7 +127,7 @@ jobs:
       - name: Register Kind cluster in Service Box
         run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
 
-      - name: Wait until rest-heroes is registered in Service Box
+      - name: Wait until rest-heroes is discovered by Primaza
         run: |
           SERVICE_BOX_KUBERNETES_NAMESPACE=sb
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
