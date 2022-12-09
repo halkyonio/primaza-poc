@@ -1,6 +1,9 @@
 package io.halkyon;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.halkyon.model.Claim;
+import io.halkyon.model.Credential;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -92,6 +95,25 @@ public class ClaimsEndpointTest {
                 .when().delete("/claims/"+claim.id)
                 .then()
                 .statusCode(200);
+    }
+
+    @Test
+    public void givenBidirectionRelation_whenUsingJacksonReferenceAnnotationWithSerialization_thenCorrect() throws JsonProcessingException, JsonProcessingException, JsonProcessingException {
+        final Claim claim = new Claim();
+        claim.name="claim-name";
+        claim.applicationId=1L;
+        claim.description="a claim for test";
+
+        final Credential credential = new Credential();
+        credential.name="credential name";
+        credential.username="username";
+        credential.password="password";
+
+        claim.credential=credential;
+
+
+        final String claimJson = new ObjectMapper().writeValueAsString(claim);
+        final String credentialJson = new ObjectMapper().writeValueAsString(credential);
     }
 
 }
