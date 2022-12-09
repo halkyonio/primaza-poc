@@ -4,6 +4,7 @@ import static javax.persistence.CascadeType.ALL;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.hibernate.annotations.Fetch;
@@ -23,6 +24,7 @@ public class Application extends PanacheEntity {
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "application")
     public Claim claim;
 }

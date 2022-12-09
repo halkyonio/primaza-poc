@@ -1,5 +1,6 @@
 package io.halkyon.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.halkyon.services.ClaimStatus;
@@ -40,6 +41,7 @@ public class Claim extends PanacheEntityBase {
     public Service service;
     public Integer attempts = 0;
 
+    @JsonBackReference
     @OneToOne(fetch = FetchType.LAZY)
     public Application application;
 
