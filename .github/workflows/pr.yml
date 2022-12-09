@@ -160,7 +160,7 @@ jobs:
       - name: Register claim
         run: .github/register_claim_in_service_box.sh heroClaimDb postgresql-11
 
-      - name: Bind application to claim
+      - name: Bind the application to the service using the claim
         run: .github/bind_application_to_claim_in_service_box.sh rest-heroes heroClaimDb
 
       - id: wait-for-super-hero
