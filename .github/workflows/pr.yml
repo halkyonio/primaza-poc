@@ -7,22 +7,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [
-          { 'version': '17', 'opts': '' }
-        ]
-    name: build with jdk ${{matrix.java.version}}
+    name: build with jdk 17
 
     steps:
       - uses: actions/checkout@v2
         name: checkout
 
       - uses: actions/setup-java@v2
-        name: set up jdk ${{matrix.java.version}}
+        name: set up jdk 17
         with:
           distribution: temurin
-          java-version: ${{matrix.java.version}}
+          java-version: 17
           cache: maven
 
       - name: build with maven
@@ -32,8 +27,6 @@ jobs:
     name: Verify in Kubernetes
     runs-on: ubuntu-latest
     needs: build
-    env:
-      SERVICE_BOX_KUBERNETES_NAMESPACE: sb
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -41,7 +34,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-          check-latest: true
           cache: 'maven'
 
       - name: Kubernetes KinD Cluster
@@ -50,89 +42,152 @@ jobs:
           version: v0.11.1
           registry: true
 
-      - name: Start Helm Repository (ChartMuseum)
-        run: docker run --rm -u 0 -it -d -p 8080:8080 -e DEBUG=1 -e STORAGE=local -e STORAGE_LOCAL_ROOTDIR=/charts -v $(pwd)/charts:/charts chartmuseum/chartmuseum:latest
+      - name: Start ServiceBox
+        run: .github/install_service_box.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
-      - id: setup-servicebox-step
-        name: Start ServiceBox
-        run: |
-          KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
-          KIND_REGISTRY_GROUP=local
-          VERSION=latest
-          kubectl create namespace $KUBERNETES_NAMESPACE
-
-          mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
-            -Dquarkus.container-image.push=true \
-            -Dquarkus.container-image.registry=$KIND_REGISTRY \
-            -Dquarkus.container-image.group=$KIND_REGISTRY_GROUP \
-            -Dquarkus.container-image.tag=$VERSION \
-            -Dquarkus.container-image.insecure=true \
-            -Dquarkus.helm.repository.push=true \
-            -Dquarkus.helm.repository.url=http://localhost:8080/api/charts \
-            -Dquarkus.helm.repository.type=CHARTMUSEUM \
-            -Dgithub.repo=${{ github.repository }} \
-            -Dgit.sha.commit=${{ github.event.pull_request.head.sha }}
-
-          # Install Helm repository
-          helm repo add local http://localhost:8080
-
-          # And install application from the Helm repository
-          helm install --devel servicebox-app local/servicebox-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/servicebox-app:$VERSION
-          kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE
-
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE -o name)
-          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $KUBERNETES_NAMESPACE -- sh -c "curl -s -i localhost:8080/home")
-          if [ "$RESULT" = *"500 Internal Server Error"* ]
-          then
-            echo "Service Box is not working"
-            exit 1
-          fi
       - name: Register Kind cluster in Service Box
-        run: |
-          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
-          KIND_URL=https://kubernetes.default.svc
-          # To connect to Kind from outside a pod:
-          # KIND_URL=$(kubectl config view -o jsonpath='{"Cluster name\tServer\n"}{range .clusters[*]}{.name}{"\t"}{.cluster.server}{"\n"}{end}' | grep kind-kind | sed "s/kind-kind//" | xargs)
-          kind get kubeconfig > /tmp/local-kind-kubeconfig
-          kubectl cp /tmp/local-kind-kubeconfig sb/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app
-          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F namespaces=kube-system -F name=local-kind -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
-          if [ "$RESULT" = *"500 Internal Server Error"* ]
-          then
-            echo "Cluster failed to be saved in Service Box: $RESULT"
-            exit 1
-          fi
-          echo "Cluster installed in Service Box: $RESULT"
+        run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
+
       - name: Create Postgresql Service in Service Box
         run: |
-          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
-
           # First, we install Postgresql via Helm.
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm install postgresql bitnami/postgresql --version 11.9.1 --set auth.username=superman --set auth.password=superman
-          ## the service endpoint should be: "postgresql:5432"
+          ## the service endpoint should be: "tcp:5432"
 
           # Next, we register the Postgresql service in Service Box
-          BODY="name=postgresql&version=11&endpoint=tcp:5432"
-          RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' --data '$BODY' -s -i localhost:8080/services")
-          if [ "$RESULT" = *"500 Internal Server Error"* ]
-          then
-            echo "Service failed to be saved in Service Box: $RESULT"
-            exit 1
-          fi
-          echo "Service installed in Service Box: $RESULT"
+          .github/register_service_in_service_box.sh postgresql 11 tcp:5432 postgresql
 
-          SERVICE=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/services/name/postgresql")
-          if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
-          then
-            echo "ServiceBox didn't discovered the Postgresql service: $SERVICE"
-            exit 1
-          fi
       - name: (Only if it failed) Log Service Box traces at failures
         if: failure()
+        run: .github/print_service_box_logs.sh
+
+  verify-e2e-example-in-kubernetes:
+    name: Verify Super Hero workshop in Kubernetes
+    runs-on: ubuntu-latest
+    needs: [ build, verify-in-kubernetes ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'maven'
+
+      - name: Kubernetes KinD Cluster
+        uses: container-tools/kind-action@v1
+        with:
+          version: v0.11.1
+          registry: true
+
+      - name: Start ServiceBox
+        run: .github/install_service_box.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
+
+      - name: Install the Quarkus Super Hero application
         run: |
-          SERVICE_BOX_KUBERNETES_NAMESPACE=${{ env.SERVICE_BOX_KUBERNETES_NAMESPACE }}
+          KUBERNETES_NAMESPACE=app
+          kubectl create namespace $KUBERNETES_NAMESPACE
+
+          git clone https://github.com/quarkusio/quarkus-super-heroes
+          cd quarkus-super-heroes/rest-heroes
+
+          # install service binding extension
+          mvn quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
+
+          # remove the third party installations via templates (we'll install these services using Service Box :) )
+          rm -rf src/main/kubernetes
+
+          # remove the default application.yml as we'll provide a different one with our Helm properties
+          rm -rf src/main/resources/application.yml
+
+          # copy the import.sql file from
+          cp deploy/db-init/initialize-tables.sql src/main/resources/
+
+          cat > src/main/resources/application.properties << "EOF"
+          quarkus.application.name=rest-heroes
+          quarkus.http.port=8080
+          quarkus.hibernate-orm.sql-load-script=initialize-tables.sql
+          quarkus.hibernate-orm.database.generation=drop-and-create
+
+          quarkus.container-image.build=true
+          quarkus.container-image.builder=docker
+          quarkus.container-image.group=superhero
+          quarkus.container-image.tag=1.0
+          quarkus.kubernetes.deployment-target=kubernetes
+          EOF
+
+          # install application
+          mvn clean package -DskipTests \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.registry=$KIND_REGISTRY \
+            -Dquarkus.kubernetes.namespace=$KUBERNETES_NAMESPACE \
+            -Dquarkus.kubernetes.deploy=true
+
+      - name: Register Kind cluster in Service Box
+        run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
+
+      - name: Wait until rest-heroes is registered in Service Box
+        run: |
+          SERVICE_BOX_KUBERNETES_NAMESPACE=sb
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
-          kubectl logs $POD_NAME -n $SERVICE_BOX_KUBERNETES_NAMESPACE
-          kubectl describe $POD_NAME -n $SERVICE_BOX_KUBERNETES_NAMESPACE
+          APPLICATION=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/rest-heroes")
+          if [ $(echo "$APPLICATION" | jq -r '.name') != "rest-heroes" ]
+          then
+            echo "ServiceBox didn't discovery the rest-heroes application: $APPLICATION"
+            exit 1
+          fi
+
+      - name: Create Postgresql Service in Service Box
+        run: |
+          KUBERNETES_NAMESPACE=app
+          USERNAME=superman
+          PASSWORD=superman
+          TYPE=postgresql
+          DATABASE_NAME=database
+
+          # First, we install Postgresql via Helm.
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm install postgresql bitnami/postgresql --namespace $KUBERNETES_NAMESPACE --version 11.9.1 --set auth.username=$USERNAME --set auth.password=$PASSWORD --set auth.database=$DATABASE_NAME
+          ## the service endpoint should be: "tcp:5432"
+
+          # Next, we register the Postgresql service in Service Box
+          .github/register_service_in_service_box.sh postgresql 11 tcp:5432 $TYPE
+
+          # And finally the credentials
+          .github/register_service_credential_in_service_box.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
+
+      - name: Register claim
+        run: .github/register_claim_in_service_box.sh heroClaimDb postgresql-11
+
+      - name: Bind application to claim
+        run: .github/bind_application_to_claim_in_service_box.sh rest-heroes heroClaimDb
+
+      - id: wait-for-super-hero
+        name: rest-heroes should now be up and running
+        run: |
+          KUBERNETES_NAMESPACE=app
+          # Ready means that the application is now binded with the service, so we're ok!
+          kubectl wait --timeout=160s --for=condition=available deployment rest-heroes -n $KUBERNETES_NAMESPACE
+
+      - name: (Only if it failed) Log Service Box traces at failures
+        if: failure()
+        run: .github/print_service_box_logs.sh
+
+      - name: (Only if it failed) Log Rest Heroes traces at failures
+        if: failure()
+        run: |
+          KUBERNETES_NAMESPACE=app
+          echo "Deployment resource:"
+          kubectl get deployment rest-heroes -o yaml -n $KUBERNETES_NAMESPACE
+          echo "Logs of the deployment:"
+          kubectl logs deploy/rest-heroes --all-containers=true -n $KUBERNETES_NAMESPACE
+          echo "Print secret: "
+          kubectl get secret rest-heroes-heroclaimdb -o yaml -n $KUBERNETES_NAMESPACE
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=rest-heroes -n $KUBERNETES_NAMESPACE -o name)
+          echo "Describe pod:"
+          kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
+          echo "Logs of running pod:"
+          kubectl logs $POD_NAME -n $KUBERNETES_NAMESPACE
+          echo "Logs of terminated pod:"
+          kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE

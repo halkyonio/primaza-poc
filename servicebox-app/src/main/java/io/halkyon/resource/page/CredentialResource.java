@@ -64,7 +64,7 @@ public class CredentialResource {
                     credential.params = new ArrayList<>();
                     if (request.params != null) {
                         for (String param : request.params) {
-                            String[] nameValue = param.split("=");
+                            String[] nameValue = param.split(":");
                             if (nameValue.length == 2) {
                                 CredentialParameter paramEntity = new CredentialParameter();
                                 paramEntity.credential = credential;
@@ -89,7 +89,7 @@ public class CredentialResource {
                 credential.params = new ArrayList<>();
                 if (request.params != null) {
                     for (String param : request.params) {
-                        String[] nameValue = param.split("=");
+                        String[] nameValue = param.split(":");
                         if (nameValue.length == 2) {
                             CredentialParameter paramEntity = new CredentialParameter();
                             paramEntity.credential = credential;

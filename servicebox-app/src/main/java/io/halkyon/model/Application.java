@@ -18,4 +18,8 @@ public class Application extends PanacheEntity {
     @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
+
+    public static Application findByName(String name) {
+        return find("name", name).firstResult();
+    }
 }

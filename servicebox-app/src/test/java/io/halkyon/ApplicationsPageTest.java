@@ -16,19 +16,18 @@ import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 
-import io.halkyon.model.Claim;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
@@ -131,7 +130,6 @@ public class ApplicationsPageTest {
             page.refresh();
             page.assertContentContains(appName);
         });
-
         // click on bind button
         page.clickByName("btn-application-bind");
         // modal should be displayed
@@ -153,20 +151,16 @@ public class ApplicationsPageTest {
         assertEquals("user1", actualClaim.credential.username);
         assertEquals("pass1",actualClaim.credential.password);
 
-        //protocol://service_name:port
+        // protocol://service_name:port
         assertNotNull(actualClaim.url);
-        assertEquals("testbind://" + serviceName + ":1111",actualClaim.url);
+        String expectedUrl = "testbind://" + serviceName + ":1111";
+        assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        String url = serviceName + ":1111";
-        String urlBase64 = Base64.getEncoder().encodeToString(url.getBytes());
-        String userBase64 = Base64.getEncoder().encodeToString("user1".getBytes());
-        String pwdBase64 = Base64.getEncoder().encodeToString("pass1".getBytes());
-        String typeBase64 = Base64.getEncoder().encodeToString("type".getBytes());
         verify(mockKubernetesClientService, times(1))
                 .mountSecretInApplication(argThat(new ApplicationNameMatcher(appName)),
                         argThat(new ClaimNameMatcher(claimName)),
-                        argThat(new SecretDataMatcher(urlBase64,userBase64,pwdBase64,typeBase64)));
+                        argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1))
                 .rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
