@@ -124,7 +124,7 @@ jobs:
             -Dquarkus.kubernetes.namespace=$KUBERNETES_NAMESPACE \
             -Dquarkus.kubernetes.deploy=true
 
-      - name: Register Kind cluster in Service Box
+      - name: Register Kind cluster in Service Box excluding technical namespaces for service and application discovery 
         run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
 
       - name: Wait until rest-heroes is discovered by Primaza
