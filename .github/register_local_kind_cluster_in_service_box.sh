@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# List of namespaces to be excluded during service and application and service discovery separated by commas
 EXCLUDED_NAMESPACES=$1
 SERVICE_BOX_KUBERNETES_NAMESPACE=sb
 KIND_URL=https://kubernetes.default.svc
