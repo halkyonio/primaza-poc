@@ -1,6 +1,5 @@
 package io.halkyon.resource.page;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -8,18 +7,28 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.halkyon.model.Application;
-import io.halkyon.model.Cluster;
-import io.halkyon.services.BindApplicationService;
 import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
+import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
+import io.halkyon.resource.requests.ClaimRequest;
+import io.halkyon.services.BindApplicationService;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimingServiceJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
@@ -43,8 +52,7 @@ public class ClaimResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.Claims.form(new Claim())
-                .data("services",Service.findAvailableServices())
+        return Templates.Claims.form(new Claim(), Service.listAll())
                 .data("title","Claim form");
     }
 
@@ -88,16 +96,19 @@ public class ClaimResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@Form io.halkyon.model.Claim claim, @HeaderParam("HX-Request") boolean hxRequest) {
-        Set<ConstraintViolation<Claim>> errors = validator.validate(claim);
-        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claim");
+    public Response add(@Form ClaimRequest claimRequest, @HeaderParam("HX-Request") boolean hxRequest) {
+        Set<ConstraintViolation<ClaimRequest>> errors = validator.validate(claimRequest);
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claims");
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            if (claim.status == null) {
-                claim.status = ClaimStatus.NEW.toString();
-            }
+            Claim claim = new Claim();
+            claim.name = claimRequest.name;
+            claim.owner = claimRequest.owner;
+            claim.description = claimRequest.description;
+            claim.serviceRequested = claimRequest.serviceRequested;
+            claim.status = ClaimStatus.NEW.toString();
 
             claimingService.claimService(claim);
             response.withSuccessMessage(claim.id);
@@ -108,7 +119,7 @@ public class ClaimResource {
     }
 
     @GET
-    @Path("/claim/{id}")
+    @Path("/{id:[0-9]+}")
     @Consumes(MediaType.TEXT_HTML)
     @Produces(MediaType.TEXT_HTML)
     public Object edit(@PathParam("id") Long id) {
@@ -116,7 +127,39 @@ public class ClaimResource {
         if (claim == null) {
             throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
         }
-        return Templates.Claims.form(claim);
+
+        return Templates.Claims.form(claim, Service.listAll());
+    }
+
+    @PUT
+    @Path("/{id:[0-9]+}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_HTML)
+    @Transactional
+    public Object edit(@PathParam("id") Long id, @Form ClaimRequest claimRequest) {
+        Claim claim = Claim.findById(id);
+        if (claim == null) {
+            throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
+        }
+
+        Set<ConstraintViolation<ClaimRequest>> errors = validator.validate(claimRequest);
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claims/" + claim.id);
+
+        if (errors.size() > 0) {
+            response.withErrors(errors);
+        } else {
+            claim.name = claimRequest.name;
+            claim.owner = claimRequest.owner;
+            claim.description = claimRequest.description;
+            claim.serviceRequested = claimRequest.serviceRequested;
+            claim.status = ClaimStatus.NEW.toString();
+
+            claimingService.claimService(claim);
+            response.withUpdateSuccessMessage(claim.id);
+        }
+
+        // Return as HTML the template rendering the item for HTMX
+        return response.build();
     }
 
     @DELETE

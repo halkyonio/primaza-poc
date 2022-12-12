@@ -23,7 +23,7 @@
                                 hx-target="#app_bind_modal-container"
                                 hx-trigger="click"
                                 onclick="stopPolling()"
-                                name="btn-application-bind"
+                                id="btn-application-bind-{application.id}"
                                 class="btn btn-success btn-sm rounded-2"
                                 _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Bind</button>
                     </li>

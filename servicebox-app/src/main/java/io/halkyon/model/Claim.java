@@ -1,16 +1,5 @@
 package io.halkyon.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import io.halkyon.services.ClaimStatus;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Sort;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.jboss.resteasy.annotations.jaxrs.FormParam;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,24 +8,33 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import io.halkyon.services.ClaimStatus;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Sort;
+
 @Entity
 public class Claim extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-
-    @NotBlank(message = "Name must not be empty")
-    @FormParam
 	public String name;
-    @NotBlank(message = "Service Requested must not be empty")
-    @FormParam
     public String serviceRequested;
-    @FormParam
     public String description;
-    @FormParam
     public String status;
-    @FormParam
     public String owner;
     @CreationTimestamp
     public Date created;
