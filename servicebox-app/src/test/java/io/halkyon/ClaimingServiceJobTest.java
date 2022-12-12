@@ -1,6 +1,7 @@
 package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
+import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -17,11 +18,16 @@ import org.junit.jupiter.api.Test;
 import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.ClaimingServiceJob;
+import io.halkyon.services.KubernetesClientService;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
 public class ClaimingServiceJobTest {
+
+    @InjectMock
+    KubernetesClientService mockKubernetesClientService;
 
     @Inject
     ClaimingServiceJob job;
@@ -37,8 +43,9 @@ public class ClaimingServiceJobTest {
         pauseScheduler();
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
-        createService("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", true);
-        createService("MySQLClaimingServiceJobTest", "7.5", "mysql", "demo", false);
+        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port", mockKubernetesClientService, "protocol", "9999");
+        createService("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", "protocol:9999");
+        createService("MySQLClaimingServiceJobTest", "7.5", "mysql", "demo");
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
@@ -46,9 +53,7 @@ public class ClaimingServiceJobTest {
         // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should increase the attempts to 2
 
         job.execute();
-        Claim actualPostgresql
-
-                = given()
+        Claim actualPostgresql = given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name)
                 .then()

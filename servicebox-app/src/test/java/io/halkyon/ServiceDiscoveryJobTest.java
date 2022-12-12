@@ -2,6 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createService;
+import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -134,10 +135,7 @@ public class ServiceDiscoveryJobTest {
     }
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort, String serviceNamespace) {
-        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(protocol), eq(servicePort)))
-                .thenReturn(Optional.of(new ServiceBuilder()
-                        .withNewMetadata().withNamespace(serviceNamespace).endMetadata()
-                        .build()));
+        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocol, servicePort, serviceNamespace);
     }
 
     private void pauseScheduler() {
