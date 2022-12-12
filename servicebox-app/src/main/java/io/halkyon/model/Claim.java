@@ -52,7 +52,6 @@ public class Claim extends PanacheEntityBase {
     // Id of the application which is bound to a claim
     public Long applicationId;
 
-    @JsonManagedReference
     @OneToOne
     public Credential credential;
     public String url;

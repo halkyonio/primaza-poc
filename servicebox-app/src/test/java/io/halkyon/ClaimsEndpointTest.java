@@ -1,6 +1,9 @@
 package io.halkyon;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.halkyon.model.Claim;
+import io.halkyon.model.Credential;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -93,5 +96,6 @@ public class ClaimsEndpointTest {
                 .then()
                 .statusCode(200);
     }
+
 
 }
