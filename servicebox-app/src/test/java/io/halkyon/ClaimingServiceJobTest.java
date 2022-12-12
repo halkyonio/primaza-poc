@@ -113,7 +113,8 @@ public class ClaimingServiceJobTest {
 
         assertEquals(mySqlClaim.name, actualMysql.name);
         assertEquals(ClaimStatus.ERROR.toString(), actualMysql.status);
-        assertEquals(maxAttempts,actualMysql.attempts);
+        assertEquals(String.format(ClaimingServiceJob.ERROR_MESSAGE_NO_SERVICE_FOUND, maxAttempts), actualMysql.errorMessage);
+        assertEquals(maxAttempts, actualMysql.attempts);
     }
 
     @Test
