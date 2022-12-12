@@ -17,7 +17,7 @@ public class Templates {
         public static class Claims {
                 public static native TemplateInstance list(List<io.halkyon.model.Claim> claims);
                 public static native TemplateInstance table(List<io.halkyon.model.Claim> claims);
-                public static native TemplateInstance form(Claim claim);
+                public static native TemplateInstance form(Claim claim, List<io.halkyon.model.Service> services);
         }
 
         @CheckedTemplate(basePath = "services", requireTypeSafeExpressions = false)

@@ -1,28 +1,36 @@
 package io.halkyon;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.halkyon.model.Claim;
-import io.halkyon.model.Credential;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.response.ResponseBody;
-import io.restassured.specification.RequestSpecification;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-
-import javax.ws.rs.core.MediaType;
-
 import static io.halkyon.utils.TestUtils.createClaim;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import javax.ws.rs.core.MediaType;
+
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
+import io.halkyon.model.Claim;
+import io.halkyon.services.KubernetesClientService;
+import io.halkyon.utils.WebPageExtension;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
+import io.restassured.specification.RequestSpecification;
+
 @QuarkusTest
+@QuarkusTestResource(WebPageExtension.class)
 public class ClaimsEndpointTest {
+
+    WebPageExtension.PageManager page;
+
+    @InjectMock
+    KubernetesClientService mockKubernetesClientService;
 
     @Test
     public void testQueryClaimBody(){
@@ -97,5 +105,26 @@ public class ClaimsEndpointTest {
                 .statusCode(200);
     }
 
+    @Test
+    public void testEditClaimFromPage() {
+        // Create data
+        Claim claim = createClaim("testEditClaimFromPage", "payment-api-1.1");
+        // Go to the claims page
+        page.goTo("/claims");
+        // Ensure our data is listed
+        page.assertContentContains(claim.name);
+        // Let's change the owner
+        page.clickById("btn-claim-edit-" + claim.id);
+        page.assertPathIs("/claims/" + claim.id);
+        page.assertContentContains("Edit Claim");
+        page.assertContentContains(claim.name);
+        page.type("owner", "NEW OWNER");
+        page.clickById("claim-button");
+        // Verify the entity was properly updated:
+        page.assertContentContains("Updated successfully for id: " + claim.id);
+        // Go back to the claims list and check whether the owner is displayed
+        page.goTo("/claims");
+        page.assertContentContains("NEW OWNER");
+    }
 
 }

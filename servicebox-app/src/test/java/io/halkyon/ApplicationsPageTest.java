@@ -4,6 +4,7 @@ import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createCredential;
 import static io.halkyon.utils.TestUtils.createService;
+import static io.halkyon.utils.TestUtils.findApplicationByName;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -27,6 +28,7 @@ import org.mockito.Mockito;
 
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
@@ -131,7 +133,8 @@ public class ApplicationsPageTest {
             page.assertContentContains(appName);
         });
         // click on bind button
-        page.clickByName("btn-application-bind");
+        Application app = findApplicationByName(appName);
+        page.clickById("btn-application-bind-" + app.id);
         // modal should be displayed
         page.assertContentContains("Bind Application " + appName);
         // select our claim

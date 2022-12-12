@@ -21,23 +21,21 @@
     <td>{time:format(claim.updated, 'dd/MM/yyyy HH:mm')}</td>
     <td>
         <ul class="list-inline m-0">
-            {#if claim.status is 'new' || claim.status is 'error'}
-            <li class="list-inline-item">
-                <a class="btn btn-success btn-sm rounded-2" type="button"
-                   title="Edit"
-                   href="/claims/claim/{claim.id}"
-                   hx-get="/claims/claim/{claim.id}"
-                   hx-swap="outerHTML"
-                   hx-target="#base">Edit</a>
-            </li>
-            {/if}
             {#if claim.status is 'bind'}
             <li class="list-inline-item">
                 <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete"
+                        id="btn-claim-delete-{claim.id}"
                         hx-delete="/claims/{claim.id}"
                         hx-confirm="Are you sure ?"
                         hx-target="#base"
                         hx-swap="innerHTML swap:1s">Delete</button>
+            </li>
+            {#else}
+            <li class="list-inline-item">
+                <a class="btn btn-success btn-sm rounded-2" type="button"
+                   id="btn-claim-edit-{claim.id}"
+                   title="Edit"
+                   href="/claims/{claim.id}">Edit</a>
             </li>
             {/if}
         </ul>
