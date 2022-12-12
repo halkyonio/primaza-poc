@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.halkyon.services.ClaimStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.sql.Date;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -35,8 +38,11 @@ public class Claim extends PanacheEntityBase {
     public String status;
     @FormParam
     public String owner;
-    @FormParam
+    @CreationTimestamp
     public Date created;
+    @UpdateTimestamp
+    public Date updated;
+    public String errorMessage;
     // TODO: To be discussed and adapted if needed. This is not because we will delete a Claim that the service bound should be deleted and its credential
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "service_id", referencedColumnName = "id")

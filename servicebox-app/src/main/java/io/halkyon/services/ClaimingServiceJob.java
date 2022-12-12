@@ -27,6 +27,8 @@ import io.quarkus.scheduler.Scheduled;
 @ApplicationScoped
 public class ClaimingServiceJob {
 
+    public static final String ERROR_MESSAGE_NO_SERVICE_FOUND = "Could not find a service after %s attempts";
+
     @ConfigProperty(name = "servicebox.claiming-service-job.max-attempts")
     int maxAttempts;
 
@@ -72,6 +74,7 @@ public class ClaimingServiceJob {
             int attempts = ofNullable(claim.attempts).orElse(0);
             if (attempts >= maxAttempts) {
                 claim.status = ClaimStatus.ERROR.toString();
+                claim.errorMessage = String.format(ERROR_MESSAGE_NO_SERVICE_FOUND, maxAttempts);
             } else {
                 claim.attempts = attempts + 1;
                 claim.status = ClaimStatus.PENDING.toString();

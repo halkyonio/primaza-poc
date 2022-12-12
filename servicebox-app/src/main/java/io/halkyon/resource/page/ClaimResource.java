@@ -95,9 +95,6 @@ public class ClaimResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            if (claim.created == null) {
-                claim.created = new Date(System.currentTimeMillis());
-            }
             if (claim.status == null) {
                 claim.status = ClaimStatus.NEW.toString();
             }

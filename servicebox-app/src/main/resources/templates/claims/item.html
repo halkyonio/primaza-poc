@@ -11,11 +11,17 @@
     <td>{claim.description}</td>
     <td>{claim.owner}</td>
     <td>{claim.serviceRequested}</td>
-    <td>{claim.status}</td>
-    <td>{claim.created}</td>
+    <td>
+        {claim.status}
+        {#if claim.status is 'error'}
+        <i class="bi bi-info-circle" title="{claim.errorMessage}"></i>
+        {/if}
+    </td>
+    <td>{time:format(claim.created, 'dd/MM/yyyy HH:mm')}</td>
+    <td>{time:format(claim.updated, 'dd/MM/yyyy HH:mm')}</td>
     <td>
         <ul class="list-inline m-0">
-            {#if claim.status is 'new' || claim.status is 'errors'}
+            {#if claim.status is 'new' || claim.status is 'error'}
             <li class="list-inline-item">
                 <a class="btn btn-success btn-sm rounded-2" type="button"
                    title="Edit"
