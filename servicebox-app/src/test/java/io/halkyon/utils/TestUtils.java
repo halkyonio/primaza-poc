@@ -1,16 +1,32 @@
 package io.halkyon.utils;
 
 import static io.restassured.RestAssured.given;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 
-import javax.transaction.Transactional;
+import java.util.Optional;
+
 import javax.ws.rs.core.MediaType;
 
+import org.mockito.Mockito;
+
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
+import io.halkyon.services.KubernetesClientService;
 
 public final class TestUtils {
     private TestUtils() {}
+
+    public static Cluster createClusterWithServiceAvailable(String clusterName, String url,
+            KubernetesClientService mockKubernetesClientService,
+            String protocolAvailable,
+            String portAvailable) {
+        Cluster cluster = createCluster(clusterName, url);
+        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocolAvailable, portAvailable);
+        return cluster;
+    }
 
     public static Cluster createCluster(String clusterName, String url) {
         given()
@@ -31,16 +47,11 @@ public final class TestUtils {
                 .extract().as(Cluster.class);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, boolean available) {
-        return createService(serviceName, serviceVersion, serviceType, database,"tcp:5672", available);
+    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database) {
+        return createService(serviceName, serviceVersion, serviceType, database,"tcp:5672");
     }
 
     public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, String endpoint) {
-        return createService(serviceName, serviceVersion, serviceType, database, endpoint, false);
-    }
-
-    @Transactional
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, String endpoint, boolean available) {
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -58,10 +69,6 @@ public final class TestUtils {
                 .then()
                 .statusCode(200)
                 .extract().as(Service.class);
-
-        if (available){
-            Service.update("update from Service set available = true where id = ?1", service.id);
-        }
         return service;
     }
 
@@ -94,5 +101,18 @@ public final class TestUtils {
                 .formParam("password", password)
                 .when().post("/credentials")
                 .then().statusCode(201);
+    }
+
+    public static void mockServiceIsAvailableInCluster(KubernetesClientService mockKubernetesClientService, String clusterName,
+            String protocol, String servicePort) {
+        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocol, servicePort, "ns1");
+    }
+
+    public static void mockServiceIsAvailableInCluster(KubernetesClientService mockKubernetesClientService, String clusterName,
+            String protocol, String servicePort, String serviceNamespace) {
+        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(protocol), eq(servicePort)))
+                .thenReturn(Optional.of(new ServiceBuilder()
+                        .withNewMetadata().withNamespace(serviceNamespace).endMetadata()
+                        .build()));
     }
 }
