@@ -14,19 +14,19 @@ public class ClusterRequest {
     @FormParam
     public String id;
 
-    @NotBlank
+    @NotBlank(message = "Name must not be empty")
     @FormParam
     public String name;
 
-    @NotBlank
+    @NotBlank(message = "URL must not be empty")
     @FormParam
     public String url;
 
-    @NotBlank
+    @NotBlank(message = "Namespaces must not be empty")
     @FormParam
     public String namespaces;
 
-    @NotBlank
+    @NotBlank(message = "Environment must not be empty")
     @FormParam
     public String environment;
 

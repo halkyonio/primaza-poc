@@ -1,6 +1,8 @@
 package io.halkyon.utils;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public final class StringUtils {
     private StringUtils() {}
@@ -30,5 +32,9 @@ public final class StringUtils {
         } else {
             return left.equalsIgnoreCase(right);
         }
+    }
+
+    public static String toBase64(String paramValue) {
+        return Base64.getEncoder().encodeToString(paramValue.getBytes(StandardCharsets.UTF_8));
     }
 }

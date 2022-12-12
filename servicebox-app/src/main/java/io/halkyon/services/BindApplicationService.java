@@ -1,6 +1,5 @@
 package io.halkyon.services;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,10 +13,21 @@ import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 
-import static io.halkyon.utils.StringUtils.*;
+import static io.halkyon.utils.StringUtils.getHostFromUrl;
+import static io.halkyon.utils.StringUtils.getPortFromUrl;
+import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
+import static io.halkyon.utils.StringUtils.toBase64;
 
 @ApplicationScoped
 public class BindApplicationService {
+
+    public static final String TYPE_KEY = "type";
+    public static final String URI_KEY = "uri";
+    public static final String URL_KEY = "url";
+    public static final String HOST_KEY = "host";
+    public static final String PORT_KEY = "port";
+    public static final String USERNAME_KEY = "username";
+    public static final String PASSWORD_KEY = "password";
 
     @Inject
     KubernetesClientService kubernetesClientService;
@@ -53,15 +63,16 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
-        secretData.put("type",ToBase64(claim.type));
-        secretData.put("uri", ToBase64(removeSchemeFromUrl(url)));
-        secretData.put("host", ToBase64(getHostFromUrl(url)));
-        secretData.put("port", ToBase64(getPortFromUrl(url)));
-        secretData.put("database", ToBase64(claim.database));
-        secretData.put("username", ToBase64(credential.username));
-        secretData.put("password", ToBase64(credential.password));
+        secretData.put(TYPE_KEY, toBase64(claim.type));
+        secretData.put(URI_KEY, toBase64(removeSchemeFromUrl(url)));
+        secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
+        secretData.put(PORT_KEY, toBase64(getPortFromUrl(url)));
+        secretData.put(URL_KEY, toBase64(url));
+        secretData.put(USERNAME_KEY, toBase64(credential.username));
+        secretData.put(PASSWORD_KEY, toBase64(credential.password));
+
         for (CredentialParameter param : credential.params) {
-            secretData.put(param.paramName, ToBase64(param.paramValue));
+            secretData.put(param.paramName, toBase64(param.paramValue));
         }
 
         kubernetesClientService.mountSecretInApplication(application, claim, secretData);
@@ -91,9 +102,5 @@ public class BindApplicationService {
         // TODO: rule 4: app + service running on a standalone machine. https://github.com/halkyonio/primaza-poc/discussions/135
 
         return null;
-    }
-    
-    private String ToBase64(String content) {
-        return Base64.getEncoder().encodeToString(content.getBytes());
     }
 }
