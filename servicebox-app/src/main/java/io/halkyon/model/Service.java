@@ -64,7 +64,7 @@ public class Service extends PanacheEntityBase {
     public Date created;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "service", fetch = FetchType.EAGER)
     public List<Credential> credentials;
 
     @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)

@@ -17,6 +17,7 @@ import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -46,6 +47,10 @@ public class ClustersEndpointTest {
                 .statusCode(201);
     }
 
+    /**
+     * `@InjectMock` does not work when running tests in prod mode.
+     */
+    @DisabledOnIntegrationTest
     @Test
     public void testDeleteClusterInPage() {
         // First, we create a cluster with a service

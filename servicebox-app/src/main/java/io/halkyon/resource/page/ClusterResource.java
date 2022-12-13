@@ -121,7 +121,6 @@ public class ClusterResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public Cluster findByName(@PathParam("name") String name) {
         Cluster cluster = Cluster.findByName(name);

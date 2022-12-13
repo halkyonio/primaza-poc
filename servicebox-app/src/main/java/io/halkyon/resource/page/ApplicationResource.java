@@ -38,7 +38,6 @@ public class ApplicationResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public Application findByName(@PathParam("name") String name) {
         Application application = Application.findByName(name);

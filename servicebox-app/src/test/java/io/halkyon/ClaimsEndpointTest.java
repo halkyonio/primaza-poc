@@ -13,11 +13,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
-import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
@@ -28,9 +26,6 @@ import io.restassured.specification.RequestSpecification;
 public class ClaimsEndpointTest {
 
     WebPageExtension.PageManager page;
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
 
     @Test
     public void testQueryClaimBody(){
@@ -125,6 +120,23 @@ public class ClaimsEndpointTest {
         // Go back to the claims list and check whether the owner is displayed
         page.goTo("/claims");
         page.assertContentContains("NEW OWNER");
+    }
+
+    @Test
+    public void testDeleteClaim() {
+        String prefix = "ClaimsEndpointTest-testDeleteClaim-";
+        Claim claim = createClaim(prefix + "claim", "Postgresql-5509");
+
+        // When, we go to the claims page
+        page.goTo("/claims");
+        page.assertContentContains(claim.name);
+
+        // And click on delete
+        page.clickById("btn-claim-delete-" + claim.id);
+
+        // Then, the claim should have been deleted
+        page.goTo("/claims");
+        page.assertContentDoesNotContain(claim.name);
     }
 
 }

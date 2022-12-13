@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
@@ -69,6 +70,15 @@ public class ServiceResource {
         return response.build();
     }
 
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.TEXT_HTML)
+    @Transactional
+    public TemplateInstance delete(@PathParam("id") Long id) {
+        Service.deleteById(id);
+        return list();
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -83,7 +93,6 @@ public class ServiceResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public io.halkyon.model.Service findByName(@PathParam("name") String name) {
         Service service = Service.findByName(name);
