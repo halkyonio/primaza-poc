@@ -33,7 +33,7 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
-import io.halkyon.services.ClaimingServiceJob;
+import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.ApplicationNameMatcher;
@@ -59,7 +59,7 @@ public class ApplicationsPageTest {
     ApplicationDiscoveryJob applicationDiscoveryJob;
 
     @Inject
-    ClaimingServiceJob claimingServiceJob;
+    UpdateClaimJob claimingServiceJob;
 
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;

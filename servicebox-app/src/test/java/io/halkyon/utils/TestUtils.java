@@ -53,6 +53,13 @@ public final class TestUtils {
         return createService(serviceName, serviceVersion, serviceType, database,"tcp:5672");
     }
 
+    public static Service createServiceWithCredential(String serviceName, String serviceVersion, String serviceType,
+            String database, String endpoint) {
+        Service service = createService(serviceName, serviceVersion, serviceType, database, endpoint);
+        createCredential(serviceName + "-credential", service.id, "username", "password");
+        return service;
+    }
+
     public static Service createService(String serviceName, String serviceVersion, String serviceType, String database, String endpoint) {
         given()
                 .header("HX-Request", true)

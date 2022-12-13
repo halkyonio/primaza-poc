@@ -30,20 +30,20 @@ import io.halkyon.model.Service;
 import io.halkyon.resource.requests.ClaimRequest;
 import io.halkyon.services.BindApplicationService;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.ClaimingServiceJob;
+import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/claims")
 public class ClaimResource {
     private final Validator validator;
-    private final ClaimingServiceJob claimingService;
+    private final UpdateClaimJob claimingService;
 
     @Inject
     BindApplicationService bindService;
 
     @Inject
-    public ClaimResource(Validator validator, ClaimingServiceJob claimingService){
+    public ClaimResource(Validator validator, UpdateClaimJob claimingService){
         this.validator = validator;
         this.claimingService = claimingService;
     }
@@ -109,7 +109,7 @@ public class ClaimResource {
             claim.serviceRequested = claimRequest.serviceRequested;
             claim.status = ClaimStatus.NEW.toString();
 
-            claimingService.claimService(claim);
+            claimingService.updateClaim(claim);
             response.withSuccessMessage(claim.id);
         }
 
@@ -153,7 +153,7 @@ public class ClaimResource {
             claim.serviceRequested = claimRequest.serviceRequested;
             claim.status = ClaimStatus.NEW.toString();
 
-            claimingService.claimService(claim);
+            claimingService.updateClaim(claim);
             response.withUpdateSuccessMessage(claim.id);
         }
 

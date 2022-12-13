@@ -3,11 +3,13 @@ package io.halkyon;
 import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
 import static io.halkyon.utils.TestUtils.createService;
+import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -17,22 +19,22 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.ClaimingServiceJob;
+import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.services.KubernetesClientService;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-public class ClaimingServiceJobTest {
+public class UpdateClaimJobTest {
 
     @InjectMock
     KubernetesClientService mockKubernetesClientService;
 
     @Inject
-    ClaimingServiceJob job;
+    UpdateClaimJob job;
 
-    @ConfigProperty(name = "servicebox.claiming-service-job.max-attempts")
+    @ConfigProperty(name = "servicebox.update-claim-job.max-attempts")
     int maxAttempts;
 
     @Inject
@@ -44,8 +46,7 @@ public class ClaimingServiceJobTest {
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
         createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port", mockKubernetesClientService, "protocol", "9999");
-        createService("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", "protocol:9999");
-        createService("MySQLClaimingServiceJobTest", "7.5", "mysql", "demo");
+        createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", "protocol:9999");
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
@@ -118,7 +119,9 @@ public class ClaimingServiceJobTest {
 
         assertEquals(mySqlClaim.name, actualMysql.name);
         assertEquals(ClaimStatus.ERROR.toString(), actualMysql.status);
-        assertEquals(String.format(ClaimingServiceJob.ERROR_MESSAGE_NO_SERVICE_FOUND, maxAttempts), actualMysql.errorMessage);
+        assertTrue(actualMysql.errorMessage.startsWith(
+                String.format(UpdateClaimJob.ERROR_MESSAGE_NO_SERVICE_REGISTERED, actualMysql.serviceRequested)),
+                "Unexpected error message " + actualMysql.errorMessage);
         assertEquals(maxAttempts, actualMysql.attempts);
     }
 
