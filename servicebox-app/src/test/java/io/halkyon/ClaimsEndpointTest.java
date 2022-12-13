@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import io.halkyon.model.Claim;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -100,6 +101,7 @@ public class ClaimsEndpointTest {
                 .statusCode(200);
     }
 
+    @DisabledOnIntegrationTest
     @Test
     public void testEditClaimFromPage() {
         // Create data
