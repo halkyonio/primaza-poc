@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,11 +50,11 @@ public class Cluster extends PanacheEntityBase {
     public Date created;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     public Set<Service> services = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     public Set<Application> applications = new HashSet<>();
 
     public static Cluster findByName(String name) {
