@@ -17,6 +17,7 @@
             </li>
             <li class="list-inline-item">
                 <button class="btn btn-danger btn-sm rounded-2" type="button" title="Delete"
+                        id="btn-cluster-delete-{cluster.id}"
                         hx-delete="/clusters/{cluster.id}"
                         hx-confirm="Are you sure ?"
                         hx-target="#base"
