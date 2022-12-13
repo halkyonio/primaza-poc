@@ -81,7 +81,6 @@ public class ClaimResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public io.halkyon.model.Claim findByName(@PathParam("name") String name) {
         Claim claim = Claim.findByName(name);

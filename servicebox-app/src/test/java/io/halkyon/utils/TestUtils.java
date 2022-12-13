@@ -14,6 +14,7 @@ import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.Credential;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 
@@ -93,7 +94,7 @@ public final class TestUtils {
 
     }
 
-    public static void createCredential(String credentialName, long serviceId, String username, String password) {
+    public static Credential createCredential(String credentialName, long serviceId, String username, String password) {
         given()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", credentialName)
@@ -102,6 +103,13 @@ public final class TestUtils {
                 .formParam("password", password)
                 .when().post("/credentials")
                 .then().statusCode(201);
+
+        return given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .get("/credentials/name/" + credentialName)
+                .then()
+                .statusCode(200)
+                .extract().as(Credential.class);
     }
 
     public static void mockServiceIsAvailableInCluster(KubernetesClientService mockKubernetesClientService, String clusterName,

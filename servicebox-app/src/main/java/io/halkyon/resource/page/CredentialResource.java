@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
@@ -108,6 +109,15 @@ public class CredentialResource {
         return response.build();
     }
 
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.TEXT_HTML)
+    @Transactional
+    public TemplateInstance delete(@PathParam("id") Long id) {
+        Credential.deleteById(id);
+        return list();
+    }
+
     @GET
     @Path("/credential/{id}")
     @Consumes(MediaType.TEXT_HTML)
@@ -135,7 +145,6 @@ public class CredentialResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
     public Credential findByName(@PathParam("name") String name) {
         Credential credential = Credential.findByName(name);

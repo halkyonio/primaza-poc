@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createCredential;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,6 +63,24 @@ public class CredentialsPageTest {
                 .extract().as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
+    }
+
+    @Test
+    public void testDeleteCredential() {
+        String prefix = "CredentialsPageTest-testDeleteCredential-";
+        Service service = createService(prefix + "service", "8", "postgresql", "demo");
+        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
+
+        // When, we go to the credentials page
+        page.goTo("/credentials");
+        page.assertContentContains(credential.name);
+
+        // And click on delete
+        page.clickById("btn-credential-delete-" + credential.id);
+
+        // Then, the credential should have been deleted
+        page.goTo("/credentials");
+        page.assertContentDoesNotContain(credential.name);
     }
 
 }
