@@ -21,7 +21,7 @@ jobs:
           cache: maven
 
       - name: build with maven
-        run: mvn clean install
+        run: mvn clean install -Pvalidate-format
 
   verify-in-kubernetes:
     name: Verify in Kubernetes

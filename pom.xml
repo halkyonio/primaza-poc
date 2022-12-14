@@ -38,8 +38,13 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>2.13.2.Final</quarkus.platform.version>
         <htmlunit.version>2.66.0</htmlunit.version>
-        <skipITs>true</skipITs>
         <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+        <formatter-maven-plugin.version>2.21.0</formatter-maven-plugin.version>
+        <impsort-maven-plugin.version>1.8.0</impsort-maven-plugin.version>
+
+        <skipITs>true</skipITs>
+        <src.format.goal>format</src.format.goal>
+        <src.sort.goal>sort</src.sort.goal>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -118,6 +123,37 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${formatter-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>${src.format.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+                <version>${impsort-maven-plugin.version}</version>
+                <configuration>
+                    <!-- store outside of target to speed up formatting when mvn clean is used -->
+                    <cachedir>.cache</cachedir>
+                    <groups>java.,javax.,org.,com.</groups>
+                    <staticGroups>*</staticGroups>
+                    <removeUnused>true</removeUnused>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>${src.sort.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -137,6 +173,18 @@
             <properties>
                 <skipITs>false</skipITs>
                 <quarkus.package.type>native</quarkus.package.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>validate-format</id>
+            <activation>
+                <property>
+                    <name>validate-format</name>
+                </property>
+            </activation>
+            <properties>
+                <src.format.goal>validate</src.format.goal>
+                <src.sort.goal>check</src.sort.goal>
             </properties>
         </profile>
     </profiles>
