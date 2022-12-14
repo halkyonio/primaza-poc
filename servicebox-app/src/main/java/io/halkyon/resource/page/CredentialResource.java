@@ -46,7 +46,7 @@ public class CredentialResource {
 
     @POST
     @Transactional
-    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Response add(@Form NewCredentialRequest request, @HeaderParam("HX-Request") boolean hxRequest) {
         Set<ConstraintViolation<NewCredentialRequest>> errors = validator.validate(request);

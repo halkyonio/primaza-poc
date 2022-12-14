@@ -41,7 +41,9 @@ public class ServiceDiscoveryJob {
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {
-            checkIfServiceIsRunningInClusterAndPersist(service);
+            if (linkServiceInCluster(service)) {
+                service.persist();
+            }
         }
     }
 
@@ -50,7 +52,7 @@ public class ServiceDiscoveryJob {
         List<Service> services = Service.listAll();
         boolean updated = false;
         for (Service service : services) {
-            if (service.cluster == null && linkServiceWithCluster(service, cluster)) {
+            if (service.cluster == null && updateServiceIfFoundInCluster(service, cluster)) {
                 updated = true;
             }
         }
@@ -61,27 +63,23 @@ public class ServiceDiscoveryJob {
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void checkIfServiceIsRunningInClusterAndPersist(Service service) {
+    public boolean linkServiceInCluster(Service service) {
+        boolean updated = false;
         if (service.cluster == null || !getServiceInCluster(service, service.cluster).isPresent()) {
             service.available = false;
             List<Cluster> clusters = Cluster.listAll();
             for (Cluster cluster : clusters) {
-                if (linkServiceWithCluster(service, cluster)) {
+                if (updateServiceIfFoundInCluster(service, cluster)) {
+                    updated = true;
                     break;
                 }
             }
-
-            try {
-                service.persist();
-            } catch (PersistenceException e) {
-                if(e.getCause() instanceof ConstraintViolationException) {
-                    throw new ClientErrorException(e.getMessage(), 409);
-                }
-            }
         }
+
+        return updated;
     }
 
-    private boolean linkServiceWithCluster(Service service, Cluster cluster) {
+    private boolean updateServiceIfFoundInCluster(Service service, Cluster cluster) {
         Optional<io.fabric8.kubernetes.api.model.Service> serviceInCluster = getServiceInCluster(service, cluster);
         if (serviceInCluster.isPresent()) {
             service.available = true;
