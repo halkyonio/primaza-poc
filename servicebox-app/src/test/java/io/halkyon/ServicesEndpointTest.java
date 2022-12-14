@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
+import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
@@ -58,23 +59,58 @@ public class ServicesEndpointTest {
 
     @Test
     public void testCannotAddServiceWithSameNameAndVersion() {
-        String serviceName = "RabbitMQ2";
-        String serviceVersion = "3.11.0";
-        String serviceType= "Broker";
-        String endpoint = "tcp:5672";
-        String database = "demo";
-
-        createService(serviceName, serviceVersion, serviceType, database, endpoint);
+        String prefix = "ServicesEndpointTest-testCannotAddServiceWithSameNameAndVersion-";
+        Service service = createService(prefix + "service", "1", "type", "database");
 
         given()
                 .header("HX-Request", true)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", serviceName)
-                .formParam("version", serviceVersion)
-                .formParam("type", serviceType)
-                .formParam("endpoint", endpoint)
+                .formParam("name", service.name)
+                .formParam("version", service.version)
+                .formParam("type", service.type)
+                .formParam("endpoint", service.endpoint)
                 .when().post("/services")
                 .then().statusCode(409);
+    }
+
+    @Test
+    public void testCannotUpdateServiceWithSameNameAndVersion() {
+        String prefix = "ServicesEndpointTest-testCannotUpdateServiceWithSameNameAndVersion-";
+        Service service1 = createService(prefix + "service", "1", "type", "database");
+        Service service2 = createService(prefix + "service", "2", "type", "database");
+
+        given()
+                .header("HX-Request", true)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", service2.name)
+                .formParam("version", "1") // conflicts with version of service1!
+                .formParam("type", service2.type)
+                .formParam("endpoint", service2.endpoint)
+                .when().put("/services/" + service2.id)
+                .then().statusCode(409);
+    }
+
+    @Test
+    public void testEditServiceFromPage() {
+        // Create data
+        String prefix = "ServicesEndpointTest-testEditServiceFromPage-";
+        Service service = createService(prefix + "service", "master:port", "type", "database");
+        // Go to the page
+        page.goTo("/services");
+        // Ensure our data is listed
+        page.assertContentContains(service.name);
+        // Let's change the owner
+        page.clickById("btn-service-edit-" + service.id);
+        page.assertPathIs("/services/" + service.id);
+        page.assertContentContains("Update Service");
+        page.assertContentContains(service.name);
+        page.type("name", service.name + "-new");
+        page.clickById("service-button");
+        // Verify the entity was properly updated:
+        page.assertContentContains("Updated successfully for id: " + service.id);
+        // Go back to the page list and check whether the owner is displayed
+        page.goTo("/services");
+        page.assertContentContains(service.name + "-new");
     }
 
     @Test

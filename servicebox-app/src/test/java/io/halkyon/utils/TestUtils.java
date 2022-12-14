@@ -67,7 +67,7 @@ public final class TestUtils {
 
         Service service = given()
                 .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + serviceName)
+                .get("/services/name/" + serviceName + "/version/" + serviceVersion)
                 .then()
                 .statusCode(200)
                 .extract().as(Service.class);

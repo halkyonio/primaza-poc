@@ -91,6 +91,10 @@ public class Service extends PanacheEntityBase {
         return find("name", name).firstResult();
     }
 
+    public static Service findByNameAndVersion(String name, String version) {
+        return find("name=?1 AND version=?2", name, version).firstResult();
+    }
+
     public static List<Service> listAll() {
         return findAll(Sort.ascending("name")).list();
     }
