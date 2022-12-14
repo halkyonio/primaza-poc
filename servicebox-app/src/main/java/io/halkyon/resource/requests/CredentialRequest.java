@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
-public class NewCredentialRequest {
+public class CredentialRequest {
 
     @FormParam
     public Long id;

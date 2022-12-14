@@ -33,7 +33,7 @@ public class Templates {
         public static class Credentials {
                 public static native TemplateInstance list(List<io.halkyon.model.Credential> credentials);
                 public static native TemplateInstance item(io.halkyon.model.Credential credential);
-                public static native TemplateInstance form(Credential credential);
+                public static native TemplateInstance form(Credential credential, List<Service> services);
         }
 
         @CheckedTemplate(basePath = "clusters")
