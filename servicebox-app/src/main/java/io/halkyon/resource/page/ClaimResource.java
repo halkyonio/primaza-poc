@@ -56,9 +56,8 @@ public class ClaimResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_JSON)
     public TemplateInstance list() {
-        return showList(Claim.listAll()).data("all", true);
+        return Templates.Claims.list(Claim.listAll(), Service.listAll(), Claim.count());
     }
 
     @GET
@@ -66,12 +65,7 @@ public class ClaimResource {
     @Path("/filter")
     public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
         List<Claim> claims = Claim.getClaims(name, serviceRequested);
-        return Response.ok(Templates.Claims.table(claims).data("items", claims.size())).build();
-    }
-
-    private TemplateInstance showList(List<Claim> claims) {
-        return Templates.Claims.list(claims).data("services", Service.listAll()).data("items",
-                io.halkyon.model.Claim.count());
+        return Response.ok(Templates.Claims.table(claims, claims.size())).build();
     }
 
     @GET
@@ -165,7 +159,7 @@ public class ClaimResource {
             bindService.unBindApplication(Application.findById(claim.applicationId), claim);
         }
         Claim.deleteById(id);
-        return showList(Claim.listAll());
+        return list();
     }
 
 }

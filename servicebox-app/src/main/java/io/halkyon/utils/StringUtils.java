@@ -10,7 +10,7 @@ public final class StringUtils {
 
     public static String removeSchemeFromUrl(String URL) {
         URI uri = URI.create(URL);
-        return uri.getHost() + ":" + String.valueOf(uri.getPort());
+        return uri.getHost() + ":" + uri.getPort();
     }
 
     public static String getHostFromUrl(String URL) {
@@ -33,6 +33,10 @@ public final class StringUtils {
         } else {
             return left.equalsIgnoreCase(right);
         }
+    }
+
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 
     public static String toBase64(String paramValue) {

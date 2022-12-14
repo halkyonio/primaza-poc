@@ -1,0 +1,59 @@
+<form class="form-horizontal" action="/services/filter" hx-get="/services/filter" hx-target="#service-table" hx-swap="innerHTML"
+      hx-trigger="input from:#service_search_by_name,input from:#service_search_by_version,input from:#service_search_by_type,input from:#service_search_by_database,input from:#service_search_by_endpoint,input from:#service_search_by_available">
+  <div class="container table-responsiv">
+    <table class="table">
+        <thead>
+        <tr>
+            <th aria-valuetext="left">Name</th>
+            <th aria-valuetext="left">Version</th>
+            <th aria-valuetext="left">Type</th>
+            <th aria-valuetext="left">Database</th>
+            <th aria-valuetext="left">Endpoint</th>
+            <th aria-valuetext="left">Available</th>
+            <th aria-valuetext="left">Action</th>
+        </tr>
+        </thead>
+        <tbody id="service-list">
+        <tr>
+            <td>
+                <input id="service_search_by_name" class="form-control" type="search" name="name"
+                       value="{#if filter.containsKey('name')}{filter.get('name')}{/if}"
+                       placeholder="Search by name ...">
+            </td>
+            <td>
+                <input id="service_search_by_version" class="form-control" type="search" name="version"
+                       value="{#if filter.containsKey('version')}{filter.get('version')}{/if}"
+                       placeholder="Search by version ...">
+            </td>
+            <td>
+                <input id="service_search_by_type" class="form-control" type="search" name="type"
+                       value="{#if filter.containsKey('type')}{filter.get('type')}{/if}"
+                       placeholder="Search by type ...">
+            </td>
+            <td>
+                <input id="service_search_by_database" class="form-control" type="search" name="database"
+                       value="{#if filter.containsKey('database')}{filter.get('database')}{/if}"
+                       placeholder="Search by database ...">
+            </td>
+            <td>
+                <input id="service_search_by_endpoint" class="form-control" type="search" name="endpoint"
+                       value="{#if filter.containsKey('endpoint')}{filter.get('endpoint')}{/if}"
+                       placeholder="Search by endpoint ...">
+            </td>
+            <td>
+                <input id="service_search_by_available" class="form-check-input" type="checkbox" name="available" {#if filter.containsKey('available') && filter.get('available')}checked{/if}>
+            </td>
+            <td></td>
+        </tr>
+        {#for service in services}
+        <!-- Include the HTML template rendering the service item -->
+        {#include services/item.html service=service /}
+        {/for}
+        </tbody>
+    </table>
+  </div>
+  <div class="container">
+    <!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+  </div>
+</form>

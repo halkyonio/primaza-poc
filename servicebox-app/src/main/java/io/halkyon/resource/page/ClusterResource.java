@@ -50,8 +50,7 @@ public class ClusterResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Clusters.list(Cluster.listAll()).data("title", "Cluster form").data("items", Cluster.count())
-                .data("all", true);
+        return Templates.Clusters.list(Cluster.listAll(), Cluster.count()).data("title", "Cluster form");
     }
 
     @POST
@@ -138,7 +137,7 @@ public class ClusterResource {
     @Transactional
     public TemplateInstance delete(@PathParam("id") Long id) {
         Cluster.deleteById(id);
-        return Templates.Clusters.list(Cluster.listAll()).data("items", Cluster.count());
+        return list();
     }
 
     @GET
