@@ -1,5 +1,26 @@
 package io.halkyon.resource.page;
 
+import java.io.IOException;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
 import io.halkyon.Templates;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.ClusterRequest;
@@ -7,18 +28,6 @@ import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.quarkus.qute.TemplateInstance;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.sql.Date;
-import java.util.Set;
 
 @Path("/clusters")
 public class ClusterResource {
@@ -64,7 +73,6 @@ public class ClusterResource {
             cluster.url = clusterRequest.url;
             cluster.namespaces = clusterRequest.namespaces;
             cluster.environment = clusterRequest.environment;
-            cluster.created = new Date(System.currentTimeMillis());
             if (clusterRequest.kubeConfig != null) {
                 try {
                     cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());

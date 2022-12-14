@@ -1,6 +1,6 @@
 package io.halkyon.model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +16,9 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,7 +49,10 @@ public class Cluster extends PanacheEntityBase {
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     public String kubeConfig;
+    @CreationTimestamp
     public Date created;
+    @UpdateTimestamp
+    public Date updated;
 
     @JsonIgnore
     @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
