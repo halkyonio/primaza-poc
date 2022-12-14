@@ -1,6 +1,6 @@
 package io.halkyon.model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -42,7 +45,10 @@ public class Credential extends PanacheEntityBase {
 
     @OneToMany(mappedBy = "credential", cascade = CascadeType.ALL)
     public List<CredentialParameter> params;
+    @CreationTimestamp
     public Date created;
+    @UpdateTimestamp
+    public Date updated;
 
     public static Credential findByName(String name) {
         return find("name", name).firstResult();

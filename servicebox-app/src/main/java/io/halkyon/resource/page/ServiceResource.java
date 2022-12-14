@@ -1,7 +1,6 @@
 package io.halkyon.resource.page;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -60,10 +59,6 @@ public class ServiceResource {
         } else {
             if (Service.count("name=?1 AND version=?2", service.name, service.version) > 0) {
                 throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
-            }
-
-            if (service.created == null) {
-                service.created = new Date(System.currentTimeMillis());
             }
 
             serviceDiscoveryJob.linkServiceInCluster(service);

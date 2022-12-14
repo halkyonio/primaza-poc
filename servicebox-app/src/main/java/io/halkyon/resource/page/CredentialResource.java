@@ -1,6 +1,5 @@
 package io.halkyon.resource.page;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -138,7 +137,6 @@ public class CredentialResource {
         credential.username = request.username;
         credential.password = request.password;
         credential.service = Service.findById(request.serviceId);
-        credential.created = new Date(System.currentTimeMillis());
         credential.params = new ArrayList<>();
         if (request.params != null) {
             for (String param : request.params) {

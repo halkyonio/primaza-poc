@@ -2,7 +2,7 @@ package io.halkyon.model;
 
 import static javax.persistence.CascadeType.ALL;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -19,6 +19,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -61,7 +63,10 @@ public class Service extends PanacheEntityBase {
 
     public String namespace;
     public Boolean available;
+    @CreationTimestamp
     public Date created;
+    @UpdateTimestamp
+    public Date updated;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "service", fetch = FetchType.EAGER)
