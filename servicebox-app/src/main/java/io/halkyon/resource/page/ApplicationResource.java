@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotAcceptableException;
@@ -32,8 +31,7 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.list(applications)
-                .data("items", applications.size());
+        return Templates.Applications.list(applications).data("items", applications.size());
     }
 
     @GET
@@ -53,15 +51,15 @@ public class ApplicationResource {
     @Path("/polling")
     public TemplateInstance pollingApplications() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.listTable(applications)
-                .data("items", applications.size());
+        return Templates.Applications.listTable(applications).data("items", applications.size());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/bind/{id}")
     public TemplateInstance bindApplicationModal(@PathParam("id") long applicationId) {
-        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable()).data("claims", Claim.listAll());
+        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable()).data("claims",
+                Claim.listAll());
     }
 
     @Transactional

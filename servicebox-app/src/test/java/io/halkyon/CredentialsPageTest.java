@@ -20,7 +20,7 @@ public class CredentialsPageTest {
     WebPageExtension.PageManager page;
 
     @Test
-    public void testCreateNewCredential(){
+    public void testCreateNewCredential() {
         createService("postgresql-credential1", "8", "postgresql", "demo");
         page.goTo("/credentials/new");
         // add param a=1
@@ -42,11 +42,8 @@ public class CredentialsPageTest {
         // then, the new credential should be listed:
         page.goTo("/credentials");
         page.assertContentContains("Credential1");
-        Credential credential = given()
-                .when().get("/credentials/name/Credential1")
-                .then()
-                .statusCode(200)
-                .extract().as(Credential.class);
+        Credential credential = given().when().get("/credentials/name/Credential1").then().statusCode(200).extract()
+                .as(Credential.class);
         assertEquals("Admin", credential.username);
         assertEquals("Supersecret", credential.password);
         assertEquals(2, credential.params.size());
@@ -56,11 +53,8 @@ public class CredentialsPageTest {
         assertEquals("2", credential.params.get(1).paramValue);
 
         // and the service should have been linked to it.
-        Service service = given()
-                .when().get("/services/name/postgresql-credential1")
-                .then()
-                .statusCode(200)
-                .extract().as(Service.class);
+        Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
+                .as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
     }

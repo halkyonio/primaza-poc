@@ -5,11 +5,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
-import org.hibernate.exception.ConstraintViolationException;
-
-import javax.ws.rs.ClientErrorException;
 
 import org.jboss.logging.Logger;
 
@@ -18,8 +14,8 @@ import io.halkyon.model.Service;
 import io.quarkus.scheduler.Scheduled;
 
 /**
- * The service discovery job will loop over the registered services and clusters and check whether a service is available in
- * a cluster. If so, it will update the service entity available and cluster fields accordingly.
+ * The service discovery job will loop over the registered services and clusters and check whether a service is
+ * available in a cluster. If so, it will update the service entity available and cluster fields accordingly.
  */
 @ApplicationScoped
 public class ServiceDiscoveryJob {
@@ -30,14 +26,14 @@ public class ServiceDiscoveryJob {
     KubernetesClientService kubernetesClientService;
 
     /**
-     * This method will be executed at every `${servicebox.discovery-service-job.poll-every}`.
-     * First, it will collect the list of all services and clusters, and then will loop over the services to check whether
-     * the service name (from the first part of the service.endpoint field) is installed in one cluster. If so, then it will
-     * check whether service port (from the second part of the service.endpoint field) is declared in the found kubernetes
+     * This method will be executed at every `${servicebox.discovery-service-job.poll-every}`. First, it will collect
+     * the list of all services and clusters, and then will loop over the services to check whether the service name
+     * (from the first part of the service.endpoint field) is installed in one cluster. If so, then it will check
+     * whether service port (from the second part of the service.endpoint field) is declared in the found kubernetes
      * service resource.
      */
     @Transactional
-    @Scheduled(every="${servicebox.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${servicebox.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {

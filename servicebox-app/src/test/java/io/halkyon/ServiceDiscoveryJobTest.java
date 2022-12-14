@@ -7,23 +7,16 @@ import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
-import io.halkyon.utils.ClusterNameMatcher;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -46,86 +39,56 @@ public class ServiceDiscoveryJobTest {
     WebPageExtension.PageManager page;
 
     @Test
-    public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
+    public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
         pauseScheduler();
         Service service = createService("ServiceDiscoveryJobTest", "Api", "any", "demo", "host:1111");
 
         // When we run the job once:
         // Then:
-        // - the service "ServiceDiscoveryJobTest" should keep the available flag to false because it's not available in any cluster yet
+        // - the service "ServiceDiscoveryJobTest" should keep the available flag to false because it's not available in
+        // any cluster yet
         // When we install the service in a cluster
         // And we run the job again.
         // Then:
-        // - the service "ServiceDiscoveryJobTest" should be updated with available=true and be linked to the cluster where was installed.
+        // - the service "ServiceDiscoveryJobTest" should be updated with available=true and be linked to the cluster
+        // where was installed.
         job.execute();
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + service.name)
-                .then()
-                .statusCode(200)
+        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
                 .body("available", is(false));
         Cluster cluster = createCluster("dummy-cluster-1", "master:port");
         configureMockServiceFor(cluster.name, "host", "1111", "ns1");
 
         job.execute();
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + service.name)
-                .then()
-                .statusCode(200)
-                .body("available", is(true))
-                .body("cluster.name", is(cluster.name));
+        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
+                .body("available", is(true)).body("cluster.name", is(cluster.name));
         thenServiceIsInTheAvailableServicePage(service.name);
     }
 
     @Test
-    public void testShouldDiscoveryServiceWhenNewServiceIsCreated(){
+    public void testShouldDiscoveryServiceWhenNewServiceIsCreated() {
         pauseScheduler();
         String serviceName = "ServiceDiscoveryJobTest2";
         Cluster cluster = createCluster("dummy-cluster-2", "master:port");
         configureMockServiceFor(cluster.name, "host", "2222", "ns1");
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", serviceName)
-                .formParam("version", "any")
-                .formParam("type", "Api")
-                .formParam("endpoint", "host:2222")
-                .when().post("/services")
-                .then()
-                .statusCode(201);
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + serviceName)
-                .then()
-                .statusCode(200)
-                .body("available", is(true))
-                .body("cluster.name", is(cluster.name));
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", serviceName).formParam("version", "any").formParam("type", "Api")
+                .formParam("endpoint", "host:2222").when().post("/services").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then().statusCode(200)
+                .body("available", is(true)).body("cluster.name", is(cluster.name));
         thenServiceIsInTheAvailableServicePage(serviceName);
     }
 
     @Test
-    public void testShouldDiscoveryServiceWhenNewClusterIsCreated(){
+    public void testShouldDiscoveryServiceWhenNewClusterIsCreated() {
         pauseScheduler();
         Service service = createService("ServiceDiscoveryJobTest3", "Api", "any", "demo", "host:3333");
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .multiPart("name", "dummy-cluster-3")
-                .multiPart("environment", "TEST")
-                .multiPart("namespaces","kube-system,ingress")
-                .multiPart("url", "master:port")
-                .when().post("/clusters")
-                .then()
-                .statusCode(201);
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + service.name)
-                .then()
-                .statusCode(200)
-                .body("available", is(true))
-                .body("cluster.name", is("dummy-cluster-3"));
+        given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("name", "dummy-cluster-3").multiPart("environment", "TEST")
+                .multiPart("namespaces", "kube-system,ingress").multiPart("url", "master:port").when().post("/clusters")
+                .then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
+                .body("available", is(true)).body("cluster.name", is("dummy-cluster-3"));
         thenServiceIsInTheAvailableServicePage(service.name);
     }
 
@@ -134,8 +97,10 @@ public class ServiceDiscoveryJobTest {
         page.assertContentContains(expectedServiceName);
     }
 
-    private void configureMockServiceFor(String clusterName, String protocol, String servicePort, String serviceNamespace) {
-        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocol, servicePort, serviceNamespace);
+    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
+            String serviceNamespace) {
+        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocol, servicePort,
+                serviceNamespace);
     }
 
     private void pauseScheduler() {

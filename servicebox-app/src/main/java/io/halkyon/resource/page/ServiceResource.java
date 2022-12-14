@@ -43,7 +43,7 @@ public class ServiceResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance service() {
-        return Templates.Services.form(new Service()).data("title","Service form");
+        return Templates.Services.form(new Service()).data("title", "Service form");
     }
 
     @POST
@@ -99,7 +99,8 @@ public class ServiceResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            if (Service.count("id != ?1 AND name=?2 AND version=?3", id, serviceRequest.name, serviceRequest.version) > 0) {
+            if (Service.count("id != ?1 AND name=?2 AND version=?3", id, serviceRequest.name,
+                    serviceRequest.version) > 0) {
                 throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
             }
 
@@ -140,7 +141,6 @@ public class ServiceResource {
         return Templates.Services.list(services).data("items", io.halkyon.model.Service.count());
     }
 
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/name/{name}")
@@ -155,10 +155,12 @@ public class ServiceResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/name/{name}/version/{version}")
-    public io.halkyon.model.Service findByNameAndVersion(@PathParam("name") String name, @PathParam("version") String version) {
+    public io.halkyon.model.Service findByNameAndVersion(@PathParam("name") String name,
+            @PathParam("version") String version) {
         Service service = Service.findByNameAndVersion(name, version);
         if (service == null) {
-            throw new NotFoundException("Service with name '" + name + "' and version '" + version + "' does not exist.");
+            throw new NotFoundException(
+                    "Service with name '" + name + "' and version '" + version + "' does not exist.");
         }
         return service;
     }

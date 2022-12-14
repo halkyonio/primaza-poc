@@ -5,7 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public final class StringUtils {
-    private StringUtils() {}
+    private StringUtils() {
+    }
 
     public static String removeSchemeFromUrl(String URL) {
         URI uri = URI.create(URL);

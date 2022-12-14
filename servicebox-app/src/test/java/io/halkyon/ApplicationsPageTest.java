@@ -33,9 +33,9 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
-import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
+import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.ApplicationNameMatcher;
 import io.halkyon.utils.ClaimNameMatcher;
 import io.halkyon.utils.ClusterNameMatcher;
@@ -67,8 +67,8 @@ public class ApplicationsPageTest {
     @Inject
     Scheduler scheduler;
 
-//    @Test
-    public void testDiscoverApplications(){
+    // @Test
+    public void testDiscoverApplications() {
         String prefix = "ApplicationsPageTest.testDiscoverApplications.";
         pauseScheduler();
         // create data
@@ -105,7 +105,7 @@ public class ApplicationsPageTest {
     }
 
     @Test
-    public void testBindApplication(){
+    public void testBindApplication() {
         pauseScheduler();
         // names
         String prefix = "ApplicationsPageTest.testBindApplication.";
@@ -142,17 +142,13 @@ public class ApplicationsPageTest {
         // click on bind
         page.clickById("application-bind-button");
 
-        //Verify the Claim has been updated with service credential and url
-        Claim actualClaim = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + claimName)
-                .then()
-                .statusCode(200)
-                .extract().as(Claim.class);
+        // Verify the Claim has been updated with service credential and url
+        Claim actualClaim = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then()
+                .statusCode(200).extract().as(Claim.class);
 
         assertNotNull(actualClaim.credential);
         assertEquals("user1", actualClaim.credential.username);
-        assertEquals("pass1",actualClaim.credential.password);
+        assertEquals("pass1", actualClaim.credential.password);
 
         // protocol://service_name:port
         assertNotNull(actualClaim.url);
@@ -160,13 +156,11 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1))
-                .mountSecretInApplication(argThat(new ApplicationNameMatcher(appName)),
-                        argThat(new ClaimNameMatcher(claimName)),
-                        argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
+                argThat(new ApplicationNameMatcher(appName)), argThat(new ClaimNameMatcher(claimName)),
+                argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
-        verify(mockKubernetesClientService, times(1))
-                .rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
+        verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) {
@@ -176,19 +170,18 @@ public class ApplicationsPageTest {
 
     private void configureMockApplicationFor(String clusterName, String appName, String appImage, String appNamespace) {
         Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(clusterName))))
-                .thenReturn(Arrays.asList(new DeploymentBuilder()
-                        .withNewMetadata().withName(appName).withNamespace(appNamespace).endMetadata()
-                        .withNewSpec().withNewTemplate().withNewSpec()
-                        .addNewContainer().withImage(appImage).endContainer()
-                        .endSpec().endTemplate().endSpec()
-                        .build()));
+                .thenReturn(Arrays
+                        .asList(new DeploymentBuilder().withNewMetadata().withName(appName).withNamespace(appNamespace)
+                                .endMetadata().withNewSpec().withNewTemplate().withNewSpec().addNewContainer()
+                                .withImage(appImage).endContainer().endSpec().endTemplate().endSpec().build()));
     }
 
-    private void configureMockServiceFor(String clusterName, String protocol, String servicePort, String serviceNamespace) {
-        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)), eq(protocol), eq(servicePort)))
-                .thenReturn(Optional.of(new ServiceBuilder()
-                        .withNewMetadata().withNamespace(serviceNamespace).endMetadata()
-                        .build()));
+    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
+            String serviceNamespace) {
+        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
+                eq(protocol), eq(servicePort)))
+                .thenReturn(Optional.of(
+                        new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().build()));
     }
 
     private void pauseScheduler() {

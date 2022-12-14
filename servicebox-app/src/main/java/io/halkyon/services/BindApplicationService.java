@@ -1,5 +1,10 @@
 package io.halkyon.services;
 
+import static io.halkyon.utils.StringUtils.getHostFromUrl;
+import static io.halkyon.utils.StringUtils.getPortFromUrl;
+import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
+import static io.halkyon.utils.StringUtils.toBase64;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,11 +17,6 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
-
-import static io.halkyon.utils.StringUtils.getHostFromUrl;
-import static io.halkyon.utils.StringUtils.getPortFromUrl;
-import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
-import static io.halkyon.utils.StringUtils.toBase64;
 
 @ApplicationScoped
 public class BindApplicationService {
@@ -90,18 +90,19 @@ public class BindApplicationService {
 
     private String generateUrlByClaimService(Application application, Claim claim) {
         Service service = claim.service;
-        if (application.cluster.id == service.cluster.id
-                && Objects.equals(application.namespace, service.namespace)) {
+        if (application.cluster.id == service.cluster.id && Objects.equals(application.namespace, service.namespace)) {
             // rule 1: app + service within same ns, cluster
-            //         -> app can access the service using: protocol://service_name:port
+            // -> app can access the service using: protocol://service_name:port
             return String.format("%s://%s:%s", service.getProtocol(), service.name, service.getPort());
         } else if (application.cluster.id == service.cluster.id) {
             // rule 2: app + service in different ns, same cluster
-            //         -> app can access the service using: protocol://service_name.namespace:port
-            return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace, service.getPort());
+            // -> app can access the service using: protocol://service_name.namespace:port
+            return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
+                    service.getPort());
         }
         // TODO: rule 3: app + service running in another cluster. https://github.com/halkyonio/primaza-poc/issues/134
-        // TODO: rule 4: app + service running on a standalone machine. https://github.com/halkyonio/primaza-poc/discussions/135
+        // TODO: rule 4: app + service running on a standalone machine.
+        // https://github.com/halkyonio/primaza-poc/discussions/135
 
         return null;
     }

@@ -39,10 +39,8 @@ public class Cluster extends PanacheEntityBase {
     public String environment;
 
     /**
-     * Internal namespaces which should be excluded
-     * from the services looking about the services or applications available
-     * Separate the namespaces within the string using a ";" character
-     * Example: default;kube-system;ingress
+     * Internal namespaces which should be excluded from the services looking about the services or applications
+     * available Separate the namespaces within the string using a ";" character Example: default;kube-system;ingress
      */
     public String namespaces;
 
@@ -72,8 +70,7 @@ public class Cluster extends PanacheEntityBase {
 
     public Application getApplicationByNameAndNamespace(String appName, String appNamespace) {
         return applications.stream()
-                .filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.namespace, appNamespace))
-                .findFirst()
+                .filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.namespace, appNamespace)).findFirst()
                 .orElse(null);
     }
 }

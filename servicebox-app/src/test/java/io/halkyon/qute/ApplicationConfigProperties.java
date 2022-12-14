@@ -1,12 +1,13 @@
 package io.halkyon.qute;
 
-import io.halkyon.ApplicationProperties;
-import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.inject.Inject;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import io.halkyon.ApplicationProperties;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class ApplicationConfigProperties {

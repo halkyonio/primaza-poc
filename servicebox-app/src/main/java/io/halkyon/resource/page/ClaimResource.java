@@ -38,22 +38,20 @@ import io.quarkus.qute.TemplateInstance;
 public class ClaimResource {
     private final Validator validator;
     private final UpdateClaimJob claimingService;
+    private final BindApplicationService bindService;
 
     @Inject
-    BindApplicationService bindService;
-
-    @Inject
-    public ClaimResource(Validator validator, UpdateClaimJob claimingService){
+    public ClaimResource(Validator validator, UpdateClaimJob claimingService, BindApplicationService bindService) {
         this.validator = validator;
         this.claimingService = claimingService;
+        this.bindService = bindService;
     }
 
     @GET
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.Claims.form(new Claim(), Service.listAll())
-                .data("title","Claim form");
+        return Templates.Claims.form(new Claim(), Service.listAll()).data("title", "Claim form");
     }
 
     @GET
@@ -68,15 +66,12 @@ public class ClaimResource {
     @Path("/filter")
     public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
         List<Claim> claims = Claim.getClaims(name, serviceRequested);
-        return Response.ok(Templates.Claims.table(claims)
-                .data("items", claims.size()))
-                .build();
+        return Response.ok(Templates.Claims.table(claims).data("items", claims.size())).build();
     }
 
     private TemplateInstance showList(List<Claim> claims) {
-        return Templates.Claims.list(claims)
-                .data("services", Service.listAll())
-                .data("items", io.halkyon.model.Claim.count());
+        return Templates.Claims.list(claims).data("services", Service.listAll()).data("items",
+                io.halkyon.model.Claim.count());
     }
 
     @GET
@@ -166,7 +161,7 @@ public class ClaimResource {
     @Transactional
     public TemplateInstance delete(@PathParam("id") Long id) {
         Claim claim = Claim.findById(id);
-        if(claim.applicationId !=null){
+        if (claim.applicationId != null) {
             bindService.unBindApplication(Application.findById(claim.applicationId), claim);
         }
         Claim.deleteById(id);

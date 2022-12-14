@@ -2,7 +2,6 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
-import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -19,8 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.services.KubernetesClientService;
+import io.halkyon.services.UpdateClaimJob;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
@@ -41,38 +40,35 @@ public class UpdateClaimJobTest {
     Scheduler scheduler;
 
     @Test
-    public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded(){
+    public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
         pauseScheduler();
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
-        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port", mockKubernetesClientService, "protocol", "9999");
+        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port",
+                mockKubernetesClientService, "protocol", "9999");
         createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", "protocol:9999");
-        // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created with status "new" and attempts set to 1)
+        // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created
+        // with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
         // - the claim "PostgresSQL" should change from "new" to "pending", attempts still to 1
-        // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should increase the attempts to 2
+        // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should
+        // increase the attempts to 2
 
         job.execute();
-        Claim actualPostgresql = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + postgresqlClaim.name)
-                .then()
-                .statusCode(200).extract().as(Claim.class);
+        Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(postgresqlClaim.name, actualPostgresql.name);
-        assertEquals(ClaimStatus.BIND.toString(),actualPostgresql.status);
-        assertEquals(1,actualPostgresql.attempts);
+        assertEquals(ClaimStatus.BIND.toString(), actualPostgresql.status);
+        assertEquals(1, actualPostgresql.attempts);
 
-        Claim actualMysql = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + mySqlClaim.name)
-                .then()
-                .statusCode(200).extract().as(Claim.class);
+        Claim actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name)
+                .then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
-        assertEquals(ClaimStatus.PENDING.toString(),actualMysql.status);
-        assertEquals(2,actualMysql.attempts);
+        assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
+        assertEquals(2, actualMysql.attempts);
 
         // When we repeat running the job again until reaching the maxAttempts:
         // Then:
@@ -81,26 +77,19 @@ public class UpdateClaimJobTest {
         // We iterate from the number of attempts until the max attempts just for checking the "PENDING" status.
         for (int attempt = 2; attempt < maxAttempts; attempt++) {
             job.execute();
-            actualPostgresql = given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .get("/claims/name/" + postgresqlClaim.name)
-                    .then()
-                    .statusCode(200).extract().as(Claim.class);
+            actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
+                    .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
             assertEquals(postgresqlClaim.name, actualPostgresql.name);
-            assertEquals(ClaimStatus.BIND.toString(),actualPostgresql.status);
-            assertEquals(1,actualPostgresql.attempts);
+            assertEquals(ClaimStatus.BIND.toString(), actualPostgresql.status);
+            assertEquals(1, actualPostgresql.attempts);
 
-            actualMysql = given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .get("/claims/name/" + mySqlClaim.name)
-                    .then()
-                    .statusCode(200)
-                    .extract().as(Claim.class);
+            actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name).then()
+                    .statusCode(200).extract().as(Claim.class);
 
             assertEquals(mySqlClaim.name, actualMysql.name);
             assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
-            assertEquals(3,actualMysql.attempts);
+            assertEquals(3, actualMysql.attempts);
 
         }
 
@@ -110,12 +99,8 @@ public class UpdateClaimJobTest {
 
         job.execute();
 
-        actualMysql = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + mySqlClaim.name)
-                .then()
-                .statusCode(200)
-                .extract().as(Claim.class);
+        actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name).then()
+                .statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
         assertEquals(ClaimStatus.ERROR.toString(), actualMysql.status);
@@ -126,24 +111,13 @@ public class UpdateClaimJobTest {
     }
 
     @Test
-    public void testShouldClaimServiceWhenNewClaimIsCreated(){
+    public void testShouldClaimServiceWhenNewClaimIsCreated() {
         pauseScheduler();
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", "Oracle1")
-                .formParam("serviceRequested", "oracle-1234")
-                .formParam("description", "Description")
-                .when().post("/claims")
-                .then()
-                .statusCode(201);
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/Oracle1")
-                .then()
-                .statusCode(200)
-                .body("status", is(ClaimStatus.PENDING.toString()))
-                .body("attempts", is(1));
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", "Oracle1").formParam("serviceRequested", "oracle-1234")
+                .formParam("description", "Description").when().post("/claims").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/Oracle1").then().statusCode(200)
+                .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
     }
 
     private void pauseScheduler() {
