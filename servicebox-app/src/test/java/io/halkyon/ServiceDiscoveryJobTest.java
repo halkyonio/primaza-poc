@@ -85,8 +85,8 @@ public class ServiceDiscoveryJobTest {
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
         given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("name", "dummy-cluster-3").multiPart("environment", "TEST")
-                .multiPart("namespaces", "kube-system,ingress").multiPart("url", "master:port").when().post("/clusters")
-                .then().statusCode(201);
+                .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "master:port").when()
+                .post("/clusters").then().statusCode(201);
         given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
                 .body("available", is(true)).body("cluster.name", is("dummy-cluster-3"));
         thenServiceIsInTheAvailableServicePage(service.name);

@@ -31,8 +31,8 @@ public final class TestUtils {
 
     public static Cluster createCluster(String clusterName, String url) {
         given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", clusterName)
-                .multiPart("environment", "PROD").multiPart("namespaces", "kube-system,ingress").multiPart("url", url)
-                .when().post("/clusters").then().statusCode(201);
+                .multiPart("environment", "PROD").multiPart("excludedNamespaces", "kube-system,ingress")
+                .multiPart("url", url).when().post("/clusters").then().statusCode(201);
 
         return given().contentType(MediaType.APPLICATION_JSON).get("/clusters/name/" + clusterName).then()
                 .statusCode(200).extract().as(Cluster.class);

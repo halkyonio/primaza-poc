@@ -24,7 +24,7 @@ public class ClusterRequest {
 
     @NotBlank(message = "Namespaces must not be empty")
     @FormParam
-    public String namespaces;
+    public String excludedNamespaces;
 
     @NotBlank(message = "Environment must not be empty")
     @FormParam
