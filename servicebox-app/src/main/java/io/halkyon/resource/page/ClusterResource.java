@@ -66,19 +66,8 @@ public class ClusterResource {
             response.withErrors(errors);
         } else {
             Cluster cluster = new Cluster();
-            cluster.name = clusterRequest.name;
-            cluster.url = clusterRequest.url;
-            cluster.namespaces = clusterRequest.namespaces;
-            cluster.environment = clusterRequest.environment;
-            if (clusterRequest.kubeConfig != null) {
-                try {
-                    cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            doUpdateCluster(cluster, clusterRequest);
             response.withSuccessMessage(cluster.id);
-            cluster.persist();
             serviceDiscoveryJob.checkCluster(cluster);
             applicationDiscoveryJob.syncApplicationsInCluster(cluster);
         }
@@ -116,13 +105,7 @@ public class ClusterResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            cluster.name = clusterRequest.name;
-            cluster.url = clusterRequest.url;
-            cluster.namespaces = clusterRequest.namespaces;
-            cluster.environment = clusterRequest.environment;
-            cluster.kubeConfig = clusterRequest.getKubeConfig();
-
-            cluster.persist();
+            doUpdateCluster(cluster, clusterRequest);
             serviceDiscoveryJob.checkCluster(cluster);
             applicationDiscoveryJob.syncApplicationsInCluster(cluster);
 
@@ -150,5 +133,20 @@ public class ClusterResource {
             throw new NotFoundException("Cluster with name " + name + " does not exist.");
         }
         return cluster;
+    }
+
+    private void doUpdateCluster(Cluster cluster, ClusterRequest clusterRequest) {
+        cluster.name = clusterRequest.name;
+        cluster.url = clusterRequest.url;
+        cluster.excludedNamespaces = clusterRequest.excludedNamespaces;
+        cluster.environment = clusterRequest.environment;
+        if (clusterRequest.kubeConfig != null) {
+            try {
+                cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        cluster.persist();
     }
 }

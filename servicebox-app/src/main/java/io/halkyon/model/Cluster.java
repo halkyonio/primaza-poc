@@ -42,7 +42,7 @@ public class Cluster extends PanacheEntityBase {
      * Internal namespaces which should be excluded from the services looking about the services or applications
      * available Separate the namespaces within the string using a ";" character Example: default;kube-system;ingress
      */
-    public String namespaces;
+    public String excludedNamespaces;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")

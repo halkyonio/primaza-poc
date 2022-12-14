@@ -157,7 +157,7 @@ public class KubernetesClientService {
     private <E extends HasMetadata, L extends KubernetesResourceList<E>> List<E> filterByCluster(
             MixedOperation<E, L, ?> operation, Cluster cluster) {
         FilterWatchListDeletable<E, L> filter = operation.inAnyNamespace();
-        String[] excludedNamespaces = cluster.namespaces.split(",");
+        String[] excludedNamespaces = cluster.excludedNamespaces.split(",");
         for (var excludedNamespace : excludedNamespaces) {
             filter = filter.withoutField("metadata.namespace", excludedNamespace);
         }

@@ -32,8 +32,8 @@ public class ClustersEndpointTest {
         // A htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("name", "ocp4.11-node-2").multiPart("environment", "TEST")
-                .multiPart("namespaces", "kube-system,ingress").multiPart("url", "https://10.0.2.12:6443").when()
-                .post("/clusters").then().statusCode(201);
+                .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "https://10.0.2.12:6443")
+                .when().post("/clusters").then().statusCode(201);
     }
 
     @Test
