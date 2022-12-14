@@ -5,29 +5,10 @@
   <div class="container pt-4">
     <a href="/services/new" class="btn btn-info active" role="button" aria-pressed="true">New service</a>
     <hr>
-    <div class="table-responsive">
-      <table class="table">
-          <thead>
-            <tr>
-                <th aria-valuetext="left">Name</th>
-                <th aria-valuetext="left">Version</th>
-                <th aria-valuetext="left">Type</th>
-                <th aria-valuetext="left">Database</th>
-                <th aria-valuetext="left">Endpoint</th>
-                <th aria-valuetext="left">Available</th>
-                <th aria-valuetext="left">Action</th>
-            </tr>
-          </thead>
-          <tbody id="service-list">
-            {#for service in services}
-                <!-- Include the HTML template rendering the service item -->
-                {#include services/item.html service=service /}
-            {/for}
-          </tbody>
-      </table>
+    <div id="service-table">
+      <!-- Include the HTML table template to display the claims -->
+      {#include services/table.html /}
     </div>
-    <!-- Showing the number of services. Returned by the template key: items of ServiceResource -->
-    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
     <hr>
     <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
   </div>

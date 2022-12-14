@@ -31,7 +31,7 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.list(applications).data("items", applications.size());
+        return Templates.Applications.list(applications, Application.count());
     }
 
     @GET
@@ -51,7 +51,7 @@ public class ApplicationResource {
     @Path("/polling")
     public TemplateInstance pollingApplications() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.listTable(applications).data("items", applications.size());
+        return Templates.Applications.listTable(applications, applications.size());
     }
 
     @GET

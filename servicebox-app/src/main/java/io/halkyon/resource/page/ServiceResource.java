@@ -1,6 +1,7 @@
 package io.halkyon.resource.page;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -28,6 +30,8 @@ import io.halkyon.Templates;
 import io.halkyon.model.Service;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
+import io.halkyon.utils.FilterableQueryBuilder;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/services")
@@ -132,13 +136,43 @@ public class ServiceResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_JSON)
     public TemplateInstance list() {
-        return showList(io.halkyon.model.Service.listAll()).data("all", true);
+        return Templates.Services.list(Service.listAll(), Service.count(), Collections.emptyMap());
     }
 
-    private TemplateInstance showList(List<Service> services) {
-        return Templates.Services.list(services).data("items", io.halkyon.model.Service.count());
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/filter")
+    public Response filter(@QueryParam("name") String name, @QueryParam("version") String version,
+            @QueryParam("type") String type, @QueryParam("database") String database,
+            @QueryParam("endpoint") String endpoint, @QueryParam("available") String available) {
+        FilterableQueryBuilder query = new FilterableQueryBuilder();
+        if (!StringUtils.isNullOrEmpty(name)) {
+            query.containsIgnoreCase("name", name);
+        }
+
+        if (!StringUtils.isNullOrEmpty(version)) {
+            query.startsWith("version", version);
+        }
+
+        if (!StringUtils.isNullOrEmpty(type)) {
+            query.startsWith("type", type);
+        }
+
+        if (!StringUtils.isNullOrEmpty(database)) {
+            query.containsIgnoreCase("database", database);
+        }
+
+        if (!StringUtils.isNullOrEmpty(endpoint)) {
+            query.containsIgnoreCase("endpoint", endpoint);
+        }
+
+        if (!StringUtils.isNullOrEmpty(available)) {
+            query.equals("available", StringUtils.equalsIgnoreCase("on", available));
+        }
+
+        List<Service> services = Service.list(query.build(), query.getParameters());
+        return Response.ok(Templates.Services.table(services, services.size(), query.getFilterAsMap())).build();
     }
 
     @GET

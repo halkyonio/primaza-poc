@@ -1,7 +1,6 @@
 package io.halkyon.resource.page;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -110,13 +109,8 @@ public class CredentialResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_JSON)
     public TemplateInstance list() {
-        return showList(Credential.listAll()).data("all", true);
-    }
-
-    private TemplateInstance showList(List<Credential> credentials) {
-        return Templates.Credentials.list(credentials).data("items", Credential.count());
+        return Templates.Credentials.list(Credential.listAll(), Credential.count());
     }
 
     @GET
