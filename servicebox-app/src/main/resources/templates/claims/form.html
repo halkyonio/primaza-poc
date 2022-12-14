@@ -3,14 +3,13 @@
   {#title}Claim{/title}
   {#body}
      <div class="container" id="form">
-       {#if claim.id == null}
-       <h1>New Claim</h1>
-       <form class="form-horizontal" action="/claims" hx-post="/claims" hx-target="#response" method="POST" hx-swap="innerHTML">
-       {#else}
-       <h1>Edit Claim</h1>
-       <form class="form-horizontal" action="/claims/{claim.id}" hx-put="/claims/{claim.id}" hx-target="#response" method="PUT" hx-swap="innerHTML">
-       {/if}
-
+         {#if claim.id == null }
+         <h1>New Claim</h1>
+         <form class="form-horizontal" action="/claims" hx-post="/claims" hx-target="#response" method="POST" hx-swap="innerHTML">
+         {#else}
+         <h1>Update Claim</h1>
+         <form class="form-horizontal" action="/claims/{claim.id}" hx-put="/claims/{claim.id}" hx-target="#response" method="PUT" hx-swap="innerHTML">
+         {/if}
          <div class="form-group">
             <label class="control-label col-sm-2" for="name">Claim name:</label>
             <div class="col-sm-5">

@@ -48,18 +48,6 @@ public class ClusterResource {
                 .data("all", true);
     }
 
-    @GET
-    @Path("/cluster/{id}")
-    @Consumes(MediaType.TEXT_HTML)
-    @Produces(MediaType.TEXT_HTML)
-    public Object edit(@PathParam("id") Long id) {
-        Cluster cluster = Cluster.findById(id);
-        if (cluster == null) {
-            throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
-        }
-        return Templates.Clusters.form(cluster);
-    }
-
     @POST
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -71,39 +59,69 @@ public class ClusterResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            Cluster cluster;
-            if (clusterRequest.getLongId() != null && clusterRequest.getLongId() != 0) {
-                cluster = Cluster.findById(clusterRequest.getLongId());
-                if (cluster != null) {
-                    cluster.name = clusterRequest.name;
-                    cluster.url = clusterRequest.url;
-                    cluster.namespaces = clusterRequest.namespaces;
-                    cluster.environment = clusterRequest.environment;
-                    cluster.kubeConfig = clusterRequest.getKubeConfig();
-                    cluster.created = new Date(System.currentTimeMillis());
-                } else {
-                    throw new NotFoundException(String.format("Cluster not found for id: %d%n", clusterRequest.id));
+            Cluster cluster = new Cluster();
+            cluster.name = clusterRequest.name;
+            cluster.url = clusterRequest.url;
+            cluster.namespaces = clusterRequest.namespaces;
+            cluster.environment = clusterRequest.environment;
+            cluster.created = new Date(System.currentTimeMillis());
+            if (clusterRequest.kubeConfig != null) {
+                try {
+                    cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-                response.withUpdateSuccessMessage(cluster.id);
-            } else {
-                cluster = new Cluster();
-                cluster.name = clusterRequest.name;
-                cluster.url = clusterRequest.url;
-                cluster.namespaces = clusterRequest.namespaces;
-                cluster.environment = clusterRequest.environment;
-                cluster.created = new Date(System.currentTimeMillis());
-                if (clusterRequest.kubeConfig != null) {
-                    try {
-                        cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                response.withSuccessMessage(cluster.id);
             }
+            response.withSuccessMessage(cluster.id);
             cluster.persist();
             serviceDiscoveryJob.checkCluster(cluster);
             applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+        }
+
+        // Return as HTML the template rendering the item for HTMX
+        return response.build();
+    }
+
+    @GET
+    @Path("/{id:[0-9]+}")
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_HTML)
+    public Object edit(@PathParam("id") Long id) {
+        Cluster cluster = Cluster.findById(id);
+        if (cluster == null) {
+            throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
+        }
+        return Templates.Clusters.form(cluster);
+    }
+
+    @PUT
+    @Path("/{id:[0-9]+}")
+    @Transactional
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_HTML)
+    public Response edit(@PathParam("id") Long id, @MultipartForm ClusterRequest clusterRequest) throws IOException {
+        Cluster cluster = Cluster.findById(id);
+        if (cluster == null) {
+            throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
+        }
+
+        Set<ConstraintViolation<ClusterRequest>> errors = validator.validate(clusterRequest);
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters/" + id);
+
+        if (errors.size() > 0) {
+            response.withErrors(errors);
+        } else {
+            cluster.name = clusterRequest.name;
+            cluster.url = clusterRequest.url;
+            cluster.namespaces = clusterRequest.namespaces;
+            cluster.environment = clusterRequest.environment;
+            cluster.kubeConfig = clusterRequest.getKubeConfig();
+
+            cluster.persist();
+            serviceDiscoveryJob.checkCluster(cluster);
+            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+
+            response.withUpdateSuccessMessage(cluster.id);
         }
 
         // Return as HTML the template rendering the item for HTMX
