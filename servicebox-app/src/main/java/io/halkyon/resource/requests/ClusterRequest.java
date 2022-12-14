@@ -39,7 +39,7 @@ public class ClusterRequest {
     }
 
     public Long getLongId() {
-        if ( id != null) {
+        if (id != null) {
             return Long.valueOf(id);
         } else {
             return null;

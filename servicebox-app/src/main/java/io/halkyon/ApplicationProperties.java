@@ -1,9 +1,9 @@
 package io.halkyon;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Named
 @ApplicationScoped
@@ -14,7 +14,8 @@ public class ApplicationProperties {
     @ConfigProperty(name = "git.sha.commit", defaultValue = "666")
     String gGitShaCommit;
 
-    public ApplicationProperties() {}
+    public ApplicationProperties() {
+    }
 
     public String getGitHubRepo() {
         return gGitHubRepo;

@@ -19,8 +19,6 @@ import javax.persistence.OneToOne;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import io.halkyon.services.ClaimStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
@@ -31,7 +29,7 @@ public class Claim extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-	public String name;
+    public String name;
     public String serviceRequested;
     public String description;
     public String status;
@@ -41,8 +39,9 @@ public class Claim extends PanacheEntityBase {
     @UpdateTimestamp
     public Date updated;
     public String errorMessage;
-    // TODO: To be discussed and adapted if needed. This is not because we will delete a Claim that the service bound should be deleted and its credential
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    // TODO: To be discussed and adapted if needed. This is not because we will delete a Claim that the service bound
+    // should be deleted and its credential
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
     public Integer attempts = 0;
@@ -70,18 +69,19 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> getClaims(String name, String serviceRequested) {
         Map<String, Object> parameters = new HashMap<>();
-        addIfNotNull(parameters, "name", name );
+        addIfNotNull(parameters, "name", name);
         addIfNotNull(parameters, "servicerequested", serviceRequested);
 
-        if ( parameters.isEmpty() ) {
+        if (parameters.isEmpty()) {
             return listAll();
         }
 
         String query = parameters.entrySet().stream()
-                .map( entry -> "LOWER(" + entry.getKey() + ") " + "like :" + entry.getKey() )
-                .collect( Collectors.joining(" AND ") );
+                .map(entry -> "LOWER(" + entry.getKey() + ") " + "like :" + entry.getKey())
+                .collect(Collectors.joining(" AND "));
 
-        // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not, etc
+        // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not,
+        // etc
         // String query = "name like ?1 or servicerequested = ?2";
         return Claim.list(query, parameters);
     }

@@ -10,7 +10,7 @@ import java.util.Objects;
 
 import org.mockito.ArgumentMatcher;
 
-public class SecretDataMatcher  implements ArgumentMatcher<Map<String, String>> {
+public class SecretDataMatcher implements ArgumentMatcher<Map<String, String>> {
 
     private final String url;
     private final String username;

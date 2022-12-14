@@ -2,10 +2,8 @@ package io.halkyon.services;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -17,13 +15,11 @@ import org.jboss.logging.Logger;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.halkyon.model.Application;
 import io.halkyon.model.Cluster;
-import io.halkyon.model.Service;
-import io.quarkus.runtime.util.StringUtil;
 import io.quarkus.scheduler.Scheduled;
 
 /**
- * The application discovery job will loop over the registered clusters and register all the installed Kubernetes deployments in
- * a cluster.
+ * The application discovery job will loop over the registered clusters and register all the installed Kubernetes
+ * deployments in a cluster.
  */
 @ApplicationScoped
 public class ApplicationDiscoveryJob {
@@ -34,7 +30,7 @@ public class ApplicationDiscoveryJob {
     KubernetesClientService kubernetesClientService;
 
     @Transactional
-    @Scheduled(every="${servicebox.discovery-application-job.poll-every:5s}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${servicebox.discovery-application-job.poll-every:5s}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
         List<Cluster> clusters = Cluster.listAll();
         for (Cluster cluster : clusters) {
@@ -80,10 +76,7 @@ public class ApplicationDiscoveryJob {
     }
 
     private String getImageInDeployment(Deployment deployment) {
-        return deployment.getSpec().getTemplate()
-                .getSpec()
-                .getContainers()
-                .stream().map(c -> c.getImage())
+        return deployment.getSpec().getTemplate().getSpec().getContainers().stream().map(c -> c.getImage())
                 .collect(Collectors.joining(", "));
     }
 }

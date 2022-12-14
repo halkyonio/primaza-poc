@@ -49,7 +49,7 @@ public class Service extends PanacheEntityBase {
     @FormParam
     public String type;
 
-    /* in form of tcp:8080*/
+    /* in form of tcp:8080 */
     @NotBlank(message = "Service endpoint must not be empty")
     @javax.validation.constraints.Pattern(regexp = "\\w+:\\d+", message = "Wrong format in service endpoint. It must be 'protocol:port'")
     @FormParam

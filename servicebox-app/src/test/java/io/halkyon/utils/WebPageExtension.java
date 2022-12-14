@@ -107,7 +107,8 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
 
         public void assertPathIs(String expectedPath) {
             String actualPath = currentPage.getUrl().toString();
-            assertTrue(actualPath.endsWith(expectedPath), "Unexpected path found: " + actualPath + ". Expected: " + expectedPath);
+            assertTrue(actualPath.endsWith(expectedPath),
+                    "Unexpected path found: " + actualPath + ". Expected: " + expectedPath);
         }
 
         public void assertContentContains(String expectedContent) {
@@ -131,9 +132,7 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
         private void clickOn(DomElement element) {
             try {
                 currentPage = element.click();
-                if (element instanceof HtmlInput
-                        || element instanceof HtmlLink
-                        || element instanceof HtmlAnchor) {
+                if (element instanceof HtmlInput || element instanceof HtmlLink || element instanceof HtmlAnchor) {
                     refresh();
                 }
                 waitUntilLoaded();

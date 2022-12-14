@@ -29,76 +29,57 @@ public class ClaimsEndpointTest {
     WebPageExtension.PageManager page;
 
     @Test
-    public void testQueryClaimBody(){
-         RequestSpecification httpRequest = RestAssured.given().header("HX-Request","true").queryParam("name","mysql-demo");
-         Response response = httpRequest.get("/claims/filter");
-         ResponseBody body = response.getBody();
-         MatcherAssert.assertThat(body,Matchers.notNullValue());
+    public void testQueryClaimBody() {
+        RequestSpecification httpRequest = RestAssured.given().header("HX-Request", "true").queryParam("name",
+                "mysql-demo");
+        Response response = httpRequest.get("/claims/filter");
+        ResponseBody body = response.getBody();
+        MatcherAssert.assertThat(body, Matchers.notNullValue());
     }
+
     @Test
-    public void testQueryUsingNameToGetClaims(){
+    public void testQueryUsingNameToGetClaims() {
         final String claimName = "testQueryUsingNameToGetClaims";
         createClaim(claimName, "Postgresql-5509");
-        given().header("HX-Request","true")
-               .queryParam("name",claimName)
-               .when()
-                 .get("/claims/filter")
-               .then()
-                 .body(containsString("<td>" + claimName + "</td>"));
+        given().header("HX-Request", "true").queryParam("name", claimName).when().get("/claims/filter").then()
+                .body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
-    public void testQueryUsingServiceRequestedToGetClaims(){
+    public void testQueryUsingServiceRequestedToGetClaims() {
         final String claimName = "testQueryUsingServiceRequestedToGetClaims";
         createClaim(claimName, "Postgresql-5509");
-        given().header("HX-Request","true").queryParam("servicerequested","Postgresql-5509")
-               .when().get("/claims/filter")
-               .then().body(containsString("<td>" + claimName + "</td>"));
+        given().header("HX-Request", "true").queryParam("servicerequested", "Postgresql-5509").when()
+                .get("/claims/filter").then().body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
-    public void claimCreatedViaForm(){
+    public void claimCreatedViaForm() {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         String claimName = "mysql-claim";
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", claimName)
-                .formParam("serviceRequested","mysql-8.0.3")
-                .formParam("description","mysql claim for testing purposes")
-                .when().post("/claims")
-                .then()
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", claimName).formParam("serviceRequested", "mysql-8.0.3")
+                .formParam("description", "mysql claim for testing purposes").when().post("/claims").then()
                 .statusCode(201);
 
-        Claim claim = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + claimName)
-                .then()
-                .statusCode(200)
-                .extract().as(Claim.class);
+        Claim claim = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then()
+                .statusCode(200).extract().as(Claim.class);
 
         assertNotNull(claim);
-        assertEquals(claim.name,claimName);
+        assertEquals(claim.name, claimName);
         assertEquals(claim.serviceRequested, "mysql-8.0.3");
         assertNotNull(claim.created);
     }
 
     @Test
-    public void testDeleteUnBoundClaim(){
+    public void testDeleteUnBoundClaim() {
         final String claimName = "testDeleteBoundClaim";
         Claim claim = createClaim(claimName, "Postgresql-5509");
-        given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/claims/name/" + claimName)
-                .then()
-                .statusCode(200)
+        given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
-        given().header("HX-Request","true")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .when().delete("/claims/"+claim.id)
-                .then()
-                .statusCode(200);
+        given().header("HX-Request", "true").contentType(MediaType.APPLICATION_FORM_URLENCODED).when()
+                .delete("/claims/" + claim.id).then().statusCode(200);
     }
 
     @DisabledOnIntegrationTest

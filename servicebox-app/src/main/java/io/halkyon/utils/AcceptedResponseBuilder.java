@@ -36,6 +36,7 @@ public final class AcceptedResponseBuilder {
         status = Response.Status.CREATED;
         return this;
     }
+
     public AcceptedResponseBuilder withSuccessMessage(Long id) {
         response.append(String.format(SUCCESS_MESSAGE_TEMPLATE, id));
         status = Response.Status.CREATED;
@@ -43,10 +44,8 @@ public final class AcceptedResponseBuilder {
     }
 
     public Response build() {
-        return Response.status(status)
-                .entity(StandardCharsets.UTF_8.encode(response.toString()).array())
-                .header(LOCATION_HEADER, location)
-                .build();
+        return Response.status(status).entity(StandardCharsets.UTF_8.encode(response.toString()).array())
+                .header(LOCATION_HEADER, location).build();
     }
 
     public static AcceptedResponseBuilder withLocation(String location) {

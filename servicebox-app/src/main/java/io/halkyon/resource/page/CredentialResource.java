@@ -41,8 +41,7 @@ public class CredentialResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newCredential() {
-        return Templates.Credentials.form(new Credential(), Service.listAll())
-                .data("title","Credential form");
+        return Templates.Credentials.form(new Credential(), Service.listAll()).data("title", "Credential form");
     }
 
     @POST
@@ -119,7 +118,6 @@ public class CredentialResource {
     private TemplateInstance showList(List<Credential> credentials) {
         return Templates.Credentials.list(credentials).data("items", Credential.count());
     }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

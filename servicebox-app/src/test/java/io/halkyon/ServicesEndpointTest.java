@@ -33,22 +33,12 @@ public class ServicesEndpointTest {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
 
         String rabbitMQ4 = "RabbitMQ4";
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", rabbitMQ4)
-                .formParam("version", "3.11.2")
-                .formParam("type", "Broker")
-                .formParam("endpoint", "tcp:5672")
-                .when().post("/services")
-                .then().statusCode(201);
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", rabbitMQ4).formParam("version", "3.11.2").formParam("type", "Broker")
+                .formParam("endpoint", "tcp:5672").when().post("/services").then().statusCode(201);
 
-        Service service = given()
-                .contentType(MediaType.APPLICATION_JSON)
-                .get("/services/name/" + rabbitMQ4)
-                .then()
-                .statusCode(200)
-                .extract().as(Service.class);
+        Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + rabbitMQ4).then()
+                .statusCode(200).extract().as(Service.class);
 
         assertNotNull(service);
         assertEquals(service.name, rabbitMQ4);
@@ -61,15 +51,9 @@ public class ServicesEndpointTest {
         String prefix = "ServicesEndpointTest-testCannotAddServiceWithSameNameAndVersion-";
         Service service = createService(prefix + "service", "1", "type", "database");
 
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", service.name)
-                .formParam("version", service.version)
-                .formParam("type", service.type)
-                .formParam("endpoint", service.endpoint)
-                .when().post("/services")
-                .then().statusCode(409);
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", service.name).formParam("version", service.version).formParam("type", service.type)
+                .formParam("endpoint", service.endpoint).when().post("/services").then().statusCode(409);
     }
 
     @Test
@@ -78,15 +62,10 @@ public class ServicesEndpointTest {
         Service service1 = createService(prefix + "service", "1", "type", "database");
         Service service2 = createService(prefix + "service", "2", "type", "database");
 
-        given()
-                .header("HX-Request", true)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", service2.name)
-                .formParam("version", "1") // conflicts with version of service1!
-                .formParam("type", service2.type)
-                .formParam("endpoint", service2.endpoint)
-                .when().put("/services/" + service2.id)
-                .then().statusCode(409);
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", service2.name).formParam("version", "1") // conflicts with version of service1!
+                .formParam("type", service2.type).formParam("endpoint", service2.endpoint).when()
+                .put("/services/" + service2.id).then().statusCode(409);
     }
 
     @DisabledOnIntegrationTest
@@ -141,7 +120,8 @@ public class ServicesEndpointTest {
         String prefix = "ServicesEndpointTest-testDeleteServiceWithClusterInPage-";
         String clusterName = prefix + "cluster";
         createCluster(clusterName, "master:port");
-        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, "testDeleteClusterInPage", "1111", "ns1");
+        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, "testDeleteClusterInPage", "1111",
+                "ns1");
         Service service = createService(prefix + "service", "Api", "any", "demo", "testDeleteClusterInPage:1111");
 
         // When, we go to the services page

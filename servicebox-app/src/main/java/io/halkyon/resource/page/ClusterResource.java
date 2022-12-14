@@ -44,16 +44,13 @@ public class ClusterResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newClusterForm() {
-        return Templates.Clusters.form(new Cluster())
-                .data("title","Cluster form");
+        return Templates.Clusters.form(new Cluster()).data("title", "Cluster form");
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Clusters.list(Cluster.listAll())
-                .data("title","Cluster form")
-                .data("items", Cluster.count())
+        return Templates.Clusters.list(Cluster.listAll()).data("title", "Cluster form").data("items", Cluster.count())
                 .data("all", true);
     }
 
@@ -141,8 +138,7 @@ public class ClusterResource {
     @Transactional
     public TemplateInstance delete(@PathParam("id") Long id) {
         Cluster.deleteById(id);
-        return Templates.Clusters.list(Cluster.listAll())
-                .data("items", Cluster.count());
+        return Templates.Clusters.list(Cluster.listAll()).data("items", Cluster.count());
     }
 
     @GET

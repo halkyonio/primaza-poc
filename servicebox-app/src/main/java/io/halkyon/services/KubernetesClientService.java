@@ -38,16 +38,16 @@ public class KubernetesClientService {
     private static final String SERVICE_BINDING_ROOT_DEFAULT_VALUE = "/bindings";
 
     /**
-     * Get the deployments that are installed in the cluster.
-     * TODO: For OpenShift, we should support DeploymentConfig: https://github.com/halkyonio/primaza-poc/issues/136
+     * Get the deployments that are installed in the cluster. TODO: For OpenShift, we should support DeploymentConfig:
+     * https://github.com/halkyonio/primaza-poc/issues/136
      */
     public List<Deployment> getDeploymentsInCluster(Cluster cluster) {
         return filterByCluster(getClientForCluster(cluster).apps().deployments(), cluster);
     }
 
     /**
-     * Check whether a service with <protocol>:<port> is running in the cluster.
-     * Exclude the services installed under listed namespaces
+     * Check whether a service with <protocol>:<port> is running in the cluster. Exclude the services installed under
+     * listed namespaces
      */
     public Optional<Service> getServiceInCluster(Cluster cluster, String protocol, String servicePort) {
         List<Service> services = filterByCluster(getClientForCluster(cluster).services(), cluster);
@@ -69,13 +69,8 @@ public class KubernetesClientService {
     public void deleteSecretInNamespace(Application application, Claim claim) {
         KubernetesClient client = getClientForCluster(application.cluster);
         String secretName = application.name + "-" + claim.name;
-        client.secrets()
-              .inNamespace(application.namespace)
-              .delete(new SecretBuilder()
-                      .withNewMetadata()
-                      .withName(secretName)
-                      .withNamespace(application.namespace)
-                      .endMetadata().build());
+        client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
+                .withName(secretName).withNamespace(application.namespace).endMetadata().build());
     }
 
     /**
@@ -86,21 +81,16 @@ public class KubernetesClientService {
         String secretName = application.name + "-" + claim.name;
 
         // Get the Deployment resource
-        Deployment deployment = client.apps().deployments()
-                .inNamespace(application.namespace)
-                .withName(application.name)
-                .get();
+        Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
+                .withName(application.name).get();
 
         // Remove the Volume pointing to the Secret
-        Deployment newDeployment = new DeploymentBuilder(deployment)
-                .accept(ContainerBuilder.class, container -> {
-                    container.removeMatchingFromEnv(e -> Objects.equals(SERVICE_BINDING_ROOT, e.getName()));
-                    container.removeMatchingFromVolumeMounts(v -> Objects.equals(secretName, v.getName()));
-                })
-                .accept(PodSpecBuilder.class, podSpec -> {
-                    podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
-                })
-                .build();
+        Deployment newDeployment = new DeploymentBuilder(deployment).accept(ContainerBuilder.class, container -> {
+            container.removeMatchingFromEnv(e -> Objects.equals(SERVICE_BINDING_ROOT, e.getName()));
+            container.removeMatchingFromVolumeMounts(v -> Objects.equals(secretName, v.getName()));
+        }).accept(PodSpecBuilder.class, podSpec -> {
+            podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
+        }).build();
 
         logIfDebugEnabled(newDeployment);
 
@@ -116,42 +106,33 @@ public class KubernetesClientService {
 
         // create secret
         String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
-        client.secrets().createOrReplace(new SecretBuilder()
-                .withNewMetadata()
-                .withName(secretName)
-                .withNamespace(application.namespace)
-                .endMetadata()
-                .withData(secretData)
-                .build());
+        client.secrets().createOrReplace(new SecretBuilder().withNewMetadata().withName(secretName)
+                .withNamespace(application.namespace).endMetadata().withData(secretData).build());
 
         /**
          * Get the Deployment resource to be updated
          */
-        Deployment deployment = client.apps().deployments()
-                .inNamespace(application.namespace)
-                .withName(application.name)
-                .get();
+        Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
+                .withName(application.name).get();
 
         /*
-         * Add a volumeMount to the container able to mount the path to
-         * access the secret under "/SERVICE_BINDING_ROOT/secretName"
+         * Add a volumeMount to the container able to mount the path to access the secret under
+         * "/SERVICE_BINDING_ROOT/secretName"
          *
-         * Pass as ENV the property "SERVICE_BINDING_ROOT"
-         * pointing to the mount dir (e.g /bindings)
+         * Pass as ENV the property "SERVICE_BINDING_ROOT" pointing to the mount dir (e.g /bindings)
          *
          * Mount the secret
          */
-        Deployment newDeployment = new DeploymentBuilder(deployment)
-                .accept(ContainerBuilder.class, container -> {
-                    container.addNewVolumeMount().withName(secretName).withMountPath(SERVICE_BINDING_ROOT_DEFAULT_VALUE + "/" + secretName).endVolumeMount();
-                    container.removeMatchingFromEnv(e -> Objects.equals(SERVICE_BINDING_ROOT, e.getName()));
-                    container.addNewEnv().withName(SERVICE_BINDING_ROOT).withValue(SERVICE_BINDING_ROOT_DEFAULT_VALUE).endEnv();
-                })
-                .accept(PodSpecBuilder.class, podSpec ->  {
-                    podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
-                    podSpec.addNewVolume().withName(secretName).withNewSecret().withSecretName(secretName).endSecret().endVolume();
-                })
-                .build();
+        Deployment newDeployment = new DeploymentBuilder(deployment).accept(ContainerBuilder.class, container -> {
+            container.addNewVolumeMount().withName(secretName)
+                    .withMountPath(SERVICE_BINDING_ROOT_DEFAULT_VALUE + "/" + secretName).endVolumeMount();
+            container.removeMatchingFromEnv(e -> Objects.equals(SERVICE_BINDING_ROOT, e.getName()));
+            container.addNewEnv().withName(SERVICE_BINDING_ROOT).withValue(SERVICE_BINDING_ROOT_DEFAULT_VALUE).endEnv();
+        }).accept(PodSpecBuilder.class, podSpec -> {
+            podSpec.removeMatchingFromVolumes(v -> Objects.equals(secretName, v.getName()));
+            podSpec.addNewVolume().withName(secretName).withNewSecret().withSecretName(secretName).endSecret()
+                    .endVolume();
+        }).build();
 
         logIfDebugEnabled(newDeployment);
 
@@ -163,11 +144,8 @@ public class KubernetesClientService {
      * Perform a rollout for the specified application.
      */
     public void rolloutApplication(Application application) {
-        getClientForCluster(application.cluster)
-                .apps().deployments()
-                .inNamespace(application.namespace)
-                .withName(application.name)
-                .rolling().restart();
+        getClientForCluster(application.cluster).apps().deployments().inNamespace(application.namespace)
+                .withName(application.name).rolling().restart();
     }
 
     private void logIfDebugEnabled(Deployment newDeployment) {
@@ -177,8 +155,7 @@ public class KubernetesClientService {
     }
 
     private <E extends HasMetadata, L extends KubernetesResourceList<E>> List<E> filterByCluster(
-            MixedOperation<E, L, ?> operation,
-            Cluster cluster) {
+            MixedOperation<E, L, ?> operation, Cluster cluster) {
         FilterWatchListDeletable<E, L> filter = operation.inAnyNamespace();
         String[] excludedNamespaces = cluster.namespaces.split(",");
         for (var excludedNamespace : excludedNamespaces) {

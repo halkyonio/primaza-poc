@@ -16,12 +16,13 @@ import io.halkyon.utils.StringUtils;
 import io.quarkus.scheduler.Scheduled;
 
 /**
- * The claiming service will poll every new and pending claim to update the claim status according to the following logic:
+ * The claiming service will poll every new and pending claim to update the claim status according to the following
+ * logic:
  *
- * A claim can request a service in the form of `<service name>:<service version>`, for example: "mysql:3.6".
- * If there is a service that matches the criteria of service name, plus service version, then the claim is linked to this service.
- * Next, if this service has been found in a cluster (the service available flag is true), and there is at least one service
- * credential, then the claim status will change to "Bind"
+ * A claim can request a service in the form of `<service name>:<service version>`, for example: "mysql:3.6". If there
+ * is a service that matches the criteria of service name, plus service version, then the claim is linked to this
+ * service. Next, if this service has been found in a cluster (the service available flag is true), and there is at
+ * least one service credential, then the claim status will change to "Bind"
  *
  * Otherwise, the status will be "pending".
  *
@@ -37,19 +38,18 @@ public class UpdateClaimJob {
     @ConfigProperty(name = "servicebox.update-claim-job.max-attempts")
     int maxAttempts;
 
-
     /**
-     * This method will be executed at every `${servicebox.update-claim-job.poll-every}`.
-     * First, it will collect the list of all services, and then will loop over the new or pending claims to link
-     * the service if the criteria matches.
+     * This method will be executed at every `${servicebox.update-claim-job.poll-every}`. First, it will collect the
+     * list of all services, and then will loop over the new or pending claims to link the service if the criteria
+     * matches.
      */
     @Transactional
-    @Scheduled(every="${servicebox.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${servicebox.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
-        Claim.find("status in :statuses", Collections.singletonMap("statuses",
+        Claim.find("status in :statuses",
+                Collections.singletonMap("statuses",
                         Arrays.asList(ClaimStatus.NEW.toString(), ClaimStatus.PENDING.toString())))
-                .list()
-                .forEach(e -> updateClaim((Claim) e));
+                .list().forEach(e -> updateClaim((Claim) e));
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
@@ -75,7 +75,8 @@ public class UpdateClaimJob {
             } else if (serviceAvailable) {
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED, claim.service.name));
             } else {
-                incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
+                incrementAttempts(claim,
+                        String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
             }
         }
 
@@ -94,10 +95,8 @@ public class UpdateClaimJob {
     }
 
     private Service findService(String serviceRequested) {
-        return Service.listAll()
-                .stream()
-                .filter(s -> StringUtils.equalsIgnoreCase(s.name + "-" + s.version, serviceRequested))
-                .findFirst()
+        return Service.listAll().stream()
+                .filter(s -> StringUtils.equalsIgnoreCase(s.name + "-" + s.version, serviceRequested)).findFirst()
                 .orElse(null);
     }
 }
