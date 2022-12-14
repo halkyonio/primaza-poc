@@ -37,7 +37,7 @@ public class CredentialsPageTest {
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
         // submit credential
-        page.clickById("new-credential-button");
+        page.clickById("credential-button");
 
         // then, the new credential should be listed:
         page.goTo("/credentials");
@@ -63,6 +63,30 @@ public class CredentialsPageTest {
                 .extract().as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
+    }
+
+    @Test
+    public void testEditCredentialFromPage() {
+        // Create data
+        String prefix = "CredentialsPageTest-testEditCredentialFromPage-";
+        Service service = createService(prefix + "service", "8", "type", "demo");
+        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
+        // Go to the page
+        page.goTo("/credentials");
+        // Ensure our data is listed
+        page.assertContentContains(credential.name);
+        // Let's change the owner
+        page.clickById("btn-credential-edit-" + credential.id);
+        page.assertPathIs("/credentials/" + credential.id);
+        page.assertContentContains("Update Credential");
+        page.assertContentContains(credential.name);
+        page.type("credential_name", credential.name + "new");
+        page.clickById("credential-button");
+        // Verify the entity was properly updated:
+        page.assertContentContains("Updated successfully for id: " + credential.id);
+        // Go back to the credentials list and check whether the owner is displayed
+        page.goTo("/credentials");
+        page.assertContentContains(credential.name + "new");
     }
 
     @Test
