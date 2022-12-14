@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
-import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
@@ -90,6 +89,7 @@ public class ServicesEndpointTest {
                 .then().statusCode(409);
     }
 
+    @DisabledOnIntegrationTest
     @Test
     public void testEditServiceFromPage() {
         // Create data
