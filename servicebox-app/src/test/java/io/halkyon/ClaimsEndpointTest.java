@@ -113,7 +113,7 @@ public class ClaimsEndpointTest {
         // Let's change the owner
         page.clickById("btn-claim-edit-" + claim.id);
         page.assertPathIs("/claims/" + claim.id);
-        page.assertContentContains("Edit Claim");
+        page.assertContentContains("Update Claim");
         page.assertContentContains(claim.name);
         page.type("owner", "NEW OWNER");
         page.clickById("claim-button");

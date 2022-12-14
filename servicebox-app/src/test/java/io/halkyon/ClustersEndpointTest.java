@@ -1,5 +1,6 @@
 package io.halkyon;
 
+import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
+import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
@@ -45,6 +47,29 @@ public class ClustersEndpointTest {
                 .when().post("/clusters")
                 .then()
                 .statusCode(201);
+    }
+
+    @Test
+    public void testEditClusterFromPage() {
+        // Create data
+        String prefix = "ClustersEndpointTest-testEditClusterFromPage-";
+        Cluster cluster = createCluster(prefix + "cluster", "master:port");
+        // Go to the clusters page
+        page.goTo("/clusters");
+        // Ensure our data is listed
+        page.assertContentContains(cluster.name);
+        // Let's change the owner
+        page.clickById("btn-cluster-edit-" + cluster.id);
+        page.assertPathIs("/clusters/" + cluster.id);
+        page.assertContentContains("Update Cluster");
+        page.assertContentContains(cluster.name);
+        page.type("clusterName", cluster.name + "-new");
+        page.clickById("cluster-button");
+        // Verify the entity was properly updated:
+        page.assertContentContains("Updated successfully for id: " + cluster.id);
+        // Go back to the clusters list and check whether the owner is displayed
+        page.goTo("/clusters");
+        page.assertContentContains(cluster.name + "-new");
     }
 
     /**
