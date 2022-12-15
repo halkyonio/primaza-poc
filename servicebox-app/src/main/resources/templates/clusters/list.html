@@ -5,27 +5,10 @@
   <div class="container pt-4">
     <a href="/clusters/new" class="btn btn-info active" role="button" aria-pressed="true">New cluster</a>
     <hr>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-              <tr>
-                  <th aria-valuetext="left">Name</th>
-                  <th aria-valuetext="left">Environment</th>
-                  <th aria-valuetext="left">Excluded Namespaces</th>
-                  <th aria-valuetext="left">URL</th>
-                  <th aria-valuetext="left">Action</th>
-              </tr>
-            </thead>
-            <tbody id="cluster-list">
-              {#for cluster in clusters}
-                  <!-- Include the HTML template rendering the cluster item -->
-                  {#include clusters/item.html cluster=cluster /}
-              {/for}
-            </tbody>
-        </table>
+    <div id="cluster-table">
+      <!-- Include the HTML table template to display the clusters -->
+      {#include clusters/table.html /}
     </div>
-    <!-- Showing the number of clusters. Returned by the template key: items of ClusterResource -->
-    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
     <hr>
     <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
   </div>
