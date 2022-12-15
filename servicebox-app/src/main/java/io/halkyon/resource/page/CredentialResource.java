@@ -1,6 +1,8 @@
 package io.halkyon.resource.page;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -17,6 +19,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -28,6 +31,8 @@ import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 import io.halkyon.resource.requests.CredentialRequest;
 import io.halkyon.utils.AcceptedResponseBuilder;
+import io.halkyon.utils.FilterableQueryBuilder;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/credentials")
@@ -110,7 +115,34 @@ public class CredentialResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Credentials.list(Credential.listAll(), Credential.count());
+        return Templates.Credentials.list(Credential.listAll(), Credential.count(), Collections.emptyMap());
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/filter")
+    public Response filter(@QueryParam("name") String name, @QueryParam("service.name") String service,
+            @QueryParam("username") String username, @QueryParam("password") String password) {
+        FilterableQueryBuilder query = new FilterableQueryBuilder();
+        if (!StringUtils.isNullOrEmpty(name)) {
+            query.containsIgnoreCase("name", name);
+        }
+
+        if (!StringUtils.isNullOrEmpty(service)) {
+            query.containsIgnoreCase("service.name", service);
+        }
+
+        if (!StringUtils.isNullOrEmpty(username)) {
+            query.containsIgnoreCase("username", username);
+        }
+
+        if (!StringUtils.isNullOrEmpty(password)) {
+            query.containsIgnoreCase("password", password);
+        }
+
+        List<Credential> credentials = Credential.list(query.build(), query.getParameters());
+        return Response.ok(Templates.Credentials.table(credentials, credentials.size(), query.getFilterAsMap()))
+                .build();
     }
 
     @GET

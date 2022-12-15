@@ -41,7 +41,11 @@ public class Templates {
 
     @CheckedTemplate(basePath = "credentials", requireTypeSafeExpressions = false)
     public static class Credentials {
-        public static native TemplateInstance list(List<Credential> credentials, long items);
+        public static native TemplateInstance list(List<Credential> credentials, long items,
+                Map<String, Object> filter);
+
+        public static native TemplateInstance table(List<Credential> credentials, long items,
+                Map<String, Object> filter);
 
         public static native TemplateInstance item(Credential credential);
 
