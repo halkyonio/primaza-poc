@@ -90,11 +90,12 @@ public class BindApplicationService {
 
     private String generateUrlByClaimService(Application application, Claim claim) {
         Service service = claim.service;
-        if (application.cluster.id == service.cluster.id && Objects.equals(application.namespace, service.namespace)) {
+        if (Objects.equals(application.cluster.id, service.cluster.id)
+                && Objects.equals(application.namespace, service.namespace)) {
             // rule 1: app + service within same ns, cluster
             // -> app can access the service using: protocol://service_name:port
             return String.format("%s://%s:%s", service.getProtocol(), service.name, service.getPort());
-        } else if (application.cluster.id == service.cluster.id) {
+        } else if (Objects.equals(application.cluster.id, service.cluster.id)) {
             // rule 2: app + service in different ns, same cluster
             // -> app can access the service using: protocol://service_name.namespace:port
             return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
