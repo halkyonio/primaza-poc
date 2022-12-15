@@ -1,5 +1,6 @@
 package io.halkyon.resource.page;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +21,8 @@ import io.halkyon.Templates;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.services.BindApplicationService;
+import io.halkyon.utils.FilterableQueryBuilder;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/applications")
@@ -31,7 +35,34 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.list(applications, Application.count());
+        return Templates.Applications.list(applications, Application.count(), Collections.emptyMap());
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/filter")
+    public Response filter(@QueryParam("name") String name, @QueryParam("namespace") String namespace,
+            @QueryParam("image") String image, @QueryParam("cluster.name") String clusterName) {
+        FilterableQueryBuilder query = new FilterableQueryBuilder();
+        if (!StringUtils.isNullOrEmpty(name)) {
+            query.containsIgnoreCase("name", name);
+        }
+
+        if (!StringUtils.isNullOrEmpty(namespace)) {
+            query.containsIgnoreCase("namespace", namespace);
+        }
+
+        if (!StringUtils.isNullOrEmpty(image)) {
+            query.containsIgnoreCase("image", image);
+        }
+
+        if (!StringUtils.isNullOrEmpty(clusterName)) {
+            query.containsIgnoreCase("cluster.name", clusterName);
+        }
+
+        List<Application> applications = Application.list(query.build(), query.getParameters());
+        return Response.ok(Templates.Applications.table(applications, applications.size(), query.getFilterAsMap()))
+                .build();
     }
 
     @GET
@@ -44,14 +75,6 @@ public class ApplicationResource {
         }
 
         return application;
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    @Path("/polling")
-    public TemplateInstance pollingApplications() {
-        List<Application> applications = Application.listAll();
-        return Templates.Applications.listTable(applications, applications.size());
     }
 
     @GET

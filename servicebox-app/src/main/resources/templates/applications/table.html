@@ -1,5 +1,8 @@
-<div class="table-responsive">
-  <table class="table">
+<form id="applications_list_polling" class="form-horizontal" action="/applications/filter" hx-get="/applications/filter" hx-target="#application-table" hx-swap="innerHTML"
+      enable-polling="true"
+      hx-trigger="every 5s [document.getElementById('applications_list_polling').hasAttribute('enable-polling')],input from:#application_search_by_name,input from:#application_search_by_namespace,input from:#application_search_by_image,input from:#application_search_by_cluster">
+  <div class="table-responsive">
+    <table class="table">
       <thead>
         <tr>
             <th aria-valuetext="left">Name</th>
@@ -10,6 +13,29 @@
         </tr>
       </thead>
       <tbody id="applications-list">
+        <tr>
+          <td>
+              <input id="application_search_by_name" class="form-control" type="search" name="name"
+                     value="{#if filter.containsKey('name')}{filter.get('name')}{/if}"
+                     placeholder="Search by name ...">
+          </td>
+          <td>
+              <input id="application_search_by_namespace" class="form-control" type="search" name="namespace"
+                     value="{#if filter.containsKey('namespace')}{filter.get('namespace')}{/if}"
+                     placeholder="Search by namespace ...">
+          </td>
+          <td>
+              <input id="application_search_by_image" class="form-control" type="search" name="image"
+                     value="{#if filter.containsKey('image')}{filter.get('image')}{/if}"
+                     placeholder="Search by image ...">
+          </td>
+          <td>
+              <input id="application_search_by_cluster" class="form-control" type="search" name="cluster.name"
+                     value="{#if filter.containsKey('cluster.name')}{filter.get('cluster.name')}{/if}"
+                     placeholder="Search by cluster ...">
+          </td>
+          <td></td>
+        </tr>
         {#for application in applications}
         <tr>
             <td>{application.name}</td>
@@ -32,13 +58,14 @@
         </tr>
         {/for}
       </tbody>
-  </table>
-</div>
-<!-- Showing the number of applications. -->
-<strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-<hr>
-<a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
-<div id="app_bind_modal-container"></div>
+    </table>
+  </div>
+  <div class="container">
+    <!-- Showing the number of applications. -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+  </div>
+  <hr>
+  <div id="app_bind_modal-container"></div>
 <script>
 function stopPolling() {
    document.getElementById('applications_list_polling').removeAttribute("enable-polling");
@@ -60,3 +87,4 @@ function closeModal() {
 	}, 200)
 }
 </script>
+</form>

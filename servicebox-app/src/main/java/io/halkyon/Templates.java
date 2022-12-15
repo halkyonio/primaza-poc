@@ -65,9 +65,11 @@ public class Templates {
 
     @CheckedTemplate(basePath = "applications", requireTypeSafeExpressions = false)
     public static class Applications {
-        public static native TemplateInstance list(List<Application> applications, long items);
+        public static native TemplateInstance list(List<Application> applications, long items,
+                Map<String, Object> filter);
 
-        public static native TemplateInstance listTable(List<Application> applications, long items);
+        public static native TemplateInstance table(List<Application> applications, long items,
+                Map<String, Object> filter);
 
         public static native TemplateInstance bind(Application application, List<Claim> claims);
     }

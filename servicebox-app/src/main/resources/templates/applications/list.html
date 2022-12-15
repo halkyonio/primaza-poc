@@ -2,8 +2,13 @@
 {#include base}
   {#title}Applications{/title}
   {#body}
-  <div id="applications_list_polling" class="container pt-4" hx-get="/applications/polling" enable-polling="true" hx-trigger="every 5s [document.getElementById('applications_list_polling').hasAttribute('enable-polling')]">
-      {#include applications/listTable.html applications=applications items=items /}
+  <div class="container pt-4">
+    <div id="application-table">
+      <!-- Include the HTML table template to display the applications -->
+      {#include applications/table.html /}
+    </div>
+    <hr>
+    <a href="/" class="btn btn-info active" role="button" aria-pressed="true">Home</a>
   </div>
   {/body}
 {/include}
