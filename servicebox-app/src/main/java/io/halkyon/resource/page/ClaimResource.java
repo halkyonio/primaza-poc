@@ -1,5 +1,6 @@
 package io.halkyon.resource.page;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +33,8 @@ import io.halkyon.services.BindApplicationService;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
+import io.halkyon.utils.FilterableQueryBuilder;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/claims")
@@ -57,15 +60,33 @@ public class ClaimResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Claims.list(Claim.listAll(), Service.listAll(), Claim.count());
+        return Templates.Claims.list(Claim.listAll(), Service.listAll(), Claim.count(), Collections.emptyMap());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
-    public Response filter(@QueryParam("name") String name, @QueryParam("servicerequested") String serviceRequested) {
-        List<Claim> claims = Claim.getClaims(name, serviceRequested);
-        return Response.ok(Templates.Claims.table(claims, claims.size())).build();
+    public Response filter(@QueryParam("name") String name, @QueryParam("serviceRequested") String serviceRequested,
+            @QueryParam("owner") String owner, @QueryParam("status") String status) {
+        FilterableQueryBuilder query = new FilterableQueryBuilder();
+        if (!StringUtils.isNullOrEmpty(name)) {
+            query.containsIgnoreCase("name", name);
+        }
+
+        if (!StringUtils.isNullOrEmpty(serviceRequested)) {
+            query.containsIgnoreCase("serviceRequested", serviceRequested);
+        }
+
+        if (!StringUtils.isNullOrEmpty(owner)) {
+            query.containsIgnoreCase("owner", owner);
+        }
+
+        if (!StringUtils.isNullOrEmpty(status)) {
+            query.equals("status", status);
+        }
+
+        List<Claim> claims = Claim.list(query.build(), query.getParameters());
+        return Response.ok(Templates.Claims.table(claims, claims.size(), query.getFilterAsMap())).build();
     }
 
     @GET

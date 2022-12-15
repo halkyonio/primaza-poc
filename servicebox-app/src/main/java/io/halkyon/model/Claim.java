@@ -2,11 +2,7 @@ package io.halkyon.model;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -65,30 +61,5 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> listAvailable() {
         return find("status=:status", Collections.singletonMap("status", ClaimStatus.BIND.toString())).list();
-    }
-
-    public static List<Claim> getClaims(String name, String serviceRequested) {
-        Map<String, Object> parameters = new HashMap<>();
-        addIfNotNull(parameters, "name", name);
-        addIfNotNull(parameters, "servicerequested", serviceRequested);
-
-        if (parameters.isEmpty()) {
-            return listAll();
-        }
-
-        String query = parameters.entrySet().stream()
-                .map(entry -> "LOWER(" + entry.getKey() + ") " + "like :" + entry.getKey())
-                .collect(Collectors.joining(" AND "));
-
-        // TODO: To be reviewed in order to generate the query with multiple parameters where we could use like or not,
-        // etc
-        // String query = "name like ?1 or servicerequested = ?2";
-        return Claim.list(query, parameters);
-    }
-
-    private static void addIfNotNull(Map<String, Object> map, String key, String value) {
-        if (value != null && !value.isEmpty()) {
-            map.put(key, "%" + value.toLowerCase(Locale.ROOT) + "%");
-        }
     }
 }

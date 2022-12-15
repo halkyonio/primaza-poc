@@ -1,25 +1,58 @@
-<div class="container table-responsive">
-  <table class="table">
-    <thead>
-    <tr>
-      <th aria-valuetext="left">Name</th>
-      <th aria-valuetext="left">Description</th>
-      <th aria-valuetext="left">Owner</th>
-      <th aria-valuetext="left">Service requested</th>
-      <th aria-valuetext="left">Status</th>
-      <th aria-valuetext="left">Created</th>
-      <th aria-valuetext="left">Updated</th>
-      <th aria-valuetext="left">Action</th>
-    </tr>
-    </thead>
+<form class="form-horizontal" action="/claims/filter" hx-get="/claims/filter" hx-target="#claim-table" hx-swap="innerHTML"
+      hx-trigger="input from:#claim_search_by_name,input from:#claim_search_by_owner,input from:#claim_search_by_service,input from:#claim_search_by_status">
+  <div class="container table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th aria-valuetext="left">Name</th>
+          <th aria-valuetext="left">Description</th>
+          <th aria-valuetext="left">Owner</th>
+          <th aria-valuetext="left">Service requested</th>
+          <th aria-valuetext="left">Status</th>
+          <th aria-valuetext="left">Created</th>
+          <th aria-valuetext="left">Updated</th>
+          <th aria-valuetext="left">Action</th>
+        </tr>
+      </thead>
     <tbody>
-    {#for claim in claims}
-      {#include claims/item.html claim=claim /}
-    {/for}
-    </tbody>
-  </table>
-</div>
-<div class="container">
-  <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
-  <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-</div>
+      <tr>
+        <td>
+          <input id="claim_search_by_name" class="form-control" type="search" name="name"
+               value="{#if filter.containsKey('name')}{filter.get('name')}{/if}"
+               placeholder="Search by name ...">
+        </td>
+        <td></td>
+        <td>
+          <input id="claim_search_by_owner" class="form-control" type="search" name="owner"
+               value="{#if filter.containsKey('owner')}{filter.get('owner')}{/if}"
+               placeholder="Search by owner ...">
+        </td>
+        <td>
+          <input id="claim_search_by_service" class="form-control" type="search" name="serviceRequested"
+               value="{#if filter.containsKey('serviceRequested')}{filter.get('serviceRequested')}{/if}"
+               placeholder="Search by service requested ...">
+        </td>
+        <td>
+          <select id="claim_search_by_status" class="form-control new-service" name="status" placeholder="Select by status">
+            <option value="" {#if !filter.containsKey('status')}selected{/if}>Any</option>
+            <option value="new" {#if filter.containsKey('status') && filter.get('status').equals('new')}selected{/if}>New</option>
+            <option value="pending" {#if filter.containsKey('status') && filter.get('status').equals('pending')}selected{/if}>Pending</option>
+            <option value="bind" {#if filter.containsKey('status') && filter.get('status').equals('bind')}selected{/if}>Bind</option>
+            <option value="error" {#if filter.containsKey('status') && filter.get('status').equals('error')}selected{/if}>Error</option>
+          </select>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {#for claim in claims}
+        {#include claims/item.html claim=claim /}
+      {/for}
+      </tbody>
+    </table>
+  </div>
+  <div class="container">
+    <!-- Showing the number of claims. Returned by the template key: items of ClaimResource -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+  </div>
+</form>
