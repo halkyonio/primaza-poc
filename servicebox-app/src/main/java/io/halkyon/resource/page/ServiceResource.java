@@ -28,6 +28,7 @@ import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Service;
+import io.halkyon.resource.requests.ServiceRequest;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
@@ -54,17 +55,18 @@ public class ServiceResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@Form Service service, @HeaderParam("HX-Request") boolean hxRequest) {
-        Set<ConstraintViolation<Service>> errors = validator.validate(service);
+    public Response add(@Form ServiceRequest request, @HeaderParam("HX-Request") boolean hxRequest) {
+        Set<ConstraintViolation<ServiceRequest>> errors = validator.validate(request);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/services");
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            if (Service.count("name=?1 AND version=?2", service.name, service.version) > 0) {
+            if (Service.count("name=?1 AND version=?2", request.name, request.version) > 0) {
                 throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
             }
-
+            Service service = new Service();
+            doUpdateService(service, request);
             serviceDiscoveryJob.linkServiceInCluster(service);
             service.persist();
             response.withSuccessMessage(service.id);
@@ -91,30 +93,23 @@ public class ServiceResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response edit(@PathParam("id") Long id, @Form Service serviceRequest) throws IOException {
+    public Response edit(@PathParam("id") Long id, @Form ServiceRequest request) throws IOException {
         Service service = Service.findById(id);
         if (service == null) {
             throw new NotFoundException(String.format("Service not found for id: %d%n", id));
         }
 
-        Set<ConstraintViolation<Service>> errors = validator.validate(serviceRequest);
+        Set<ConstraintViolation<ServiceRequest>> errors = validator.validate(request);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/services/" + id);
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            if (Service.count("id != ?1 AND name=?2 AND version=?3", id, serviceRequest.name,
-                    serviceRequest.version) > 0) {
+            if (Service.count("id != ?1 AND name=?2 AND version=?3", id, request.name, request.version) > 0) {
                 throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
             }
 
-            service.name = serviceRequest.name;
-            service.version = serviceRequest.version;
-            service.type = serviceRequest.type;
-            service.database = serviceRequest.database;
-            service.endpoint = serviceRequest.endpoint;
-            service.externalEndpoint = serviceRequest.externalEndpoint;
-
+            doUpdateService(service, request);
             serviceDiscoveryJob.linkServiceInCluster(service);
             service.persist();
 
@@ -215,5 +210,14 @@ public class ServiceResource {
     public TemplateInstance pollingDiscoveredServices() {
         List<Service> discoveredServices = Service.findAvailableServices();
         return Templates.Services.listDiscoveredTable(discoveredServices).data("items", discoveredServices.size());
+    }
+
+    private void doUpdateService(Service service, ServiceRequest request) {
+        service.name = request.name;
+        service.version = request.version;
+        service.type = request.type;
+        service.database = request.database;
+        service.endpoint = request.endpoint;
+        service.externalEndpoint = request.externalEndpoint;
     }
 }

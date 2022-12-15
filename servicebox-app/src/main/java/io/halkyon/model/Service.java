@@ -17,11 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.jboss.resteasy.annotations.jaxrs.FormParam;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -36,31 +34,12 @@ public class Service extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-
-    @NotBlank(message = "Name must not be empty")
-    @FormParam
     public String name;
-
-    @NotBlank(message = "Version must not be empty")
-    @FormParam
     public String version;
-
-    @NotBlank(message = "Type must not be empty")
-    @FormParam
     public String type;
-
-    /* in form of tcp:8080 */
-    @NotBlank(message = "Service endpoint must not be empty")
-    @javax.validation.constraints.Pattern(regexp = "\\w+:\\d+", message = "Wrong format in service endpoint. It must be 'protocol:port'")
-    @FormParam
     public String endpoint;
-
-    @FormParam
     public String externalEndpoint;
-
-    @FormParam
     public String database;
-
     public String namespace;
     public Boolean available;
     @CreationTimestamp
