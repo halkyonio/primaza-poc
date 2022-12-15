@@ -16,9 +16,10 @@ public class Templates {
 
     @CheckedTemplate(basePath = "claims", requireTypeSafeExpressions = false)
     public static class Claims {
-        public static native TemplateInstance list(List<Claim> claims, List<Service> services, long items);
+        public static native TemplateInstance list(List<Claim> claims, List<Service> services, long items,
+                Map<String, Object> filter);
 
-        public static native TemplateInstance table(List<Claim> claims, long items);
+        public static native TemplateInstance table(List<Claim> claims, long items, Map<String, Object> filter);
 
         public static native TemplateInstance form(Claim claim, List<Service> services);
     }
