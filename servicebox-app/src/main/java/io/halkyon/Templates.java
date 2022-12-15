@@ -50,7 +50,9 @@ public class Templates {
 
     @CheckedTemplate(basePath = "clusters")
     public static class Clusters {
-        public static native TemplateInstance list(List<Cluster> clusters, long items);
+        public static native TemplateInstance list(List<Cluster> clusters, long items, Map<String, Object> filter);
+
+        public static native TemplateInstance table(List<Cluster> clusters, long items, Map<String, Object> filter);
 
         public static native TemplateInstance item(Cluster cluster);
 

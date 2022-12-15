@@ -1,6 +1,8 @@
 package io.halkyon.resource.page;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -16,6 +18,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -27,6 +30,8 @@ import io.halkyon.resource.requests.ClusterRequest;
 import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
+import io.halkyon.utils.FilterableQueryBuilder;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/clusters")
@@ -50,7 +55,30 @@ public class ClusterResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Clusters.list(Cluster.listAll(), Cluster.count()).data("title", "Cluster form");
+        return Templates.Clusters.list(Cluster.listAll(), Cluster.count(), Collections.emptyMap()).data("title",
+                "Cluster form");
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/filter")
+    public Response filter(@QueryParam("name") String name, @QueryParam("environment") String environment,
+            @QueryParam("url") String url, @QueryParam("status") String status) {
+        FilterableQueryBuilder query = new FilterableQueryBuilder();
+        if (!StringUtils.isNullOrEmpty(name)) {
+            query.containsIgnoreCase("name", name);
+        }
+
+        if (!StringUtils.isNullOrEmpty(environment)) {
+            query.startsWith("environment", environment);
+        }
+
+        if (!StringUtils.isNullOrEmpty(url)) {
+            query.containsIgnoreCase("url", url);
+        }
+
+        List<Cluster> clusters = Cluster.list(query.build(), query.getParameters());
+        return Response.ok(Templates.Clusters.table(clusters, clusters.size(), query.getFilterAsMap())).build();
     }
 
     @POST

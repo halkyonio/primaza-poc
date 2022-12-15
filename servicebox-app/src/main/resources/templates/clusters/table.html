@@ -1,0 +1,44 @@
+<form class="form-horizontal" action="/clusters/filter" hx-get="/clusters/filter" hx-target="#cluster-table" hx-swap="innerHTML"
+      hx-trigger="input from:#cluster_search_by_name,input from:#cluster_search_by_environment,input from:#cluster_search_by_url">
+  <div class="table-responsive">
+        <table class="table">
+            <thead>
+              <tr>
+                  <th aria-valuetext="left">Name</th>
+                  <th aria-valuetext="left">Environment</th>
+                  <th aria-valuetext="left">Excluded Namespaces</th>
+                  <th aria-valuetext="left">URL</th>
+                  <th aria-valuetext="left">Action</th>
+              </tr>
+            </thead>
+            <tbody id="cluster-list">
+              <tr>
+                <td>
+                    <input id="cluster_search_by_name" class="form-control" type="search" name="name"
+                           value="{#if filter.containsKey('name')}{filter.get('name')}{/if}"
+                           placeholder="Search by name ...">
+                </td>
+                <td>
+                    <input id="cluster_search_by_environment" class="form-control" type="search" name="environment"
+                           value="{#if filter.containsKey('environment')}{filter.get('environment')}{/if}"
+                           placeholder="Search by environment ...">
+                </td>
+                <td></td>
+                <td>
+                    <input id="cluster_search_by_url" class="form-control" type="search" name="url"
+                           value="{#if filter.containsKey('url')}{filter.get('url')}{/if}"
+                           placeholder="Search by URL ...">
+                </td>
+                <td></td>
+              </tr>
+              {#for cluster in clusters}
+                  <!-- Include the HTML template rendering the cluster item -->
+                  {#include clusters/item.html cluster=cluster /}
+              {/for}
+            </tbody>
+        </table>
+    </div>
+    <!-- Showing the number of clusters. Returned by the template key: items of ClusterResource -->
+    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+  </div>
+</form>
