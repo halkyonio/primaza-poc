@@ -54,13 +54,14 @@ public class ClaimResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance claim() {
-        return Templates.Claims.form(new Claim(), Service.listAll()).data("title", "Claim form");
+        return Templates.Claims.form("Claim form", new Claim(), Service.listAll());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Claims.list(Claim.listAll(), Service.listAll(), Claim.count(), Collections.emptyMap());
+        return Templates.Claims.list("Claims", Claim.listAll(), Service.listAll(), Claim.count(),
+                Collections.emptyMap());
     }
 
     @GET
@@ -131,13 +132,13 @@ public class ClaimResource {
     @Path("/{id:[0-9]+}")
     @Consumes(MediaType.TEXT_HTML)
     @Produces(MediaType.TEXT_HTML)
-    public Object edit(@PathParam("id") Long id) {
+    public TemplateInstance edit(@PathParam("id") Long id) {
         Claim claim = Claim.findById(id);
         if (claim == null) {
             throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
         }
 
-        return Templates.Claims.form(claim, Service.listAll());
+        return Templates.Claims.form("Claim " + id + " form", claim, Service.listAll());
     }
 
     @PUT

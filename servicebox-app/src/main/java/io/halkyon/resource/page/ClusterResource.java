@@ -49,14 +49,13 @@ public class ClusterResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newClusterForm() {
-        return Templates.Clusters.form(new Cluster()).data("title", "Cluster form");
+        return Templates.Clusters.form("Cluster form", new Cluster());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Clusters.list(Cluster.listAll(), Cluster.count(), Collections.emptyMap()).data("title",
-                "Cluster form");
+        return Templates.Clusters.list("Clusters", Cluster.listAll(), Cluster.count(), Collections.emptyMap());
     }
 
     @GET
@@ -112,7 +111,7 @@ public class ClusterResource {
         if (cluster == null) {
             throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
         }
-        return Templates.Clusters.form(cluster);
+        return Templates.Clusters.form("Cluster " + id + " form", cluster);
     }
 
     @PUT

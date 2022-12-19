@@ -45,7 +45,7 @@ public class CredentialResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance newCredential() {
-        return Templates.Credentials.form(new Credential(), Service.listAll()).data("title", "Credential form");
+        return Templates.Credentials.form("Credential form", new Credential(), Service.listAll());
     }
 
     @POST
@@ -84,7 +84,7 @@ public class CredentialResource {
         if (credential == null) {
             throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
         }
-        return Templates.Credentials.form(credential, Service.listAll());
+        return Templates.Credentials.form("Credential " + id + " form", credential, Service.listAll());
     }
 
     @PUT
@@ -115,7 +115,8 @@ public class CredentialResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Credentials.list(Credential.listAll(), Credential.count(), Collections.emptyMap());
+        return Templates.Credentials.list("Credentials", Credential.listAll(), Credential.count(),
+                Collections.emptyMap());
     }
 
     @GET

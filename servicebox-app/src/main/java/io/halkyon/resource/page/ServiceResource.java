@@ -48,7 +48,7 @@ public class ServiceResource {
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance service() {
-        return Templates.Services.form(new Service()).data("title", "Service form");
+        return Templates.Services.form("Service form", new Service());
     }
 
     @POST
@@ -85,7 +85,7 @@ public class ServiceResource {
         if (service == null) {
             throw new NotFoundException(String.format("Service not found for id: %d%n", id));
         }
-        return Templates.Services.form(service);
+        return Templates.Services.form("Service " + id + " form", service);
     }
 
     @PUT
@@ -132,7 +132,7 @@ public class ServiceResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
-        return Templates.Services.list(Service.listAll(), Service.count(), Collections.emptyMap());
+        return Templates.Services.list("Services", Service.listAll(), Service.count(), Collections.emptyMap());
     }
 
     @GET
@@ -200,7 +200,7 @@ public class ServiceResource {
     @Path("/discovered")
     public TemplateInstance listDiscoveredServices() {
         List<Service> discoveredServices = Service.findAvailableServices();
-        return Templates.Services.listDiscovered(discoveredServices).data("items", discoveredServices.size());
+        return Templates.Services.listDiscovered("Services available", discoveredServices, discoveredServices.size());
     }
 
     @GET
@@ -209,7 +209,7 @@ public class ServiceResource {
     @Path("/discovered/polling")
     public TemplateInstance pollingDiscoveredServices() {
         List<Service> discoveredServices = Service.findAvailableServices();
-        return Templates.Services.listDiscoveredTable(discoveredServices).data("items", discoveredServices.size());
+        return Templates.Services.listDiscoveredTable(discoveredServices, discoveredServices.size());
     }
 
     private void doUpdateService(Service service, ServiceRequest request) {

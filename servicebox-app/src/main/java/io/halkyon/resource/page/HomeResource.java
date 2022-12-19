@@ -18,6 +18,6 @@ public class HomeResource {
     @GET
     @Path("/home")
     public TemplateInstance home() {
-        return Templates.Index.home().data("title", "Home page");
+        return Templates.Index.home();
     }
 }
