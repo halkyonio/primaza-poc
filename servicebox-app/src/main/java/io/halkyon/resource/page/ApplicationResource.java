@@ -35,7 +35,7 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance list() {
         List<Application> applications = Application.listAll();
-        return Templates.Applications.list(applications, Application.count(), Collections.emptyMap());
+        return Templates.Applications.list("Applications", applications, Application.count(), Collections.emptyMap());
     }
 
     @GET
@@ -81,8 +81,7 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/bind/{id}")
     public TemplateInstance bindApplicationModal(@PathParam("id") long applicationId) {
-        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable()).data("claims",
-                Claim.listAll());
+        return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable());
     }
 
     @Transactional
