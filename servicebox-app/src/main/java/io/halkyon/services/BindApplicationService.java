@@ -2,7 +2,6 @@ package io.halkyon.services;
 
 import static io.halkyon.utils.StringUtils.getHostFromUrl;
 import static io.halkyon.utils.StringUtils.getPortFromUrl;
-import static io.halkyon.utils.StringUtils.removeSchemeFromUrl;
 import static io.halkyon.utils.StringUtils.toBase64;
 
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import io.halkyon.model.Service;
 public class BindApplicationService {
 
     public static final String TYPE_KEY = "type";
-    public static final String URI_KEY = "uri";
     public static final String URL_KEY = "url";
     public static final String HOST_KEY = "host";
     public static final String PORT_KEY = "port";
@@ -66,7 +64,6 @@ public class BindApplicationService {
     private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));
-        secretData.put(URI_KEY, toBase64(removeSchemeFromUrl(url)));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
         secretData.put(PORT_KEY, toBase64(getPortFromUrl(url)));
         secretData.put(URL_KEY, toBase64(url));

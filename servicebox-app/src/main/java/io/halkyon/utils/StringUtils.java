@@ -8,11 +8,6 @@ public final class StringUtils {
     private StringUtils() {
     }
 
-    public static String removeSchemeFromUrl(String URL) {
-        URI uri = URI.create(URL);
-        return uri.getHost() + ":" + uri.getPort();
-    }
-
     public static String getHostFromUrl(String URL) {
         URI uri = URI.create(URL);
         return uri.getHost();
