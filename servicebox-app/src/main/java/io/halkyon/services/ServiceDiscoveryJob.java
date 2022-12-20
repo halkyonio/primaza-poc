@@ -11,6 +11,7 @@ import org.jboss.logging.Logger;
 
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
+import io.halkyon.utils.StringUtils;
 import io.quarkus.scheduler.Scheduled;
 
 /**
@@ -76,17 +77,28 @@ public class ServiceDiscoveryJob {
     }
 
     private boolean updateServiceIfFoundInCluster(Service service, Cluster cluster) {
-        Optional<io.fabric8.kubernetes.api.model.Service> serviceInCluster = getServiceInCluster(service, cluster);
-        if (serviceInCluster.isPresent()) {
+        return getServiceInCluster(service, cluster).map(s -> {
             service.available = true;
             service.cluster = cluster;
-            service.namespace = serviceInCluster.get().getMetadata().getNamespace();
+            service.namespace = s.getMetadata().getNamespace();
+            findExternalIpFromService(s).ifPresent(ip -> service.externalIp = ip);
             cluster.services.add(service);
-
             return true;
+        }).orElse(false);
+    }
+
+    private Optional<String> findExternalIpFromService(io.fabric8.kubernetes.api.model.Service s) {
+        if (s.getStatus() == null || s.getStatus().getLoadBalancer() == null
+                || s.getStatus().getLoadBalancer().getIngress() == null) {
+            return Optional.empty();
         }
 
-        return false;
+        // IP detection rules:
+        // 1.- Try Ingress IP
+        // 2.- Try Ingress Hostname
+        return s.getStatus().getLoadBalancer().getIngress().stream()
+                .map(ingress -> StringUtils.defaultIfBlank(ingress.getIp(), ingress.getHostname()))
+                .filter(StringUtils::isNotEmpty).findFirst();
     }
 
     private Optional<io.fabric8.kubernetes.api.model.Service> getServiceInCluster(Service service, Cluster cluster) {

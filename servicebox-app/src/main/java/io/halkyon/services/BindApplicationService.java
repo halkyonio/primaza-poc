@@ -97,8 +97,12 @@ public class BindApplicationService {
             // -> app can access the service using: protocol://service_name.namespace:port
             return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
                     service.getPort());
+        } else if (!Objects.equals(application.cluster.id, service.cluster.id) && service.externalIp != null) {
+            // rule 3: app + service running in another cluster
+            // -> app can access the service using: protocol://service-external-ip:port
+            return String.format("%s://%s:%s", service.getProtocol(), service.externalIp, service.getPort());
         }
-        // TODO: rule 3: app + service running in another cluster. https://github.com/halkyonio/primaza-poc/issues/134
+
         // TODO: rule 4: app + service running on a standalone machine.
         // https://github.com/halkyonio/primaza-poc/discussions/135
 
