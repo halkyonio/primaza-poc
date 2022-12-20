@@ -163,6 +163,70 @@ public class ApplicationsPageTest {
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
     }
 
+    @Test
+    public void testBindApplicationUsingServiceFromAnotherCluster() {
+        pauseScheduler();
+        // names
+        String prefix = "ApplicationsPageTest.testBindApplicationUsingServiceFromAnotherCluster.";
+        String clusterNameOfApplication = prefix + "cluster-app";
+        String clusterNameOfService = prefix + "cluster-svc";
+        String claimName = prefix + "claim";
+        String serviceName = prefix + "service";
+        String credentialName = prefix + "credential";
+        String appName = prefix + "app";
+        String externalServiceIp = serviceName + "ip";
+
+        // mock data
+        configureMockServiceWithIngressFor(clusterNameOfService, "testbind", "1111", "ns1", externalServiceIp);
+        configureMockApplicationFor(clusterNameOfApplication, appName, "image2", "ns1");
+
+        // create data
+        Service service = createService(serviceName, "version", "type", "demo", "testbind:1111");
+        createCredential(credentialName, service.id, "user1", "pass1");
+        createCluster(clusterNameOfService, "host:port");
+        createCluster(clusterNameOfApplication, "host:port");
+        serviceDiscoveryJob.execute(); // this action will change the service to available
+        createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.execute(); // this action will link the claim with the above service
+        // test the job to find applications
+        applicationDiscoveryJob.execute();
+        // now the deployment should be listed in the page
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(appName);
+        });
+        // click on bind button
+        Application app = findApplicationByName(appName);
+        page.clickById("btn-application-bind-" + app.id);
+        // modal should be displayed
+        page.assertContentContains("Bind Application " + appName);
+        // select our claim
+        page.select("application_bind_claim", claimName);
+        // click on bind
+        page.clickById("application-bind-button");
+
+        // Verify the Claim has been updated with service credential and url
+        Claim actualClaim = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then()
+                .statusCode(200).extract().as(Claim.class);
+
+        assertNotNull(actualClaim.credential);
+        assertEquals("user1", actualClaim.credential.username);
+        assertEquals("pass1", actualClaim.credential.password);
+
+        // protocol://externalServiceIp:port
+        assertNotNull(actualClaim.url);
+        String expectedUrl = "testbind://" + externalServiceIp + ":1111";
+        assertEquals(expectedUrl, actualClaim.url);
+
+        // then secret should have been generated
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
+                argThat(new ApplicationNameMatcher(appName)), argThat(new ClaimNameMatcher(claimName)),
+                argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
+        // and application should have been rolled out.
+        verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
+    }
+
     private void configureMockApplicationWithEmptyFor(Cluster cluster) {
         Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(cluster.name))))
                 .thenReturn(Collections.emptyList());
@@ -178,10 +242,22 @@ public class ApplicationsPageTest {
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
             String serviceNamespace) {
+        configureMockServiceFor(clusterName, protocol, servicePort,
+                new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata());
+    }
+
+    private void configureMockServiceWithIngressFor(String clusterName, String protocol, String servicePort,
+            String serviceNamespace, String serviceExternalIp) {
+        configureMockServiceFor(clusterName, protocol, servicePort,
+                new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().withNewStatus()
+                        .withNewLoadBalancer().addNewIngress().withIp(serviceExternalIp).endIngress().endLoadBalancer()
+                        .endStatus());
+    }
+
+    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
+            ServiceBuilder serviceBuilder) {
         Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
-                eq(protocol), eq(servicePort)))
-                .thenReturn(Optional.of(
-                        new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().build()));
+                eq(protocol), eq(servicePort))).thenReturn(Optional.of(serviceBuilder.build()));
     }
 
     private void pauseScheduler() {

@@ -30,11 +30,19 @@ public final class StringUtils {
         }
     }
 
+    public static boolean isNotEmpty(String str) {
+        return !isNullOrEmpty(str);
+    }
+
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
 
     public static String toBase64(String paramValue) {
         return Base64.getEncoder().encodeToString(paramValue.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String defaultIfBlank(String str, String defaultValue) {
+        return isNullOrEmpty(str) ? defaultValue : str;
     }
 }
