@@ -51,7 +51,7 @@ public class UpdateClaimJobTest {
         // with status "new" and attempts set to 1)
         // When we run the job once:
         // Then:
-        // - the claim "PostgresSQL" should change from "new" to "pending", attempts still to 1
+        // - the claim "PostgresSQL" should change from "new" to "bind", attempts still to 1
         // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should
         // increase the attempts to 2
 
@@ -72,7 +72,7 @@ public class UpdateClaimJobTest {
 
         // When we repeat running the job again until reaching the maxAttempts:
         // Then:
-        // - the claim "PostgresSQL" should not change (it's already binded)
+        // - the claim "PostgresSQL" should not change (it's already bound)
         // - the claim "mysql-demo" should increase the attempts to 3 and status is still Pending.
         // We iterate from the number of attempts until the max attempts just for checking the "PENDING" status.
         for (int attempt = 2; attempt < maxAttempts; attempt++) {
