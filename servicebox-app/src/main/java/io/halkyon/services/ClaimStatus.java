@@ -4,10 +4,10 @@ public enum ClaimStatus {
     // When claim is created
     NEW,
     // When claim is waiting for the service requested to be linked and available.
-    PENDING,
+    BINDABLE,
     // When claim has a matching service that has been found in a cluster and also has at least one credential
     // installed.
-    BIND,
+    BOUND,
     // When the claim exceeded the attempts to find an available service.
     ERROR;
 

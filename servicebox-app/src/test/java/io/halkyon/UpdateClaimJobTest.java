@@ -59,14 +59,14 @@ public class UpdateClaimJobTest {
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(postgresqlClaim.name, actualPostgresql.name);
-        assertEquals(ClaimStatus.BIND.toString(), actualPostgresql.status);
+        assertEquals(ClaimStatus.BOUND.toString(), actualPostgresql.status);
         assertEquals(1, actualPostgresql.attempts);
 
         Claim actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name)
                 .then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
-        assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
+        assertEquals(ClaimStatus.BINDABLE.toString(), actualMysql.status);
         assertEquals(2, actualMysql.attempts);
 
         // When we repeat running the job again until reaching the maxAttempts:
@@ -80,14 +80,14 @@ public class UpdateClaimJobTest {
                     .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
             assertEquals(postgresqlClaim.name, actualPostgresql.name);
-            assertEquals(ClaimStatus.BIND.toString(), actualPostgresql.status);
+            assertEquals(ClaimStatus.BOUND.toString(), actualPostgresql.status);
             assertEquals(1, actualPostgresql.attempts);
 
             actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name).then()
                     .statusCode(200).extract().as(Claim.class);
 
             assertEquals(mySqlClaim.name, actualMysql.name);
-            assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
+            assertEquals(ClaimStatus.BINDABLE.toString(), actualMysql.status);
             assertEquals(3, actualMysql.attempts);
 
         }
@@ -116,7 +116,7 @@ public class UpdateClaimJobTest {
                 .formParam("name", "Oracle1").formParam("serviceRequested", "oracle-1234")
                 .formParam("description", "Description").when().post("/claims").then().statusCode(201);
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/Oracle1").then().statusCode(200)
-                .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
+                .body("status", is(ClaimStatus.BINDABLE.toString())).body("attempts", is(1));
     }
 
     private void pauseScheduler() {
