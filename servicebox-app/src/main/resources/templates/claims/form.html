@@ -29,17 +29,21 @@
              </div>
          </div>
          <div class="form-group">
-             <label class="control-label col-sm-2" for="claim_service" >Service requested:</label>
+             <label class="control-label col-sm-2" for="claim_service" >Find a service to claim:</label>
              <div class="col-sm-5">
-               <select id="claim_service" class="form-control new-credential" name="serviceRequested" required placeholder="Select the service to claim">
-               {#for service in services}
-                   {#if claim.service && claim.service.id == service.id}
-                     <option value="{service.name}-{service.version}" selected>{service.name}-{service.version}</option>
-                   {#else}
-                     <option value="{service.name}-{service.version}">{service.name}-{service.version}</option>
-                   {/if}
-               {/for}
-               </select>
+                 <select id="claim_service" class="form-control new-credential" name="serviceId" placeholder="Select the service to claim">
+                     <option value=""></option>
+                     {#for service in services}
+                     <option value="{service.id}" {#if claim.service && claim.service.id == service.id}selected{/if}>{service.name} ({service.version})</option>
+                     {/for}
+                 </select>
+             </div>
+             <label class="control-label col-sm-2" for="claim_service" >... or type a service to request:</label>
+             <div class="col-sm-5">
+                 <input class="form-control new-claim" type="text"
+                        {#if !claim.service}value="{#if claim.serviceRequested}{claim.serviceRequested}{/if}"{/if}
+                        name="serviceRequested"
+                        placeholder="<service name>-<service version>">
              </div>
          </div>
          </br>
