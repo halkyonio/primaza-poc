@@ -114,13 +114,7 @@ public class ClaimResource {
             response.withErrors(errors);
         } else {
             Claim claim = new Claim();
-            claim.name = claimRequest.name;
-            claim.owner = claimRequest.owner;
-            claim.description = claimRequest.description;
-            claim.serviceRequested = claimRequest.serviceRequested;
-            claim.status = ClaimStatus.NEW.toString();
-
-            claimingService.updateClaim(claim);
+            doUpdateClaim(claim, claimRequest);
             response.withSuccessMessage(claim.id);
         }
 
@@ -158,13 +152,7 @@ public class ClaimResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            claim.name = claimRequest.name;
-            claim.owner = claimRequest.owner;
-            claim.description = claimRequest.description;
-            claim.serviceRequested = claimRequest.serviceRequested;
-            claim.status = ClaimStatus.NEW.toString();
-
-            claimingService.updateClaim(claim);
+            doUpdateClaim(claim, claimRequest);
             response.withUpdateSuccessMessage(claim.id);
         }
 
@@ -182,6 +170,21 @@ public class ClaimResource {
         }
         Claim.deleteById(id);
         return list();
+    }
+
+    private void doUpdateClaim(Claim claim, ClaimRequest request) {
+        claim.name = request.name;
+        claim.owner = request.owner;
+        claim.description = request.description;
+        if (StringUtils.isNotEmpty(request.serviceId)) {
+            claim.service = Service.findById(Long.parseLong(request.serviceId));
+        } else if (StringUtils.isNotEmpty(request.serviceRequested)) {
+            claim.serviceRequested = request.serviceRequested;
+        }
+
+        claim.status = ClaimStatus.NEW.toString();
+
+        claimingService.updateClaim(claim);
     }
 
 }
