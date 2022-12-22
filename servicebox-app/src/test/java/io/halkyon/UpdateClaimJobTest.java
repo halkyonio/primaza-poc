@@ -2,6 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
+import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -66,7 +67,7 @@ public class UpdateClaimJobTest {
                 .then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
-        assertEquals(ClaimStatus.BINDABLE.toString(), actualMysql.status);
+        assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
         assertEquals(2, actualMysql.attempts);
 
         // When we repeat running the job again until reaching the maxAttempts:
@@ -87,7 +88,7 @@ public class UpdateClaimJobTest {
                     .statusCode(200).extract().as(Claim.class);
 
             assertEquals(mySqlClaim.name, actualMysql.name);
-            assertEquals(ClaimStatus.BINDABLE.toString(), actualMysql.status);
+            assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
             assertEquals(3, actualMysql.attempts);
 
         }
@@ -116,7 +117,44 @@ public class UpdateClaimJobTest {
                 .formParam("name", "Oracle1").formParam("serviceRequested", "oracle-1234")
                 .formParam("description", "Description").when().post("/claims").then().statusCode(201);
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/Oracle1").then().statusCode(200)
-                .body("status", is(ClaimStatus.BINDABLE.toString())).body("attempts", is(1));
+                .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
+    }
+
+    @Test
+    public void testShouldHaveBindableStatus() {
+        pauseScheduler();
+        // Given a service running in the cluster (available=true) for which there is no credential
+        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port",
+                mockKubernetesClientService, "protocol", "9999");
+        createService("ShouldHaveBindableStatusService", "8", "postgresql", "demo", "protocol:9999");
+
+        // When it's claimed
+        Claim postgresqlClaim = createClaim("ShouldHaveBindableStatusClaim", "ShouldHaveBindableStatusService-8");
+        job.execute();
+
+        // Then a claim is created with status=BINDABLE
+        Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
+
+        assertEquals(ClaimStatus.BINDABLE.toString(), actualPostgresql.status);
+
+    }
+
+    @Test
+    public void testShouldHavePendingStatus() {
+        pauseScheduler();
+
+        // Given a claim for which there is no service running
+        Claim postgresqlClaim = createClaim("ShouldHavePendingStatusClaim", "ShouldHavePendingStatusService-8");
+
+        // When job runs
+        job.execute();
+
+        // Claim status is updated to Pending
+        Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
+                .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
+        assertEquals(ClaimStatus.PENDING.toString(), actualPostgresql.status);
+
     }
 
     private void pauseScheduler() {

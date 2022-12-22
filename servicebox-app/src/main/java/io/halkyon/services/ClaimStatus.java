@@ -4,6 +4,8 @@ public enum ClaimStatus {
     // When claim is created
     NEW,
     // When claim is waiting for the service requested to be linked and available.
+    PENDING,
+    // When claim is linked to a service, claim.service!=null
     BINDABLE,
     // When claim has a matching service that has been found in a cluster and also has at least one credential
     // installed.

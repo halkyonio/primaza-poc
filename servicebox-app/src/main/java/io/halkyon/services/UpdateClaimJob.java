@@ -47,7 +47,7 @@ public class UpdateClaimJob {
     public void execute() {
         Claim.find("status in :statuses",
                 Collections.singletonMap("statuses",
-                        Arrays.asList(ClaimStatus.NEW.toString(), ClaimStatus.BINDABLE.toString())))
+                        Arrays.asList(ClaimStatus.NEW.toString(), ClaimStatus.PENDING.toString())))
                 .list().forEach(e -> updateClaim((Claim) e));
     }
 
@@ -59,6 +59,7 @@ public class UpdateClaimJob {
                 claim.type = service.type;
                 claim.service = service;
             } else {
+                claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_SERVICE_REGISTERED, claim.serviceRequested));
                 claim.persist();
                 return;
@@ -71,8 +72,10 @@ public class UpdateClaimJob {
             if (claim.service.available && hasCredentials) {
                 claim.status = ClaimStatus.BOUND.toString();
             } else if (serviceAvailable) {
+                claim.status = ClaimStatus.BINDABLE.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED, claim.service.name));
             } else {
+                claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim,
                         String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
             }
@@ -87,7 +90,7 @@ public class UpdateClaimJob {
             claim.status = ClaimStatus.ERROR.toString();
             claim.errorMessage = errorMessage + " after " + maxAttempts + " attempts";
         } else {
-            claim.status = ClaimStatus.BINDABLE.toString();
+            // claim.status = ClaimStatus.PENDING.toString();
             claim.attempts = attempts + 1;
         }
     }
