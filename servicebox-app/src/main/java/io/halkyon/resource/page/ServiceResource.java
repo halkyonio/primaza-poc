@@ -139,8 +139,8 @@ public class ServiceResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
     public Response filter(@QueryParam("name") String name, @QueryParam("version") String version,
-            @QueryParam("type") String type, @QueryParam("database") String database,
-            @QueryParam("endpoint") String endpoint, @QueryParam("available") String available) {
+            @QueryParam("type") String type, @QueryParam("endpoint") String endpoint,
+            @QueryParam("available") String available) {
         FilterableQueryBuilder query = new FilterableQueryBuilder();
         if (!StringUtils.isNullOrEmpty(name)) {
             query.containsIgnoreCase("name", name);
@@ -152,10 +152,6 @@ public class ServiceResource {
 
         if (!StringUtils.isNullOrEmpty(type)) {
             query.startsWith("type", type);
-        }
-
-        if (!StringUtils.isNullOrEmpty(database)) {
-            query.containsIgnoreCase("database", database);
         }
 
         if (!StringUtils.isNullOrEmpty(endpoint)) {
@@ -216,7 +212,6 @@ public class ServiceResource {
         service.name = request.name;
         service.version = request.version;
         service.type = request.type;
-        service.database = request.database;
         service.endpoint = request.endpoint;
         service.externalEndpoint = request.externalEndpoint;
     }

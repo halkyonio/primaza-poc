@@ -38,24 +38,22 @@ public final class TestUtils {
                 .statusCode(200).extract().as(Cluster.class);
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String serviceType,
-            String database) {
-        return createService(serviceName, serviceVersion, serviceType, database, "tcp:5672");
+    public static Service createService(String serviceName, String serviceVersion, String serviceType) {
+        return createService(serviceName, serviceVersion, serviceType, "tcp:5672");
     }
 
     public static Service createServiceWithCredential(String serviceName, String serviceVersion, String serviceType,
-            String database, String endpoint) {
-        Service service = createService(serviceName, serviceVersion, serviceType, database, endpoint);
+            String endpoint) {
+        Service service = createService(serviceName, serviceVersion, serviceType, endpoint);
         createCredential(serviceName + "-credential", service.id, "username", "password");
         return service;
     }
 
-    public static Service createService(String serviceName, String serviceVersion, String serviceType, String database,
+    public static Service createService(String serviceName, String serviceVersion, String serviceType,
             String endpoint) {
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", serviceName).formParam("version", serviceVersion).formParam("type", serviceType)
-                .formParam("database", database).formParam("endpoint", endpoint).when().post("/services").then()
-                .statusCode(201);
+                .formParam("endpoint", endpoint).when().post("/services").then().statusCode(201);
 
         Service service = given().contentType(MediaType.APPLICATION_JSON)
                 .get("/services/name/" + serviceName + "/version/" + serviceVersion).then().statusCode(200).extract()
@@ -66,8 +64,7 @@ public final class TestUtils {
     public static Claim createClaim(String claimName, String serviceRequested) {
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", claimName).formParam("serviceRequested", serviceRequested).formParam("status", "new")
-                .formParam("description", "claim for testing purposes").when().post("/claims").then().log().ifError()
-                .log().all().statusCode(201);
+                .formParam("description", "claim for testing purposes").when().post("/claims").then().statusCode(201);
         return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 

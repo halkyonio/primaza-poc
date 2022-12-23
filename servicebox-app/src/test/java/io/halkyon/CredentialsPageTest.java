@@ -21,7 +21,7 @@ public class CredentialsPageTest {
 
     @Test
     public void testCreateNewCredential() {
-        createService("postgresql-credential1", "8", "postgresql", "demo");
+        createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
         // add param a=1
         page.type("new-param-name", "a");
@@ -63,7 +63,7 @@ public class CredentialsPageTest {
     public void testEditCredentialFromPage() {
         // Create data
         String prefix = "CredentialsPageTest-testEditCredentialFromPage-";
-        Service service = createService(prefix + "service", "8", "type", "demo");
+        Service service = createService(prefix + "service", "8", "type");
         Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
         // Go to the page
         page.goTo("/credentials");
@@ -86,7 +86,7 @@ public class CredentialsPageTest {
     @Test
     public void testDeleteCredential() {
         String prefix = "CredentialsPageTest-testDeleteCredential-";
-        Service service = createService(prefix + "service", "8", "postgresql", "demo");
+        Service service = createService(prefix + "service", "8", "postgresql");
         Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
 
         // When, we go to the credentials page

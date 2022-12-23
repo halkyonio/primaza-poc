@@ -7,7 +7,6 @@
             <th aria-valuetext="left">Name</th>
             <th aria-valuetext="left">Version</th>
             <th aria-valuetext="left">Type</th>
-            <th aria-valuetext="left">Database</th>
             <th aria-valuetext="left">Endpoint</th>
             <th aria-valuetext="left">Available</th>
             <th aria-valuetext="left">Action</th>
@@ -29,11 +28,6 @@
                 <input id="service_search_by_type" class="form-control" type="search" name="type"
                        value="{#if filter.containsKey('type')}{filter.get('type')}{/if}"
                        placeholder="Search by type ...">
-            </td>
-            <td>
-                <input id="service_search_by_database" class="form-control" type="search" name="database"
-                       value="{#if filter.containsKey('database')}{filter.get('database')}{/if}"
-                       placeholder="Search by database ...">
             </td>
             <td>
                 <input id="service_search_by_endpoint" class="form-control" type="search" name="endpoint"

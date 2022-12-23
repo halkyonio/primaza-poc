@@ -23,6 +23,4 @@ public class ServiceRequest {
     public String endpoint;
     @FormParam
     public String externalEndpoint;
-    @FormParam
-    public String database;
 }

@@ -39,7 +39,6 @@ public class Service extends PanacheEntityBase {
     public String type;
     public String endpoint;
     public String externalEndpoint;
-    public String database;
     public String namespace;
     /**
      * Auto-populated property that is resolved using the Ingress resource from the Kubernetes Service.

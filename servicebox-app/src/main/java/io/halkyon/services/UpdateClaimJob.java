@@ -57,7 +57,6 @@ public class UpdateClaimJob {
             Service service = findService(claim.serviceRequested);
             if (service != null) {
                 claim.type = service.type;
-                claim.database = service.database;
                 claim.service = service;
             } else {
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_SERVICE_REGISTERED, claim.serviceRequested));
