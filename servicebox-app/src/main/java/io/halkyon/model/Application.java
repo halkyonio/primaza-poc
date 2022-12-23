@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
@@ -18,6 +19,9 @@ public class Application extends PanacheEntity {
     @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
+
+    @OneToOne(mappedBy = "application")
+    public Claim claim;
 
     public static Application findByName(String name) {
         return find("name", name).firstResult();

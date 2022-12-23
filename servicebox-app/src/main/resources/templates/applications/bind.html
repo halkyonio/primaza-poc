@@ -6,7 +6,7 @@
                 <h5 class="modal-title">Bind Application {application.name}</h5>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" action="/applications/bind/{application.id}" hx-post="/applications/bind/{application.id}" hx-target="#response" method="POST" hx-swap="innerHTML">
+                <form class="form-horizontal" action="/applications/claim/{application.id}" hx-post="/applications/claim/{application.id}" hx-target="#response" method="POST" hx-swap="innerHTML">
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="application_bind_claim">Claim:</label>
                         <div class="col-sm-5">

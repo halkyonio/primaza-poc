@@ -165,8 +165,8 @@ public class ClaimResource {
     @Transactional
     public TemplateInstance delete(@PathParam("id") Long id) {
         Claim claim = Claim.findById(id);
-        if (claim.applicationId != null) {
-            bindService.unBindApplication(Application.findById(claim.applicationId), claim);
+        if (claim.application != null) {
+            bindService.unBindApplication(Application.findById(claim.application.id), claim);
         }
         Claim.deleteById(id);
         return list();
