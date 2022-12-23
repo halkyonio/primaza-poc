@@ -42,6 +42,7 @@ public class BindApplicationService {
         String url = generateUrlByClaimService(application, claim);
         claim.credential = credential;
         claim.url = url;
+        claim.status = ClaimStatus.BOUND.toString();
         claim.persist();
         if (credential != null && url != null) {
             // scenario is supported
