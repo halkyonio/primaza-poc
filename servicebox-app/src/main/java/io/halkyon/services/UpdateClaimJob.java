@@ -69,13 +69,14 @@ public class UpdateClaimJob {
         if (claim.service != null) {
             boolean serviceAvailable = claim.service.available;
             boolean hasCredentials = claim.service.credentials.size() > 0;
+            if (claim.type == null) {
+                claim.type = claim.service.type;
+            }
             if (claim.service.available && hasCredentials) {
                 claim.status = ClaimStatus.BINDABLE.toString();
             } else if (serviceAvailable) {
-                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED, claim.service.name));
             } else {
-                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim,
                         String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
             }
