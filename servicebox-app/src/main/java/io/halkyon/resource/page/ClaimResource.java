@@ -1,7 +1,9 @@
 package io.halkyon.resource.page;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -23,6 +25,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
@@ -41,6 +44,9 @@ import io.quarkus.qute.TemplateInstance;
 
 @Path("/claims")
 public class ClaimResource {
+
+    private static final Logger LOG = Logger.getLogger(ClaimResource.class);
+
     private final Validator validator;
     private final UpdateClaimJob claimingService;
     private final BindApplicationService bindService;
@@ -55,8 +61,13 @@ public class ClaimResource {
     @GET
     @Path("/new")
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance claim() {
-        return Templates.Claims.form("Claim form", new Claim(), Service.listAll());
+    public TemplateInstance claim(@QueryParam("applicationId") Long applicationId) {
+        Map<String, Object> optional = new HashMap<>();
+        if (applicationId != null) {
+            optional.put("applicationId", applicationId);
+        }
+
+        return Templates.Claims.form("Claim form", new Claim(), Service.listAll(), optional);
     }
 
     @GET
@@ -116,7 +127,9 @@ public class ClaimResource {
             response.withErrors(errors);
         } else {
             Claim claim = new Claim();
+
             doUpdateClaim(claim, claimRequest);
+
             response.withSuccessMessage(claim.id);
         }
 
@@ -134,7 +147,7 @@ public class ClaimResource {
             throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
         }
 
-        return Templates.Claims.form("Claim " + id + " form", claim, Service.listAll());
+        return Templates.Claims.form("Claim " + id + " form", claim, Service.listAll(), Collections.emptyMap());
     }
 
     @PUT
@@ -169,7 +182,7 @@ public class ClaimResource {
         Claim claim = Claim.findById(id);
         try {
             if (claim.application != null) {
-                bindService.unBindApplication(Application.findById(claim.application.id), claim);
+                bindService.unBindApplication(claim);
             }
             Claim.deleteById(id);
             return list();
@@ -191,7 +204,19 @@ public class ClaimResource {
 
         claim.status = ClaimStatus.NEW.toString();
 
+        if (request.applicationId != null) {
+            claim.application = Application.findById(request.applicationId);
+        }
+
         claimingService.updateClaim(claim);
+
+        if (claim.service != null && claim.service.credentials != null && claim.application != null) {
+            try {
+                bindService.bindApplication(claim);
+            } catch (ClusterConnectException e) {
+                LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
+            }
+        }
     }
 
 }

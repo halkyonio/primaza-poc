@@ -31,40 +31,39 @@ public class BindApplicationService {
     @Inject
     KubernetesClientService kubernetesClientService;
 
-    public void unBindApplication(Application application, Claim claim) throws ClusterConnectException {
-        unMountSecretVolumeEnvInApplication(application, claim);
-        deleteSecretInNamespace(application, claim);
-        rolloutApplication(application);
+    public void unBindApplication(Claim claim) throws ClusterConnectException {
+        unMountSecretVolumeEnvInApplication(claim);
+        deleteSecretInNamespace(claim);
+        rolloutApplication(claim);
     }
 
-    public void bindApplication(Application application, Claim claim) throws ClusterConnectException {
+    public void bindApplication(Claim claim) throws ClusterConnectException {
         Credential credential = getFirstCredentialFromService(claim.service);
-        String url = generateUrlByClaimService(application, claim);
+        String url = generateUrlByClaimService(claim);
         claim.credential = credential;
         claim.url = url;
         claim.status = ClaimStatus.BOUND.toString();
         claim.persist();
         if (credential != null && url != null) {
             // scenario is supported
-            createSecretForApplication(application, claim, credential, url);
-            rolloutApplication(application);
+            createSecretForApplication(claim, credential, url);
+            rolloutApplication(claim);
         }
     }
 
-    private void rolloutApplication(Application application) throws ClusterConnectException {
-        kubernetesClientService.rolloutApplication(application);
+    private void rolloutApplication(Claim claim) throws ClusterConnectException {
+        kubernetesClientService.rolloutApplication(claim.application);
     }
 
-    private void deleteSecretInNamespace(Application application, Claim claim) throws ClusterConnectException {
-        kubernetesClientService.deleteSecretInNamespace(application, claim);
+    private void deleteSecretInNamespace(Claim claim) throws ClusterConnectException {
+        kubernetesClientService.deleteSecretInNamespace(claim);
     }
 
-    private void unMountSecretVolumeEnvInApplication(Application application, Claim claim)
-            throws ClusterConnectException {
-        kubernetesClientService.unMountSecretVolumeEnvInApplication(application, claim);
+    private void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
+        kubernetesClientService.unMountSecretVolumeEnvInApplication(claim);
     }
 
-    private void createSecretForApplication(Application application, Claim claim, Credential credential, String url)
+    private void createSecretForApplication(Claim claim, Credential credential, String url)
             throws ClusterConnectException {
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));
@@ -78,7 +77,7 @@ public class BindApplicationService {
             secretData.put(param.paramName, toBase64(param.paramValue));
         }
 
-        kubernetesClientService.mountSecretInApplication(application, claim, secretData);
+        kubernetesClientService.mountSecretInApplication(claim, secretData);
     }
 
     private Credential getFirstCredentialFromService(Service service) {
@@ -89,7 +88,8 @@ public class BindApplicationService {
         return service.credentials.get(0);
     }
 
-    private String generateUrlByClaimService(Application application, Claim claim) {
+    private String generateUrlByClaimService(Claim claim) {
+        Application application = claim.application;
         Service service = claim.service;
         if (Objects.equals(application.cluster.id, service.cluster.id)
                 && Objects.equals(application.namespace, service.namespace)) {

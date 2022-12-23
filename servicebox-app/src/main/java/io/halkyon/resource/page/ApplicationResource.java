@@ -108,7 +108,7 @@ public class ApplicationResource {
         }
         claim.application = application;
         try {
-            bindService.bindApplication(application, claim);
+            bindService.bindApplication(claim);
             claim.persist();
             return Response.ok().build();
         } catch (ClusterConnectException ex) {
