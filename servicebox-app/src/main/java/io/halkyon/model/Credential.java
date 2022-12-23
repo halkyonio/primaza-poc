@@ -1,5 +1,6 @@
 package io.halkyon.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,8 +44,8 @@ public class Credential extends PanacheEntityBase {
     @NotBlank
     public String password;
 
-    @OneToMany(mappedBy = "credential", cascade = CascadeType.ALL)
-    public List<CredentialParameter> params;
+    @OneToMany(mappedBy = "credential", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<CredentialParameter> params = new ArrayList<>();
     @CreationTimestamp
     public Date created;
     @UpdateTimestamp
