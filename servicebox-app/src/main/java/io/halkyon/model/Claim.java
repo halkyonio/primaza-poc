@@ -15,6 +15,8 @@ import javax.persistence.OneToOne;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.halkyon.services.ClaimStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
@@ -35,18 +37,17 @@ public class Claim extends PanacheEntityBase {
     @UpdateTimestamp
     public Date updated;
     public String errorMessage;
-    // TODO: To be discussed and adapted if needed. This is not because we will delete a Claim that the service bound
-    // should be deleted and its credential
+    public Integer attempts = 0;
     @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     public Service service;
-    public Integer attempts = 0;
-
-    // Id of the application which is bound to a claim
-    public Long applicationId;
-
-    @OneToOne
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "credential_id", referencedColumnName = "id")
     public Credential credential;
+    @JsonIgnore
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "application_id", referencedColumnName = "id")
+    public Application application;
     public String url;
     public String type;
     public String database;

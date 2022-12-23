@@ -79,16 +79,16 @@ public class ApplicationResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Path("/bind/{id}")
-    public TemplateInstance bindApplicationModal(@PathParam("id") long applicationId) {
+    @Path("/claim/{id}")
+    public TemplateInstance claimApplicationModal(@PathParam("id") long applicationId) {
         return Templates.Applications.bind(Application.findById(applicationId), Claim.listAvailable());
     }
 
     @Transactional
     @POST
     @Produces(MediaType.TEXT_HTML)
-    @Path("/bind/{id}")
-    public Response doBindApplication(@PathParam("id") long applicationId, @FormParam("claimId") long claimId) {
+    @Path("/claim/{id}")
+    public Response doClaimApplication(@PathParam("id") long applicationId, @FormParam("claimId") long claimId) {
         Application application = Application.findById(applicationId);
         if (application == null) {
             throw new NotFoundException(String.format("Application %s not found", applicationId));
@@ -104,7 +104,7 @@ public class ApplicationResource {
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));
         }
-        claim.applicationId = applicationId;
+        claim.application = application;
         claim.persist();
         bindService.bindApplication(application, claim);
         return Response.ok().build();
