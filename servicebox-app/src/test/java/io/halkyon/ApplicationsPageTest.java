@@ -28,6 +28,7 @@ import org.mockito.Mockito;
 
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
@@ -68,7 +69,7 @@ public class ApplicationsPageTest {
     Scheduler scheduler;
 
     @Test
-    public void testDiscoverApplications() {
+    public void testDiscoverApplications() throws ClusterConnectException {
         String prefix = "ApplicationsPageTest.testDiscoverApplications.";
         pauseScheduler();
         // create data
@@ -105,7 +106,7 @@ public class ApplicationsPageTest {
     }
 
     @Test
-    public void testBindApplication() {
+    public void testBindApplication() throws ClusterConnectException {
         pauseScheduler();
         // names
         String prefix = "ApplicationsPageTest.testBindApplication.";
@@ -164,7 +165,7 @@ public class ApplicationsPageTest {
     }
 
     @Test
-    public void testBindApplicationUsingServiceFromAnotherCluster() {
+    public void testBindApplicationUsingServiceFromAnotherCluster() throws ClusterConnectException {
         pauseScheduler();
         // names
         String prefix = "ApplicationsPageTest.testBindApplicationUsingServiceFromAnotherCluster.";
@@ -227,12 +228,13 @@ public class ApplicationsPageTest {
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
     }
 
-    private void configureMockApplicationWithEmptyFor(Cluster cluster) {
+    private void configureMockApplicationWithEmptyFor(Cluster cluster) throws ClusterConnectException {
         Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(cluster.name))))
                 .thenReturn(Collections.emptyList());
     }
 
-    private void configureMockApplicationFor(String clusterName, String appName, String appImage, String appNamespace) {
+    private void configureMockApplicationFor(String clusterName, String appName, String appImage, String appNamespace)
+            throws ClusterConnectException {
         Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(clusterName))))
                 .thenReturn(Arrays
                         .asList(new DeploymentBuilder().withNewMetadata().withName(appName).withNamespace(appNamespace)
@@ -241,13 +243,13 @@ public class ApplicationsPageTest {
     }
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
-            String serviceNamespace) {
+            String serviceNamespace) throws ClusterConnectException {
         configureMockServiceFor(clusterName, protocol, servicePort,
                 new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata());
     }
 
     private void configureMockServiceWithIngressFor(String clusterName, String protocol, String servicePort,
-            String serviceNamespace, String serviceExternalIp) {
+            String serviceNamespace, String serviceExternalIp) throws ClusterConnectException {
         configureMockServiceFor(clusterName, protocol, servicePort,
                 new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().withNewStatus()
                         .withNewLoadBalancer().addNewIngress().withIp(serviceExternalIp).endIngress().endLoadBalancer()
@@ -255,7 +257,7 @@ public class ApplicationsPageTest {
     }
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
-            ServiceBuilder serviceBuilder) {
+            ServiceBuilder serviceBuilder) throws ClusterConnectException {
         Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
                 eq(protocol), eq(servicePort))).thenReturn(Optional.of(serviceBuilder.build()));
     }

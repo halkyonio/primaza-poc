@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -22,6 +21,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.halkyon.services.ClusterStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 
@@ -31,12 +31,11 @@ public class Cluster extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-    @NotBlank(message = "Name must not be empty")
     public String name;
-    @NotBlank(message = "URL must not be empty")
     public String url;
-    @NotBlank(message = "Environment must not be empty")
     public String environment;
+    public ClusterStatus status;
+    public String errorMessage;
 
     /**
      * Internal namespaces which should be excluded from the services looking about the services or applications

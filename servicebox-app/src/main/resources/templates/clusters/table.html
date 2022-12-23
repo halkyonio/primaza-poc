@@ -1,5 +1,5 @@
 <form class="form-horizontal" action="/clusters/filter" hx-get="/clusters/filter" hx-target="#cluster-table" hx-swap="innerHTML"
-      hx-trigger="input from:#cluster_search_by_name,input from:#cluster_search_by_environment,input from:#cluster_search_by_url">
+      hx-trigger="input from:#cluster_search_by_name,input from:#cluster_search_by_environment,input from:#cluster_search_by_url,input from:#cluster_search_by_status">
   <div class="table-responsive">
         <table class="table">
             <thead>
@@ -8,6 +8,7 @@
                   <th aria-valuetext="left">Environment</th>
                   <th aria-valuetext="left">Excluded Namespaces</th>
                   <th aria-valuetext="left">URL</th>
+                  <th aria-valuetext="left">Status</th>
                   <th aria-valuetext="left">Action</th>
               </tr>
             </thead>
@@ -28,6 +29,9 @@
                     <input id="cluster_search_by_url" class="form-control" type="search" name="url"
                            value="{#if filter.containsKey('url')}{filter.get('url')}{/if}"
                            placeholder="Search by URL ...">
+                </td>
+                <td>
+                    <input id="cluster_search_by_status" class="form-check-input" type="checkbox" name="status" {#if filter.containsKey('status') && filter.get('status')}checked{/if}>
                 </td>
                 <td></td>
               </tr>

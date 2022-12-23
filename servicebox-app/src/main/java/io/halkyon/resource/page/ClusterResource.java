@@ -22,12 +22,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import io.halkyon.Templates;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.ClusterRequest;
 import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ClusterStatus;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
@@ -37,9 +41,12 @@ import io.quarkus.qute.TemplateInstance;
 @Path("/clusters")
 public class ClusterResource {
 
+    private static Logger LOG = Logger.getLogger(ClusterResource.class);
+
     @Inject
     Validator validator;
-
+    @Inject
+    KubernetesClientService kubernetesClientService;
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
     @Inject
@@ -74,6 +81,10 @@ public class ClusterResource {
 
         if (!StringUtils.isNullOrEmpty(url)) {
             query.containsIgnoreCase("url", url);
+        }
+
+        if (!StringUtils.isNullOrEmpty(status)) {
+            query.equals("status", StringUtils.equalsIgnoreCase("on", status) ? ClusterStatus.OK : ClusterStatus.ERROR);
         }
 
         List<Cluster> clusters = Cluster.list(query.build(), query.getParameters());
@@ -173,6 +184,13 @@ public class ClusterResource {
                 throw new RuntimeException(e);
             }
         }
-        cluster.persist();
+
+        try {
+            kubernetesClientService.getClientForCluster(cluster);
+            cluster.status = ClusterStatus.OK;
+            cluster.persist();
+        } catch (ClusterConnectException e) {
+            LOG.error("Could not connect with the cluster '" + e.getCluster().name + "'. Caused by: " + e.getMessage());
+        }
     }
 }

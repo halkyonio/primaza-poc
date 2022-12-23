@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
@@ -165,11 +167,16 @@ public class ClaimResource {
     @Transactional
     public TemplateInstance delete(@PathParam("id") Long id) {
         Claim claim = Claim.findById(id);
-        if (claim.application != null) {
-            bindService.unBindApplication(Application.findById(claim.application.id), claim);
+        try {
+            if (claim.application != null) {
+                bindService.unBindApplication(Application.findById(claim.application.id), claim);
+            }
+            Claim.deleteById(id);
+            return list();
+        } catch (ClusterConnectException ex) {
+            throw new InternalServerErrorException("Cannot delete the claim because can't connect with the cluster "
+                    + ex.getCluster().name + " where is deployed. Cause: " + ex.getMessage());
         }
-        Claim.deleteById(id);
-        return list();
     }
 
     private void doUpdateClaim(Claim claim, ClaimRequest request) {
