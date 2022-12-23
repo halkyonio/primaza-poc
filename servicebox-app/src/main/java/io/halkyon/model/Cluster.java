@@ -36,13 +36,17 @@ public class Cluster extends PanacheEntityBase {
     public String environment;
     public ClusterStatus status;
     public String errorMessage;
-
+    /**
+     * Namespace where to search services and applications.
+     */
+    public String namespace;
     /**
      * Internal namespaces which should be excluded from the services looking about the services or applications
      * available Separate the namespaces within the string using a ";" character Example: default;kube-system;ingress
      */
     public String excludedNamespaces;
 
+    public String token;
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     public String kubeConfig;

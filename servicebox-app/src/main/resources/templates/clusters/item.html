@@ -1,6 +1,6 @@
 {@io.halkyon.model.Cluster cluster}
 <tr>
-    <td>{cluster.name}</td>
+    <td>{cluster.name}{#if cluster.namespace} ({cluster.namespace}){/if}</td>
     <td>{cluster.environment}</td>
     <td>{cluster.excludedNamespaces}</td>
     <td>{cluster.url}</td>
