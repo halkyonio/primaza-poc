@@ -1,6 +1,5 @@
 package io.halkyon.resource.page;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -162,7 +161,7 @@ public class CredentialResource {
         credential.username = request.username;
         credential.password = request.password;
         credential.service = Service.findById(request.serviceId);
-        credential.params = new ArrayList<>();
+        credential.params.clear();
         if (request.params != null) {
             for (String param : request.params) {
                 String[] nameValue = param.split(":");
