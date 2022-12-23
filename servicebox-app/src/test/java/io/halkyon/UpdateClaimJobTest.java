@@ -59,6 +59,7 @@ public class UpdateClaimJobTest {
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(postgresqlClaim.name, actualPostgresql.name);
+        assertEquals("postgresql", actualPostgresql.type);
         assertEquals(ClaimStatus.BINDABLE.toString(), actualPostgresql.status);
         assertEquals(1, actualPostgresql.attempts);
 
@@ -66,6 +67,7 @@ public class UpdateClaimJobTest {
                 .then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
+        assertEquals(null, actualMysql.type);
         assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
         assertEquals(2, actualMysql.attempts);
 
