@@ -25,7 +25,8 @@ public class Templates {
 
         public static native TemplateInstance table(List<Claim> claims, long items, Map<String, Object> filter);
 
-        public static native TemplateInstance form(String title, Claim claim, List<Service> services);
+        public static native TemplateInstance form(String title, Claim claim, List<Service> services,
+                Map<String, Object> optional);
     }
 
     @CheckedTemplate(basePath = "services", requireTypeSafeExpressions = false)

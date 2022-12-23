@@ -6,10 +6,13 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
 import io.halkyon.utils.StringUtils;
@@ -35,8 +38,13 @@ public class UpdateClaimJob {
     public static final String ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED = "Service '%s' has no credentials";
     public static final String ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER = "Could not find a service with protocol '%s'";
 
+    private static final Logger LOG = Logger.getLogger(UpdateClaimJob.class);
+
     @ConfigProperty(name = "servicebox.update-claim-job.max-attempts")
     int maxAttempts;
+
+    @Inject
+    BindApplicationService bindApplicationService;
 
     /**
      * This method will be executed at every `${servicebox.update-claim-job.poll-every}`. It will loop over the new and
@@ -79,6 +87,14 @@ public class UpdateClaimJob {
             } else {
                 incrementAttempts(claim,
                         String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
+            }
+        }
+
+        if (ClaimStatus.BINDABLE.toString().equals(claim.status) && claim.application != null) {
+            try {
+                bindApplicationService.bindApplication(claim);
+            } catch (ClusterConnectException e) {
+                LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
             }
         }
 

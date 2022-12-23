@@ -22,4 +22,6 @@ public class ClaimRequest {
     public String description;
     @FormParam
     public String owner;
+    @FormParam
+    public Long applicationId;
 }

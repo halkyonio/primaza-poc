@@ -41,7 +41,7 @@ import io.quarkus.qute.TemplateInstance;
 @Path("/clusters")
 public class ClusterResource {
 
-    private static Logger LOG = Logger.getLogger(ClusterResource.class);
+    private static final Logger LOG = Logger.getLogger(ClusterResource.class);
 
     @Inject
     Validator validator;

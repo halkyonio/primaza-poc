@@ -159,8 +159,7 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
-                argThat(new ApplicationNameMatcher(appName)), argThat(new ClaimNameMatcher(claimName)),
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
@@ -224,11 +223,51 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
-                argThat(new ApplicationNameMatcher(appName)), argThat(new ClaimNameMatcher(claimName)),
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
+    }
+
+    @Test
+    public void testCreateClaimFromApplicationsPage() throws ClusterConnectException {
+        pauseScheduler();
+        // names
+        String prefix = "ApplicationsPageTest.testCreateClaimFromApplicationsPage.";
+        String clusterName = prefix + "cluster";
+        String claimName = prefix + "claim";
+        String appName = prefix + "app";
+        // mock data
+        configureMockApplicationFor(clusterName, appName, "image2", "ns1");
+        // create data
+        createCluster(clusterName, "host:port");
+        // test the job to find applications
+        applicationDiscoveryJob.execute();
+        // now the deployment should be listed in the page
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(appName);
+        });
+        // click on bind button
+        Application app = findApplicationByName(appName);
+        page.clickById("btn-application-bind-" + app.id);
+        // modal should be displayed
+        page.assertContentContains("Bind Application " + appName);
+        // click on new claim button
+        page.clickById("application-new-claim-button");
+        // claim form should be displayed
+        page.assertPathIs("/claims/new?applicationId=" + app.id);
+        // add new claim
+        page.type("name", claimName);
+        page.type("claim_serviceRequested", "service-version");
+        page.clickById("claim-button");
+        // Verify the entity was properly created:
+        page.assertContentContains("Created successfully for id");
+        page.clickById("back");
+        page.assertPathIs("/applications");
+        // claim is pending which is expected
+        page.assertContentContains("pending");
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) throws ClusterConnectException {
