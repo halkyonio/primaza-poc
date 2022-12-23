@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import org.mockito.Mockito;
 
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
@@ -86,10 +87,14 @@ public final class TestUtils {
 
     public static void mockServiceIsAvailableInCluster(KubernetesClientService mockKubernetesClientService,
             String clusterName, String protocol, String servicePort, String serviceNamespace) {
-        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
-                eq(protocol), eq(servicePort)))
-                .thenReturn(Optional.of(
-                        new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().build()));
+        try {
+            Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
+                    eq(protocol), eq(servicePort)))
+                    .thenReturn(Optional.of(new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace)
+                            .endMetadata().build()));
+        } catch (ClusterConnectException ignored) {
+            // ignore exceptions
+        }
     }
 
     public static Application findApplicationByName(String appName) {

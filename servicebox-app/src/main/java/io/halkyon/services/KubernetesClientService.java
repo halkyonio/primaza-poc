@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
@@ -26,6 +27,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.utils.Serialization;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
@@ -41,7 +43,7 @@ public class KubernetesClientService {
      * Get the deployments that are installed in the cluster. TODO: For OpenShift, we should support DeploymentConfig:
      * https://github.com/halkyonio/primaza-poc/issues/136
      */
-    public List<Deployment> getDeploymentsInCluster(Cluster cluster) {
+    public List<Deployment> getDeploymentsInCluster(Cluster cluster) throws ClusterConnectException {
         return filterByCluster(getClientForCluster(cluster).apps().deployments(), cluster);
     }
 
@@ -49,7 +51,8 @@ public class KubernetesClientService {
      * Check whether a service with <protocol>:<port> is running in the cluster. Exclude the services installed under
      * listed namespaces
      */
-    public Optional<Service> getServiceInCluster(Cluster cluster, String protocol, String servicePort) {
+    public Optional<Service> getServiceInCluster(Cluster cluster, String protocol, String servicePort)
+            throws ClusterConnectException {
         List<Service> services = filterByCluster(getClientForCluster(cluster).services(), cluster);
         for (Service service : services) {
             boolean found = service.getSpec().getPorts().stream()
@@ -66,7 +69,7 @@ public class KubernetesClientService {
     /**
      * Deleting the Kubernetes Secret
      */
-    public void deleteSecretInNamespace(Application application, Claim claim) {
+    public void deleteSecretInNamespace(Application application, Claim claim) throws ClusterConnectException {
         KubernetesClient client = getClientForCluster(application.cluster);
         String secretName = application.name + "-" + claim.name;
         client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
@@ -76,7 +79,8 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void unMountSecretVolumeEnvInApplication(Application application, Claim claim) {
+    public void unMountSecretVolumeEnvInApplication(Application application, Claim claim)
+            throws ClusterConnectException {
         KubernetesClient client = getClientForCluster(application.cluster);
         String secretName = application.name + "-" + claim.name;
 
@@ -101,7 +105,8 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void mountSecretInApplication(Application application, Claim claim, Map<String, String> secretData) {
+    public void mountSecretInApplication(Application application, Claim claim, Map<String, String> secretData)
+            throws ClusterConnectException {
         KubernetesClient client = getClientForCluster(application.cluster);
 
         // create secret
@@ -143,9 +148,43 @@ public class KubernetesClientService {
     /**
      * Perform a rollout for the specified application.
      */
-    public void rolloutApplication(Application application) {
+    public void rolloutApplication(Application application) throws ClusterConnectException {
         getClientForCluster(application.cluster).apps().deployments().inNamespace(application.namespace)
                 .withName(application.name).rolling().restart();
+    }
+
+    @Transactional
+    public KubernetesClient getClientForCluster(Cluster cluster) throws ClusterConnectException {
+        try {
+            Config config;
+            if (cluster.kubeConfig != null && !cluster.kubeConfig.isEmpty()) {
+                config = Config.fromKubeconfig(cluster.kubeConfig);
+            } else {
+                config = Config.empty();
+            }
+
+            config.setMasterUrl(cluster.url);
+
+            // verify connection works fine:
+            KubernetesClient client = new DefaultKubernetesClient(config);
+            client.getKubernetesVersion();
+            if (cluster.status == ClusterStatus.ERROR) {
+                cluster.status = ClusterStatus.OK;
+                cluster.persist();
+            }
+
+            return client;
+        } catch (Exception ex) {
+            cluster.status = ClusterStatus.ERROR;
+            if (ex.getCause() != null) {
+                cluster.errorMessage = ex.getCause().getMessage();
+            } else {
+                cluster.errorMessage = ex.getMessage();
+            }
+
+            cluster.persist();
+            throw new ClusterConnectException(cluster, ex);
+        }
     }
 
     private void logIfDebugEnabled(Deployment newDeployment) {
@@ -163,18 +202,5 @@ public class KubernetesClientService {
         }
 
         return filter.list().getItems();
-    }
-
-    private KubernetesClient getClientForCluster(Cluster cluster) {
-        Config config;
-        if (cluster.kubeConfig != null && !cluster.kubeConfig.isEmpty()) {
-            config = Config.fromKubeconfig(cluster.kubeConfig);
-        } else {
-            config = Config.empty();
-        }
-
-        config.setMasterUrl(cluster.url);
-
-        return new DefaultKubernetesClient(config);
     }
 }

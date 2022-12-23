@@ -11,6 +11,7 @@ import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
@@ -30,13 +31,13 @@ public class BindApplicationService {
     @Inject
     KubernetesClientService kubernetesClientService;
 
-    public void unBindApplication(Application application, Claim claim) {
+    public void unBindApplication(Application application, Claim claim) throws ClusterConnectException {
         unMountSecretVolumeEnvInApplication(application, claim);
         deleteSecretInNamespace(application, claim);
         rolloutApplication(application);
     }
 
-    public void bindApplication(Application application, Claim claim) {
+    public void bindApplication(Application application, Claim claim) throws ClusterConnectException {
         Credential credential = getFirstCredentialFromService(claim.service);
         String url = generateUrlByClaimService(application, claim);
         claim.credential = credential;
@@ -49,19 +50,21 @@ public class BindApplicationService {
         }
     }
 
-    private void rolloutApplication(Application application) {
+    private void rolloutApplication(Application application) throws ClusterConnectException {
         kubernetesClientService.rolloutApplication(application);
     }
 
-    private void deleteSecretInNamespace(Application application, Claim claim) {
+    private void deleteSecretInNamespace(Application application, Claim claim) throws ClusterConnectException {
         kubernetesClientService.deleteSecretInNamespace(application, claim);
     }
 
-    private void unMountSecretVolumeEnvInApplication(Application application, Claim claim) {
+    private void unMountSecretVolumeEnvInApplication(Application application, Claim claim)
+            throws ClusterConnectException {
         kubernetesClientService.unMountSecretVolumeEnvInApplication(application, claim);
     }
 
-    private void createSecretForApplication(Application application, Claim claim, Credential credential, String url) {
+    private void createSecretForApplication(Application application, Claim claim, Credential credential, String url)
+            throws ClusterConnectException {
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));

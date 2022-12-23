@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.halkyon.Templates;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.services.BindApplicationService;
@@ -105,8 +107,15 @@ public class ApplicationResource {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));
         }
         claim.application = application;
-        claim.persist();
-        bindService.bindApplication(application, claim);
-        return Response.ok().build();
+        try {
+            bindService.bindApplication(application, claim);
+            claim.persist();
+            return Response.ok().build();
+        } catch (ClusterConnectException ex) {
+            throw new InternalServerErrorException(
+                    "Can't bind the application " + application.name + " because can't connect " + "with the cluster "
+                            + ex.getCluster() + ". Cause: " + ex.getMessage());
+        }
+
     }
 }
