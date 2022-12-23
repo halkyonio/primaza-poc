@@ -70,7 +70,7 @@ public class ClustersEndpointTest {
         Cluster cluster = createCluster(prefix + "cluster", "master:port");
         mockServiceIsAvailableInCluster(mockKubernetesClientService, cluster.name, "testDeleteClusterInPage", "1111",
                 "ns1");
-        createService(prefix + "service", "Api", "any", "demo", "testDeleteClusterInPage:1111");
+        createService(prefix + "service", "Api", "any", "testDeleteClusterInPage:1111");
 
         // When, we go to the clusters page
         page.goTo("/clusters");

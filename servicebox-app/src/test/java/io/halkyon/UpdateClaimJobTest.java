@@ -46,7 +46,7 @@ public class UpdateClaimJobTest {
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
         createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port",
                 mockKubernetesClientService, "protocol", "9999");
-        createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "demo", "protocol:9999");
+        createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "protocol:9999");
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created
         // with status "new" and attempts set to 1)
         // When we run the job once:
@@ -54,7 +54,6 @@ public class UpdateClaimJobTest {
         // - the claim "PostgresSQL" should change from "new" to "bind", attempts still to 1
         // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should
         // increase the attempts to 2
-
         job.execute();
         Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);

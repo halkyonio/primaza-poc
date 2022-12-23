@@ -50,7 +50,6 @@ public class Claim extends PanacheEntityBase {
     public Application application;
     public String url;
     public String type;
-    public String database;
 
     public static Claim findByName(String name) {
         return find("name", name).firstResult();

@@ -49,7 +49,7 @@ public class ServicesEndpointTest {
     @Test
     public void testCannotAddServiceWithSameNameAndVersion() {
         String prefix = "ServicesEndpointTest-testCannotAddServiceWithSameNameAndVersion-";
-        Service service = createService(prefix + "service", "1", "type", "database");
+        Service service = createService(prefix + "service", "1", "type");
 
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", service.name).formParam("version", service.version).formParam("type", service.type)
@@ -59,8 +59,8 @@ public class ServicesEndpointTest {
     @Test
     public void testCannotUpdateServiceWithSameNameAndVersion() {
         String prefix = "ServicesEndpointTest-testCannotUpdateServiceWithSameNameAndVersion-";
-        Service service1 = createService(prefix + "service", "1", "type", "database");
-        Service service2 = createService(prefix + "service", "2", "type", "database");
+        Service service1 = createService(prefix + "service", "1", "type");
+        Service service2 = createService(prefix + "service", "2", "type");
 
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", service2.name).formParam("version", "1") // conflicts with version of service1!
@@ -73,7 +73,7 @@ public class ServicesEndpointTest {
     public void testEditServiceFromPage() {
         // Create data
         String prefix = "ServicesEndpointTest-testEditServiceFromPage-";
-        Service service = createService(prefix + "service", "master:port", "type", "database");
+        Service service = createService(prefix + "service", "master:port", "type");
         // Go to the page
         page.goTo("/services");
         // Ensure our data is listed
@@ -96,7 +96,7 @@ public class ServicesEndpointTest {
     public void testDeleteServiceInPage() {
         // First, we create a cluster with a service
         String prefix = "ServicesEndpointTest-testDeleteServiceInPage-";
-        Service service = createService(prefix + "service", "Api", "any", "demo");
+        Service service = createService(prefix + "service", "Api", "any");
 
         // When, we go to the services page
         page.goTo("/services");
@@ -122,7 +122,7 @@ public class ServicesEndpointTest {
         createCluster(clusterName, "master:port");
         mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, "testDeleteClusterInPage", "1111",
                 "ns1");
-        Service service = createService(prefix + "service", "Api", "any", "demo", "testDeleteClusterInPage:1111");
+        Service service = createService(prefix + "service", "Api", "any", "testDeleteClusterInPage:1111");
 
         // When, we go to the services page
         page.goTo("/services");
