@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -31,10 +32,11 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import io.halkyon.utils.StringUtils;
 
 @ApplicationScoped
 public class KubernetesClientService {
-    private static Logger LOG = Logger.getLogger(KubernetesClientService.class);
+    private static final Logger LOG = Logger.getLogger(KubernetesClientService.class);
 
     private static final String SERVICE_BINDING_ROOT = "SERVICE_BINDING_ROOT";
     private static final String SERVICE_BINDING_ROOT_DEFAULT_VALUE = "/bindings";
@@ -114,7 +116,7 @@ public class KubernetesClientService {
         client.secrets().createOrReplace(new SecretBuilder().withNewMetadata().withName(secretName)
                 .withNamespace(application.namespace).endMetadata().withData(secretData).build());
 
-        /**
+        /*
          * Get the Deployment resource to be updated
          */
         Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
@@ -157,13 +159,16 @@ public class KubernetesClientService {
     public KubernetesClient getClientForCluster(Cluster cluster) throws ClusterConnectException {
         try {
             Config config;
-            if (cluster.kubeConfig != null && !cluster.kubeConfig.isEmpty()) {
+            if (StringUtils.isNotEmpty(cluster.kubeConfig)) {
                 config = Config.fromKubeconfig(cluster.kubeConfig);
             } else {
                 config = Config.empty();
             }
 
             config.setMasterUrl(cluster.url);
+            if (StringUtils.isNotEmpty(cluster.token)) {
+                config.setOauthToken(cluster.token);
+            }
 
             // verify connection works fine:
             KubernetesClient client = new DefaultKubernetesClient(config);
@@ -195,10 +200,17 @@ public class KubernetesClientService {
 
     private <E extends HasMetadata, L extends KubernetesResourceList<E>> List<E> filterByCluster(
             MixedOperation<E, L, ?> operation, Cluster cluster) {
-        FilterWatchListDeletable<E, L> filter = operation.inAnyNamespace();
-        String[] excludedNamespaces = cluster.excludedNamespaces.split(",");
-        for (var excludedNamespace : excludedNamespaces) {
-            filter = filter.withoutField("metadata.namespace", excludedNamespace);
+        FilterWatchListDeletable<E, L> filter;
+        if (StringUtils.isNotEmpty(cluster.namespace)) {
+            filter = operation.inNamespace(cluster.namespace);
+        } else {
+            filter = operation.inAnyNamespace();
+            if (StringUtils.isNotEmpty(cluster.excludedNamespaces)) {
+                String[] excludedNamespaces = cluster.excludedNamespaces.split(Pattern.quote(","));
+                for (var excludedNamespace : excludedNamespaces) {
+                    filter = filter.withoutField("metadata.namespace", excludedNamespace);
+                }
+            }
         }
 
         return filter.list().getItems();

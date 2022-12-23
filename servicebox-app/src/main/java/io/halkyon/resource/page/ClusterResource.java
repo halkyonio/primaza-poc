@@ -175,8 +175,10 @@ public class ClusterResource {
     private void doUpdateCluster(Cluster cluster, ClusterRequest clusterRequest) {
         cluster.name = clusterRequest.name;
         cluster.url = clusterRequest.url;
+        cluster.namespace = clusterRequest.namespace;
         cluster.excludedNamespaces = clusterRequest.excludedNamespaces;
         cluster.environment = clusterRequest.environment;
+        cluster.token = clusterRequest.token;
         if (clusterRequest.kubeConfig != null) {
             try {
                 cluster.kubeConfig = new String(clusterRequest.kubeConfig.readAllBytes());

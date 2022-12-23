@@ -1,6 +1,5 @@
 package io.halkyon.resource.requests;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.validation.constraints.NotBlank;
@@ -22,7 +21,9 @@ public class ClusterRequest {
     @FormParam
     public String url;
 
-    @NotBlank(message = "Namespaces must not be empty")
+    @FormParam
+    public String namespace;
+
     @FormParam
     public String excludedNamespaces;
 
@@ -33,16 +34,6 @@ public class ClusterRequest {
     @FormParam
     @PartType(MediaType.APPLICATION_OCTET_STREAM)
     public InputStream kubeConfig;
-
-    public String getKubeConfig() throws IOException {
-        return new String(this.kubeConfig.readAllBytes());
-    }
-
-    public Long getLongId() {
-        if (id != null) {
-            return Long.valueOf(id);
-        } else {
-            return null;
-        }
-    }
+    @FormParam
+    public String token;
 }

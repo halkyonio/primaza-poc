@@ -17,16 +17,10 @@
              <input id="clusterName" class="form-control new-cluster" type="text" name="name" value="{#if cluster.name}{cluster.name}{/if}" placeholder="Set the cluster name">
             </div>
          </div>
-           <div class="form-group">
-               <label class="control-label col-sm-6" for="clusterName">Namespaces (to be excluded when we discover services available or applications) </label>
-               <div class="col-sm-5">
-                   <input id="clusterExcludedNamespaces" class="form-control new-cluster" type="text" name="excludedNamespaces" value="{#if cluster.excludedNamespaces}{cluster.excludedNamespaces}{#else}default,kube-system,ingress{/if}" placeholder="List of namespaces separated with a coma to be excluded from the search">
-               </div>
-           </div>
          <div class="form-group">
              <label class="control-label col-sm-2" for="clusterUrl">URL:</label>
              <div class="col-sm-5">
-              <input id="clusterUrl" class="form-control new-cluster" type="text" name="url" value="{#if cluster.url}{cluster.url}{/if}" placeholder="Set the cluster URL">
+                 <input id="clusterUrl" class="form-control new-cluster" type="text" name="url" value="{#if cluster.url}{cluster.url}{/if}" placeholder="Set the cluster URL">
              </div>
          </div>
          <div class="form-group">
@@ -40,13 +34,35 @@
              </div>
          </div>
          <div class="form-group">
-             <label class="control-label col-sm-2" for="clusterUrl">Kube Config:</label>
+             <label class="control-label col-sm-2" for="clusterKubeConfig">Kube Config:</label>
              <div class="col-sm-5">
                  {#if ! cluster.id}
                    <input id="clusterKubeConfig" class="form-control new-cluster" type="file" name="kubeConfig" placeholder="Set the cluster kube configuration">
                  {#else}
                    <textarea id="clusterKubeConfig" class="form-control rounded-0 new-cluster" rows="15" name="kubeConfig">{#if cluster.kubeConfig}{cluster.kubeConfig}{/if}</textarea>
                  {/if}
+             </div>
+         </div>
+         <div class="form-group">
+             <label class="control-label col-sm-2" for="clusterToken">... Or use the token:</label>
+             <div class="col-sm-5">
+                 <input id="clusterToken" class="form-control new-cluster" type="text" name="token" value="{#if cluster.token}{cluster.token}{/if}" placeholder="Set the cluster token">
+             </div>
+         </div>
+         <div class="form-group">
+             <label class="control-label col-sm-6" for="clusterNamespace">(Optional) In namespace:</label>
+             <div class="col-sm-5">
+                 <input id="clusterNamespace" class="form-control new-cluster" type="text" name="namespace"
+                        value="{#if cluster.namespace}{cluster.namespace}{/if}"
+                        placeholder="Namespace where to search services and applications">
+             </div>
+         </div>
+         <div class="form-group">
+             <label class="control-label col-sm-6" for="clusterExcludedNamespaces">(Optional) Exclude namespaces:</label>
+             <div class="col-sm-5">
+                 <input id="clusterExcludedNamespaces" class="form-control new-cluster" type="text" name="excludedNamespaces"
+                        value="{#if cluster.excludedNamespaces}{cluster.excludedNamespaces}{#else}default,kube-system,ingress{/if}"
+                        placeholder="List of namespaces separated with a comma to be excluded from the search">
              </div>
          </div>
          </br>
