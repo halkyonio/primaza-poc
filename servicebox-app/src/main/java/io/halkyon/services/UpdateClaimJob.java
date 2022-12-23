@@ -22,7 +22,7 @@ import io.quarkus.scheduler.Scheduled;
  * A claim can request a service registered in Primaza in the form of `<service name>-<service version>`, for example:
  * "mysql-3.6". If there is a service that matches the criteria of service name, plus service version, then the claim is
  * linked to this service. Next, if this service has been found in a cluster (the service available flag is true), and
- * there is at least one service credential, then the claim status will change to "Bind"
+ * there is at least one service credential, then the claim status will change to "Bindable"
  *
  * Otherwise, the status will be "pending".
  *
@@ -39,7 +39,7 @@ public class UpdateClaimJob {
     int maxAttempts;
 
     /**
-     * This method will be executed at every `${servicebox.update-claim-job.poll-every}`. It will loop over the new or
+     * This method will be executed at every `${servicebox.update-claim-job.poll-every}`. It will loop over the new and
      * pending claims and try to link the service if the criteria matches.
      */
     @Transactional
@@ -59,7 +59,7 @@ public class UpdateClaimJob {
                 claim.type = service.type;
                 claim.service = service;
             } else {
-                claim.status = ClaimStatus.PENDING.toString();
+                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_SERVICE_REGISTERED, claim.serviceRequested));
                 claim.persist();
                 return;
@@ -70,12 +70,12 @@ public class UpdateClaimJob {
             boolean serviceAvailable = claim.service.available;
             boolean hasCredentials = claim.service.credentials.size() > 0;
             if (claim.service.available && hasCredentials) {
-                claim.status = ClaimStatus.BOUND.toString();
-            } else if (serviceAvailable) {
                 claim.status = ClaimStatus.BINDABLE.toString();
+            } else if (serviceAvailable) {
+                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED, claim.service.name));
             } else {
-                claim.status = ClaimStatus.PENDING.toString();
+                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim,
                         String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
             }
@@ -90,7 +90,7 @@ public class UpdateClaimJob {
             claim.status = ClaimStatus.ERROR.toString();
             claim.errorMessage = errorMessage + " after " + maxAttempts + " attempts";
         } else {
-            // claim.status = ClaimStatus.PENDING.toString();
+            claim.status = ClaimStatus.PENDING.toString();
             claim.attempts = attempts + 1;
         }
     }

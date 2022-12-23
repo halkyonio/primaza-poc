@@ -34,6 +34,7 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.services.UpdateClaimJob;
@@ -143,13 +144,14 @@ public class ApplicationsPageTest {
         // click on bind
         page.clickById("application-bind-button");
 
-        // Verify the Claim has been updated with service credential and url
+        // Verify the Claim has been updated with service credential and url, also status to BOUND
         Claim actualClaim = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then()
                 .statusCode(200).extract().as(Claim.class);
 
         assertNotNull(actualClaim.credential);
         assertEquals("user1", actualClaim.credential.username);
         assertEquals("pass1", actualClaim.credential.password);
+        assertEquals(ClaimStatus.BOUND.toString(), actualClaim.status);
 
         // protocol://service_name:port
         assertNotNull(actualClaim.url);
@@ -214,6 +216,7 @@ public class ApplicationsPageTest {
         assertNotNull(actualClaim.credential);
         assertEquals("user1", actualClaim.credential.username);
         assertEquals("pass1", actualClaim.credential.password);
+        assertEquals(ClaimStatus.BOUND.toString(), actualClaim.status);
 
         // protocol://externalServiceIp:port
         assertNotNull(actualClaim.url);

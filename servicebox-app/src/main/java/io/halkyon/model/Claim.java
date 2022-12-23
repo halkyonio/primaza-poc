@@ -60,6 +60,6 @@ public class Claim extends PanacheEntityBase {
     }
 
     public static List<Claim> listAvailable() {
-        return find("status=:status", Collections.singletonMap("status", ClaimStatus.BOUND.toString())).list();
+        return find("status=:status", Collections.singletonMap("status", ClaimStatus.BINDABLE.toString())).list();
     }
 }
