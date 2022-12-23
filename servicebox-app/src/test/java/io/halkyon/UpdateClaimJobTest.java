@@ -119,7 +119,6 @@ public class UpdateClaimJobTest {
                 .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
     }
 
-
     private void pauseScheduler() {
         scheduler.pause();
         await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
