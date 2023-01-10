@@ -63,17 +63,32 @@ public class Cluster extends PanacheEntityBase {
     @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     public Set<Application> applications = new HashSet<>();
 
+    public Application getApplicationByNameAndNamespace(String appName, String appNamespace) {
+        return applications.stream()
+                .filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.namespace, appNamespace)).findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Cluster))
+            return false;
+        Cluster cluster = (Cluster) o;
+        return Objects.equals(id, cluster.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     public static Cluster findByName(String name) {
         return find("name", name).firstResult();
     }
 
     public static List<Cluster> listAll() {
         return findAll(Sort.ascending("name")).list();
-    }
-
-    public Application getApplicationByNameAndNamespace(String appName, String appNamespace) {
-        return applications.stream()
-                .filter(a -> Objects.equals(a.name, appName) && Objects.equals(a.namespace, appNamespace)).findFirst()
-                .orElse(null);
     }
 }

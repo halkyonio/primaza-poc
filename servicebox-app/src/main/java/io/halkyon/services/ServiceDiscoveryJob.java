@@ -61,6 +61,10 @@ public class ServiceDiscoveryJob {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public boolean linkServiceInCluster(Service service) {
+        if (service.isStandalone()) {
+            return false;
+        }
+
         boolean updated = false;
         if (service.cluster == null || !getServiceInCluster(service, service.cluster).isPresent()) {
             service.available = false;
@@ -81,7 +85,7 @@ public class ServiceDiscoveryJob {
             service.available = true;
             service.cluster = cluster;
             service.namespace = s.getMetadata().getNamespace();
-            findExternalIpFromService(s).ifPresent(ip -> service.externalIp = ip);
+            findExternalIpFromService(s).ifPresent(ip -> service.externalEndpoint = ip);
             cluster.services.add(service);
             return true;
         }).orElse(false);

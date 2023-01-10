@@ -7,6 +7,9 @@ import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -59,9 +62,12 @@ public class ServiceDiscoveryJobTest {
         configureMockServiceFor(cluster.name, "host", "1111", "ns1");
 
         job.execute();
-        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
-                .body("available", is(true)).body("cluster.name", is(cluster.name));
-        thenServiceIsInTheAvailableServicePage(service.name);
+        service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then()
+                .statusCode(200).extract().as(Service.class);
+        assertTrue(service.available);
+        assertNotNull(service.cluster);
+        assertEquals(cluster.name, service.cluster.name);
+        thenServiceIsInTheAvailableServicePage(service);
     }
 
     @Test
@@ -73,9 +79,12 @@ public class ServiceDiscoveryJobTest {
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", serviceName).formParam("version", "any").formParam("type", "Api")
                 .formParam("endpoint", "host:2222").when().post("/services").then().statusCode(201);
-        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then().statusCode(200)
-                .body("available", is(true)).body("cluster.name", is(cluster.name));
-        thenServiceIsInTheAvailableServicePage(serviceName);
+        Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then()
+                .statusCode(200).extract().as(Service.class);
+        assertTrue(service.available);
+        assertNotNull(service.cluster);
+        assertEquals(cluster.name, service.cluster.name);
+        thenServiceIsInTheAvailableServicePage(service);
     }
 
     @Test
@@ -87,14 +96,19 @@ public class ServiceDiscoveryJobTest {
                 .multiPart("name", "dummy-cluster-3").multiPart("environment", "TEST")
                 .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "master:port").when()
                 .post("/clusters").then().statusCode(201);
-        given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
-                .body("available", is(true)).body("cluster.name", is("dummy-cluster-3"));
-        thenServiceIsInTheAvailableServicePage(service.name);
+        service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then()
+                .statusCode(200).extract().as(Service.class);
+        assertTrue(service.available);
+        assertNotNull(service.cluster);
+        assertEquals("dummy-cluster-3", service.cluster.name);
+        thenServiceIsInTheAvailableServicePage(service);
     }
 
-    private void thenServiceIsInTheAvailableServicePage(String expectedServiceName) {
+    private void thenServiceIsInTheAvailableServicePage(Service expectedService) {
         page.goTo("/services/discovered");
-        page.assertContentContains(expectedServiceName);
+        page.assertContentContains(expectedService.name);
+        page.assertContentContains(expectedService.getProtocol() + "://" + expectedService.name + "."
+                + expectedService.namespace + ":" + expectedService.getPort());
     }
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort,

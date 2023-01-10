@@ -6,6 +6,7 @@ import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.ws.rs.core.MediaType;
 
@@ -43,7 +44,6 @@ public class ServicesEndpointTest {
         assertNotNull(service);
         assertEquals(service.name, rabbitMQ4);
         assertNotNull(service.created);
-
     }
 
     @Test
@@ -108,6 +108,28 @@ public class ServicesEndpointTest {
         // Then, the service should have been deleted
         page.goTo("/services");
         page.assertContentDoesNotContain(service.name);
+    }
+
+    @Test
+    public void createStandaloneService() {
+        String prefix = "ServicesEndpointTest-createStandaloneService-";
+        String serviceName = prefix + "service";
+        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", serviceName).formParam("version", "3.11.2").formParam("type", "Broker")
+                .formParam("endpoint", "tcp:5672").formParam("externalEndpoint", "rabbit.com").when().post("/services")
+                .then().statusCode(201);
+
+        Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then()
+                .statusCode(200).extract().as(Service.class);
+
+        assertNotNull(service);
+        assertTrue(service.available);
+        assertNotNull(service.created);
+
+        // Then, the service should be listed in the discovered page
+        page.goTo("/services/discovered");
+        page.assertContentContains(serviceName);
+        page.assertContentContains("rabbit.com");
     }
 
     /**
