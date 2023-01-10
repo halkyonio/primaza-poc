@@ -67,8 +67,6 @@ public class ServiceResource {
             }
             Service service = new Service();
             doUpdateService(service, request);
-            serviceDiscoveryJob.linkServiceInCluster(service);
-            service.persist();
             response.withSuccessMessage(service.id);
         }
 
@@ -110,8 +108,6 @@ public class ServiceResource {
             }
 
             doUpdateService(service, request);
-            serviceDiscoveryJob.linkServiceInCluster(service);
-            service.persist();
 
             response.withUpdateSuccessMessage(service.id);
         }
@@ -214,5 +210,13 @@ public class ServiceResource {
         service.type = request.type;
         service.endpoint = request.endpoint;
         service.externalEndpoint = request.externalEndpoint;
+
+        if (StringUtils.isNotEmpty(service.externalEndpoint)) {
+            service.available = true;
+        } else {
+            serviceDiscoveryJob.linkServiceInCluster(service);
+        }
+
+        service.persist();
     }
 }

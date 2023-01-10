@@ -14,9 +14,21 @@
         <tr>
             <td>{service.name}</td>
             <td>{service.version}</td>
-            <td>{service.protocol}://{service.name}.{service.namespace}:{service.port}</td>
+            <td>
+                {#if service.isStandalone()}
+                {service.externalEndpoint}
+                {#else}
+                {service.protocol}://{service.name}.{service.namespace}:{service.port}
+                {/if}
+            </td>
             <td>{service.namespace}</td>
-            <td>{service.cluster.name}</td>
+            <td>
+                {#if service.isStandalone()}
+                Standalone
+                {#else}
+                {service.cluster.name}
+                {/if}
+            </td>
         </tr>
         {/for}
       </tbody>

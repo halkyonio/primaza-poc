@@ -17,6 +17,7 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
+import io.halkyon.utils.StringUtils;
 
 @ApplicationScoped
 public class BindApplicationService {
@@ -91,24 +92,21 @@ public class BindApplicationService {
     private String generateUrlByClaimService(Claim claim) {
         Application application = claim.application;
         Service service = claim.service;
-        if (Objects.equals(application.cluster.id, service.cluster.id)
+        if (Objects.equals(application.cluster, service.cluster)
                 && Objects.equals(application.namespace, service.namespace)) {
             // rule 1: app + service within same ns, cluster
             // -> app can access the service using: protocol://service_name:port
             return String.format("%s://%s:%s", service.getProtocol(), service.name, service.getPort());
-        } else if (Objects.equals(application.cluster.id, service.cluster.id)) {
+        } else if (Objects.equals(application.cluster, service.cluster)) {
             // rule 2: app + service in different ns, same cluster
             // -> app can access the service using: protocol://service_name.namespace:port
             return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
                     service.getPort());
-        } else if (!Objects.equals(application.cluster.id, service.cluster.id) && service.externalIp != null) {
-            // rule 3: app + service running in another cluster
+        } else if (StringUtils.isNotEmpty(service.externalEndpoint)) {
+            // rule 3 and 4: app + service running in another cluster using external IP
             // -> app can access the service using: protocol://service-external-ip:port
-            return String.format("%s://%s:%s", service.getProtocol(), service.externalIp, service.getPort());
+            return String.format("%s://%s:%s", service.getProtocol(), service.externalEndpoint, service.getPort());
         }
-
-        // TODO: rule 4: app + service running on a standalone machine.
-        // https://github.com/halkyonio/primaza-poc/discussions/135
 
         return null;
     }

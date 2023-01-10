@@ -24,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import io.halkyon.utils.StringUtils;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 
@@ -38,12 +39,13 @@ public class Service extends PanacheEntityBase {
     public String version;
     public String type;
     public String endpoint;
-    public String externalEndpoint;
     public String namespace;
     /**
-     * Auto-populated property that is resolved using the Ingress resource from the Kubernetes Service.
+     * The external endpoint is provided by: - Either the user. In this scenario, the service is considered a standalone
+     * service and will not be discovered in any cluster. - Otherwise, auto-populated property that is resolved using
+     * the Ingress resource from the Kubernetes Service.
      */
-    public String externalIp;
+    public String externalEndpoint;
     public Boolean available;
     @CreationTimestamp
     public Date created;
@@ -70,6 +72,15 @@ public class Service extends PanacheEntityBase {
         return splitEndpoint()[1];
     }
 
+    /**
+     * @return true if the external endpoint was provided by the user and hence cluster is null.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isStandalone() {
+        return StringUtils.isNotEmpty(externalEndpoint) && cluster == null;
+    }
+
     private String[] splitEndpoint() {
         return endpoint.split(Pattern.quote(":"));
     }
@@ -87,6 +98,6 @@ public class Service extends PanacheEntityBase {
     }
 
     public static List<Service> findAvailableServices() {
-        return Service.find("available=true AND cluster != null").list();
+        return Service.find("available=true").list();
     }
 }

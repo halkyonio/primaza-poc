@@ -26,4 +26,5 @@ public class Application extends PanacheEntity {
     public static Application findByName(String name) {
         return find("name", name).firstResult();
     }
+
 }
