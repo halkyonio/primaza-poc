@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t quarkus/servicebox .
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/primaza .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/servicebox
+# docker run -i --rm -p 8080:8080 quarkus/primaza
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5

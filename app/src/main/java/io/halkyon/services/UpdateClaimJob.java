@@ -40,18 +40,18 @@ public class UpdateClaimJob {
 
     private static final Logger LOG = Logger.getLogger(UpdateClaimJob.class);
 
-    @ConfigProperty(name = "servicebox.update-claim-job.max-attempts")
+    @ConfigProperty(name = "primaza.update-claim-job.max-attempts")
     int maxAttempts;
 
     @Inject
     BindApplicationService bindApplicationService;
 
     /**
-     * This method will be executed at every `${servicebox.update-claim-job.poll-every}`. It will loop over the new and
+     * This method will be executed at every `${primaza.update-claim-job.poll-every}`. It will loop over the new and
      * pending claims and try to link the service if the criteria matches.
      */
     @Transactional
-    @Scheduled(every = "${servicebox.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${primaza.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
         Claim.find("status in :statuses",
                 Collections.singletonMap("statuses",

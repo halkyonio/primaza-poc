@@ -33,7 +33,7 @@ public class UpdateClaimJobTest {
     @Inject
     UpdateClaimJob job;
 
-    @ConfigProperty(name = "servicebox.update-claim-job.max-attempts")
+    @ConfigProperty(name = "primaza.update-claim-job.max-attempts")
     int maxAttempts;
 
     @Inject

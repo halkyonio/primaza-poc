@@ -27,14 +27,14 @@ public class ServiceDiscoveryJob {
     KubernetesClientService kubernetesClientService;
 
     /**
-     * This method will be executed at every `${servicebox.discovery-service-job.poll-every}`. First, it will collect
+     * This method will be executed at every `${primaza.discovery-service-job.poll-every}`. First, it will collect
      * the list of all services and clusters, and then will loop over the services to check whether the service name
      * (from the first part of the service.endpoint field) is installed in one cluster. If so, then it will check
      * whether service port (from the second part of the service.endpoint field) is declared in the found kubernetes
      * service resource.
      */
     @Transactional
-    @Scheduled(every = "${servicebox.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${primaza.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {

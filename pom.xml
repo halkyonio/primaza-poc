@@ -19,13 +19,13 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/halkyonio/servicebox/issues</url>
+        <url>https://github.com/halkyonio/primaza/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:halkyonio/servicebox.git</connection>
-        <developerConnection>scm:git:git@github.com:halkyonio/servicebox.git</developerConnection>
-        <url>https://github.com/halkyonio/servicebox/</url>
+        <connection>scm:git:git@github.com:halkyonio/primaza.git</connection>
+        <developerConnection>scm:git:git@github.com:halkyonio/primaza.git</developerConnection>
+        <url>https://github.com/halkyonio/primaza/</url>
         <tag>HEAD</tag>
     </scm>
 

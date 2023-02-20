@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      SERVICE_BOX_KUBERNETES_NAMESPACE: sb
+      PRIMAZA_KUBERNETES_NAMESPACE: sb
     strategy:
       matrix:
         java: [ 17 ]
@@ -77,11 +77,11 @@ jobs:
           version: v0.11.1
           registry: true
 
-      - name: Start ServiceBox
-        run: .github/install_service_box.sh ${{ github.repository }} $(git rev-parse --short HEAD)
+      - name: Start Primaza
+        run: .github/install_primaza.sh ${{ github.repository }} $(git rev-parse --short HEAD)
 
       - name: Register Kind cluster in Service Box
-        run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
+        run: .github/register_local_kind_cluster_in_primaza.sh kube-system,sb
 
       - name: Create Postgresql Service in Service Box
         run: |
@@ -91,11 +91,11 @@ jobs:
           ## the service endpoint should be: "tcp:5432"
 
           # Next, we register the Postgresql service in Service Box
-          .github/register_service_in_service_box.sh postgresql 11 tcp:5432 postgresql
+          .github/register_service_in_primaza.sh postgresql 11 tcp:5432 postgresql
 
       - name: (Only if it failed) Log Service Box traces at failures
         if: failure()
-        run: .github/print_service_box_logs.sh
+        run: .github/print_PRIMAZA_logs.sh
 
   verify-e2e-example-in-kubernetes:
     name: Verify Super Hero workshop in Kubernetes
@@ -116,8 +116,8 @@ jobs:
           version: v0.11.1
           registry: true
 
-      - name: Start ServiceBox
-        run: .github/install_service_box.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
+      - name: Start Primaza
+        run: .github/install_primaza.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
       - name: Install the Quarkus Super Hero application
         run: |
@@ -160,16 +160,16 @@ jobs:
             -Dquarkus.kubernetes.deploy=true
 
       - name: Register Kind cluster in Service Box
-        run: .github/register_local_kind_cluster_in_service_box.sh kube-system,sb
+        run: .github/register_local_kind_cluster_in_primaza.sh kube-system,sb
 
       - name: Wait until rest-heroes is registered in Service Box
         run: |
-          SERVICE_BOX_KUBERNETES_NAMESPACE=sb
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
-          APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/rest-heroes")
+          PRIMAZA_KUBERNETES_NAMESPACE=sb
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
+          APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/rest-heroes")
           if [ $(echo "$APPLICATION" | jq -r '.name') != "rest-heroes" ]
           then
-            echo "ServiceBox didn't discovery the rest-heroes application: $APPLICATION"
+            echo "Primaza didn't discovery the rest-heroes application: $APPLICATION"
             exit 1
           fi
 
@@ -187,16 +187,16 @@ jobs:
           ## the service endpoint should be: "tcp:5432"
 
           # Next, we register the Postgresql service in Service Box
-          .github/register_service_in_service_box.sh postgresql 11 tcp:5432 $TYPE
+          .github/register_service_in_primaza.sh postgresql 11 tcp:5432 $TYPE
 
           # And finally the credentials
-          .github/register_service_credential_in_service_box.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
+          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
 
       - name: Register claim
-        run: .github/register_claim_in_service_box.sh heroClaimDb postgresql-11
+        run: .github/register_claim_in_primaza.sh heroClaimDb postgresql-11
 
       - name: Bind application to claim
-        run: .github/bind_application_to_claim_in_service_box.sh rest-heroes heroClaimDb
+        run: .github/bind_application_to_claim_in_primaza.sh rest-heroes heroClaimDb
 
       - id: wait-for-super-hero
         name: rest-heroes should now be up and running
@@ -207,7 +207,7 @@ jobs:
 
       - name: (Only if it failed) Log Service Box traces at failures
         if: failure()
-        run: .github/print_service_box_logs.sh
+        run: .github/print_PRIMAZA_logs.sh
 
       - name: (Only if it failed) Log Rest Heroes traces at failures
         if: failure()
