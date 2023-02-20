@@ -5,13 +5,13 @@
 
   <parent>
     <groupId>io.halkyon</groupId>
-    <artifactId>servicebox</artifactId>
+    <artifactId>primaza</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>io.halkyon</groupId>
-  <artifactId>servicebox-app</artifactId>
-  <name>Service Box : REST endpoints</name>
+  <artifactId>primaza-app</artifactId>
+  <name>Primaza :: REST Application</name>
   <description>Exposes CRUD operations on service resources</description>
   <properties>
     <htmx.version>1.8.2</htmx.version>

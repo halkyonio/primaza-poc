@@ -3,10 +3,10 @@
 CLAIM_NAME=$1
 CLAIM_REQUESTED_SERVICE=$2
 SERVICE_BOX_KUBERNETES_NAMESPACE=sb
-POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
+POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -o name)
 
 PARAMS="name=$CLAIM_NAME&serviceRequested=$CLAIM_REQUESTED_SERVICE"
-RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' -d '$PARAMS' -s -i localhost:8080/claims")
+RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $SERVICE_BOX_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' -d '$PARAMS' -s -i localhost:8080/claims")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
   echo "Claim failed to be saved in Service Box: $RESULT"

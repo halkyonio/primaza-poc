@@ -18,11 +18,11 @@ mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image
   -Dgit.sha.commit=$GITHUB_COMMIT_SHA
 
 # And install application from the Helm repository
-helm install --dependency-update servicebox-app servicebox-app/target/helm/kubernetes/servicebox-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/servicebox-app:$VERSION
-kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE
+helm install --dependency-update primaza-app primaza-app/target/helm/kubernetes/primaza-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/primaza-app:$VERSION
+kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=primaza-app -n $KUBERNETES_NAMESPACE
 
-POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=servicebox-app -n $KUBERNETES_NAMESPACE -o name)
-RESULT=$(kubectl exec -i $POD_NAME --container servicebox-app -n $KUBERNETES_NAMESPACE -- sh -c "curl -s -i localhost:8080/home")
+POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $KUBERNETES_NAMESPACE -o name)
+RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $KUBERNETES_NAMESPACE -- sh -c "curl -s -i localhost:8080/home")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
   echo "Service Box is not working"
