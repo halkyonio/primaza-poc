@@ -48,7 +48,7 @@ pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-i
    -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
    -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
 
-pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app"
+pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
 
 pe "helm install --devel primaza-app \
   --dependency-update \
