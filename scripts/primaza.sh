@@ -28,7 +28,7 @@ pushd ${PROJECT_DIR}
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest 0 ${VM_IP}"
+pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
 pe "k wait -n ingress \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
