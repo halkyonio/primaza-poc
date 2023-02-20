@@ -69,7 +69,7 @@ done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
-pe "kind get kubeconfig > local-kind-kubeconfig"
+pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
 pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
 RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,ingress,kube-system,local-path-storage,primaza -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
