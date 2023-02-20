@@ -25,6 +25,6 @@ POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $KUBERNETES_
 RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $KUBERNETES_NAMESPACE -- sh -c "curl -s -i localhost:8080/home")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
-  echo "Service Box is not working"
+  echo "Primaza is not working"
   exit 1
 fi

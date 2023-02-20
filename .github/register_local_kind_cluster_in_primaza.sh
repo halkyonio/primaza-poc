@@ -12,12 +12,12 @@ kubectl cp /tmp/local-kind-kubeconfig sb/${POD_NAME:4}:/tmp/local-kind-kubeconfi
 RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=$EXCLUDED_NAMESPACES -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
-  echo "Cluster failed to be saved in Service Box: $RESULT"
+  echo "Cluster failed to be saved in Primaza: $RESULT"
   exit 1
 fi
 if [[ "$RESULT" = *"alert-danger"* ]]
 then
-  echo "Cluster failed to be saved in Service Box: $RESULT"
+  echo "Cluster failed to be saved in Primaza: $RESULT"
   exit 1
 fi
-echo "Cluster installed in Service Box: $RESULT"
+echo "Cluster installed in Primaza: $RESULT"

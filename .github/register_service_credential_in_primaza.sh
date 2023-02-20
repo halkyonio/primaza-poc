@@ -17,12 +17,12 @@ echo "Sending service credential with body: $BODY"
 RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' -d '$BODY' -s -i localhost:8080/credentials")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
-  echo "Credential failed to be saved in Service Box: $RESULT"
+  echo "Credential failed to be saved in Primaza: $RESULT"
   exit 1
 fi
 if [[ "$RESULT" = *"alert-danger"* ]]
 then
-  echo "Credential failed to be saved in Service Box: $RESULT"
+  echo "Credential failed to be saved in Primaza: $RESULT"
   exit 1
 fi
-echo "Credential installed in Service Box: $RESULT"
+echo "Credential installed in Primaza: $RESULT"

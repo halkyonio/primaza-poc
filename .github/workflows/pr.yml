@@ -45,20 +45,20 @@ jobs:
       - name: Start Primaza
         run: .github/install_primaza.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
-      - name: Register Kind cluster in Service Box
+      - name: Register Kind cluster in Primaza
         run: .github/register_local_kind_cluster_in_primaza.sh kube-system,sb
 
-      - name: Create Postgresql Service in Service Box
+      - name: Create Postgresql Service in Primaza
         run: |
           # First, we install Postgresql via Helm.
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm install postgresql bitnami/postgresql --version 11.9.1 --set auth.username=superman --set auth.password=superman
           ## the service endpoint should be: "tcp:5432"
 
-          # Next, we register the Postgresql service in Service Box
+          # Next, we register the Postgresql service in Primaza
           .github/register_service_in_primaza.sh postgresql 11 tcp:5432 postgresql
 
-      - name: (Only if it failed) Log Service Box traces at failures
+      - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: .github/print_PRIMAZA_logs.sh
 
@@ -95,7 +95,7 @@ jobs:
           # install service binding extension
           mvn quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
 
-          # remove the third party installations via templates (we'll install these services using Service Box :) )
+          # remove the third party installations via templates (we'll install these services using Primaza :) )
           rm -rf src/main/kubernetes
 
           # remove the default application.yml as we'll provide a different one with our Helm properties
@@ -124,7 +124,7 @@ jobs:
             -Dquarkus.kubernetes.namespace=$KUBERNETES_NAMESPACE \
             -Dquarkus.kubernetes.deploy=true
 
-      - name: Register Kind cluster in Service Box excluding technical namespaces for service and application discovery 
+      - name: Register Kind cluster in Primaza excluding technical namespaces for service and application discovery 
         run: .github/register_local_kind_cluster_in_primaza.sh kube-system,sb
 
       - name: Wait until rest-heroes is discovered by Primaza
@@ -138,7 +138,7 @@ jobs:
             exit 1
           fi
 
-      - name: Create Postgresql Service in Service Box
+      - name: Create Postgresql Service in Primaza
         run: |
           KUBERNETES_NAMESPACE=app
           USERNAME=superman
@@ -151,7 +151,7 @@ jobs:
           helm install postgresql bitnami/postgresql --namespace $KUBERNETES_NAMESPACE --version 11.9.1 --set auth.username=$USERNAME --set auth.password=$PASSWORD --set auth.database=$DATABASE_NAME
           ## the service endpoint should be: "tcp:5432"
 
-          # Next, we register the Postgresql service in Service Box
+          # Next, we register the Postgresql service in Primaza
           .github/register_service_in_primaza.sh postgresql 11 tcp:5432 $TYPE
 
           # We create the credentials for the PostgreSQL service recently registered
@@ -170,7 +170,7 @@ jobs:
           # Ready means that the application is now binded with the service, so we're ok!
           kubectl wait --timeout=160s --for=condition=available deployment rest-heroes -n $KUBERNETES_NAMESPACE
 
-      - name: (Only if it failed) Log Service Box traces at failures
+      - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: .github/print_PRIMAZA_logs.sh
 

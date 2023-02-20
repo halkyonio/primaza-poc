@@ -12,11 +12,11 @@ BODY="name=$SERVICE_NAME&version=$SERVICE_VERSION&endpoint=$SERVICE_ENDPOINT&typ
 RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data '$BODY' -s -i localhost:8080/services")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
-  echo "Service failed to be saved in Service Box: $RESULT"
+  echo "Service failed to be saved in Primaza: $RESULT"
   exit 1
 fi
 
-echo "Service installed in Service Box: $RESULT"
+echo "Service installed in Primaza: $RESULT"
 
 SERVICE=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/services/name/$SERVICE_NAME")
 if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
