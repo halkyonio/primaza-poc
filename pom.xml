@@ -4,11 +4,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.halkyon</groupId>
-    <artifactId>servicebox</artifactId>
+    <artifactId>primaza</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>Service Box: Parent</name>
+    <name>Primaza :: Parent</name>
 
     <licenses>
         <license>
@@ -19,13 +19,13 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/halkyonio/servicebox/issues</url>
+        <url>https://github.com/halkyonio/primaza/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:halkyonio/servicebox.git</connection>
-        <developerConnection>scm:git:git@github.com:halkyonio/servicebox.git</developerConnection>
-        <url>https://github.com/halkyonio/servicebox/</url>
+        <connection>scm:git:git@github.com:halkyonio/primaza.git</connection>
+        <developerConnection>scm:git:git@github.com:halkyonio/primaza.git</developerConnection>
+        <url>https://github.com/halkyonio/primaza/</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -158,7 +158,7 @@
     </build>
 
     <modules>
-        <module>servicebox-app</module>
+        <module>app</module>
         <!--    <module>watcher</module>-->
     </modules>
 

@@ -16,7 +16,7 @@ REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
 PROJECT_NAME=primaza-poc
-PROJECT_DIR=servicebox-app
+PROJECT_DIR=app
 GITHUB_REPO_PRIMAZA=https://github.com/halkyonio/primaza-poc.git
 
 # Parameters to play the demo
@@ -28,7 +28,7 @@ pushd ${PROJECT_DIR}
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest 0 ${VM_IP}"
+pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
 pe "k wait -n ingress \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
@@ -48,34 +48,34 @@ pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-i
    -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
    -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
 
-pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/servicebox-app"
+pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
 
-pe "helm install --devel servicebox-app \
+pe "helm install --devel primaza-app \
   --dependency-update \
-  ./target/helm/kubernetes/servicebox-app \
+  ./target/helm/kubernetes/primaza-app \
   -n ${NAMESPACE} \
-  --set app.image=localhost:5000/${REGISTRY_GROUP}/servicebox-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
+  --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
 pe "k wait -n ${NAMESPACE} \
   --for=condition=ready pod \
-  -l app.kubernetes.io/name=servicebox-app \
+  -l app.kubernetes.io/name=primaza-app \
   --timeout=7m"
 
 p "waiting till Primaza Application is running"
-POD_NAME=$(k get pod -l app.kubernetes.io/name=servicebox-app -n ${NAMESPACE} -o name)
-while [[ $(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
+while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
   do sleep 1
 done
 
 p "Get the kubeconf and creating a cluster"
 KIND_URL=https://kubernetes.default.svc
-pe "kind get kubeconfig > local-kind-kubeconfig"
-pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c servicebox-app"
+pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
+pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-RESULT=$(k exec -i $POD_NAME -c servicebox-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,ingress,kube-system,local-path-storage,primaza -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,ingress,kube-system,local-path-storage,primaza -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 if [ "$RESULT" = *"500 Internal Server Error"* ]
 then
-    p "Cluster failed to be saved in Service Box: $RESULT"
+    p "Cluster failed to be saved in Primaza: $RESULT"
     k describe $POD_NAME -n ${NAMESPACE}
     k logs $POD_NAME -n ${NAMESPACE}
     exit 1

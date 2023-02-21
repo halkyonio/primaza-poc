@@ -20,7 +20,7 @@ Table of Contents
 
 # Primaza project
 
-Quarkus Primaza Service Box Application - POC
+Quarkus Primaza Application - POC
 
 Application developers need access to backing services to build and connect workloads.
 Today in Kubernetes, the exposure of secrets for connecting workloads to external services such as REST APIs, databases, event buses, and many more is manual and custom-made.
@@ -85,15 +85,15 @@ mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image
 
 Push the image to the kind container
 ```bash
-kind load docker-image kind-registry:5000/local/servicebox-app
+kind load docker-image kind-registry:5000/local/primaza-app
 ```
 When this is done, you can install the helm chart populated by Quarkus
 ```bash
-helm install --devel servicebox-app \
+helm install --devel primaza-app \
   --dependency-update \
-  ./target/helm/kubernetes/servicebox-app \
+  ./target/helm/kubernetes/primaza-app \
   -n primaza \
-  --set app.image=localhost:5000/local/servicebox-app:latest
+  --set app.image=localhost:5000/local/primaza-app:latest
 ```
 
 To play with the local k8s cluster, you will have to create a [cluster](https://primaza.<VM_IP>.nip.io/clusters) where you will import the `kubeconfig` file
@@ -108,7 +108,7 @@ VM_IP=<VM_IP> ./scripts/primaza.sh
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
-cd servicebox-app
+cd primaza-app
 ./mvnw compile quarkus:dev
 ```
 
