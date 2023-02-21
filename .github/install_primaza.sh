@@ -18,7 +18,7 @@ mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image
   -Dgit.sha.commit=$GITHUB_COMMIT_SHA
 
 # And install application from the Helm repository
-helm install --dependency-update primaza-app primaza-app/target/helm/kubernetes/primaza-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/primaza-app:$VERSION
+helm install --dependency-update primaza-app app/target/helm/kubernetes/primaza-app -n $KUBERNETES_NAMESPACE --set app.image=$KIND_REGISTRY/$KIND_REGISTRY_GROUP/primaza-app:$VERSION
 kubectl wait --for=condition=ready --timeout=5m pod -l app.kubernetes.io/name=primaza-app -n $KUBERNETES_NAMESPACE
 
 POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $KUBERNETES_NAMESPACE -o name)
