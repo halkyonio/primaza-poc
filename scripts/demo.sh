@@ -46,7 +46,7 @@ pe "k create ns $NAMESPACE --dry-run=client -o yaml | k apply -f -"
 pe "k config set-context --current --namespace=${NAMESPACE}"
 
 pe "mvn quarkus:add-extension -Dextensions=\"quarkus-kubernetes-service-binding\""
-p "Remove the third party installations via templates (we'll install these services using Service Box :) )"
+p "Remove the third party installations via templates (we'll install these services using Primaza :) )"
 pe "rm -rf src/main/kubernetes"
 p "Remove the default application.yml as we'll provide a different one with our Helm properties"
 pe "rm -rf src/main/resources/application.yml"
