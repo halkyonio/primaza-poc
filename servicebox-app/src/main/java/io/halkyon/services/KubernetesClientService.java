@@ -18,6 +18,7 @@ import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.PodSpecBuilder;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -114,8 +115,9 @@ public class KubernetesClientService {
 
         // create secret
         String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
-        client.secrets().createOrReplace(new SecretBuilder().withNewMetadata().withName(secretName)
-                .withNamespace(application.namespace).endMetadata().withData(secretData).build());
+        Secret secret = new SecretBuilder().withNewMetadata().withName(secretName).withNamespace(application.namespace)
+                .endMetadata().withData(secretData).build();
+        client.secrets().inNamespace(application.namespace).createOrReplace(secret);
 
         /*
          * Get the Deployment resource to be updated
@@ -145,7 +147,7 @@ public class KubernetesClientService {
         logIfDebugEnabled(newDeployment);
 
         // update deployment
-        client.apps().deployments().createOrReplace(newDeployment);
+        client.apps().deployments().inNamespace(application.namespace).createOrReplace(newDeployment);
     }
 
     /**
