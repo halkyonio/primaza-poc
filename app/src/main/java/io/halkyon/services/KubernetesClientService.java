@@ -27,6 +27,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
@@ -114,8 +115,10 @@ public class KubernetesClientService {
 
         // create secret
         String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
-        client.secrets().createOrReplace(new SecretBuilder().withNewMetadata().withName(secretName)
-                .withNamespace(application.namespace).endMetadata().withData(secretData).build());
+        client.secrets().inNamespace(application.namespace)
+                .resource(new SecretBuilder().withNewMetadata().withName(secretName)
+                        .withNamespace(application.namespace).endMetadata().withData(secretData).build())
+                .createOrReplace();
 
         /*
          * Get the Deployment resource to be updated
@@ -145,7 +148,7 @@ public class KubernetesClientService {
         logIfDebugEnabled(newDeployment);
 
         // update deployment
-        client.apps().deployments().createOrReplace(newDeployment);
+        client.apps().deployments().inNamespace(application.namespace).resource(newDeployment).createOrReplace();
     }
 
     /**
@@ -199,9 +202,9 @@ public class KubernetesClientService {
         }
     }
 
-    private <E extends HasMetadata, L extends KubernetesResourceList<E>> List<E> filterByCluster(
-            MixedOperation<E, L, ?> operation, Cluster cluster) {
-        FilterWatchListDeletable<E, L> filter;
+    private <E extends HasMetadata, L extends KubernetesResourceList<E>, R extends Resource<E>> List<E> filterByCluster(
+            MixedOperation<E, L, R> operation, Cluster cluster) {
+        FilterWatchListDeletable<E, L, R> filter;
         if (StringUtils.isNotEmpty(cluster.namespace)) {
             filter = operation.inNamespace(cluster.namespace);
         } else {
