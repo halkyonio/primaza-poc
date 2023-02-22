@@ -17,7 +17,7 @@
     <htmx.version>1.8.2</htmx.version>
     <bootstrap.version>5.2.2</bootstrap.version>
     <bootstrap-icons.version>1.7.0</bootstrap-icons.version>
-    <quarkus-helm.version>0.2.6</quarkus-helm.version>
+    <quarkus-helm.version>0.2.5</quarkus-helm.version>
   </properties>
 
   <dependencies>
