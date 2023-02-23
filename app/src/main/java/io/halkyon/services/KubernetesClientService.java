@@ -135,6 +135,8 @@ public class KubernetesClientService {
          * Mount the secret
          */
         Deployment newDeployment = new DeploymentBuilder(deployment).accept(ContainerBuilder.class, container -> {
+            container.removeMatchingFromVolumeMounts(vm -> Objects.equals(secretName, vm.getName())
+                    && Objects.equals(SERVICE_BINDING_ROOT_DEFAULT_VALUE + "/" + secretName, vm.getMountPath()));
             container.addNewVolumeMount().withName(secretName)
                     .withMountPath(SERVICE_BINDING_ROOT_DEFAULT_VALUE + "/" + secretName).endVolumeMount();
             container.removeMatchingFromEnv(e -> Objects.equals(SERVICE_BINDING_ROOT, e.getName()));
