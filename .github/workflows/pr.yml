@@ -93,7 +93,7 @@ jobs:
           cd quarkus-super-heroes/rest-heroes
 
           # install service binding extension
-          mvn quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
+          ./mvnw quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
 
           # remove the third party installations via templates (we'll install these services using Primaza :) )
           rm -rf src/main/kubernetes
@@ -118,7 +118,7 @@ jobs:
           EOF
 
           # deploy super-heroes application in kind cluster
-          mvn clean package -DskipTests \
+          ./mvnw clean package -DskipTests \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=$KIND_REGISTRY \
             -Dquarkus.kubernetes.namespace=$KUBERNETES_NAMESPACE \
