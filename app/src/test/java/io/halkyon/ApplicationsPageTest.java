@@ -121,7 +121,7 @@ public class ApplicationsPageTest {
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1");
+        createCredential(credentialName, service.id, "user1", "pass1", null);
         createCluster(clusterName, "host:port");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         createClaim(claimName, serviceName + "-version");
@@ -184,7 +184,7 @@ public class ApplicationsPageTest {
 
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1");
+        createCredential(credentialName, service.id, "user1", "pass1", null);
         createCluster(clusterNameOfService, "host:port");
         createCluster(clusterNameOfApplication, "host:port");
         serviceDiscoveryJob.execute(); // this action will change the service to available

@@ -28,6 +28,10 @@ public class CredentialRequest {
     @FormParam
     public String password;
 
+    @NotBlank
+    @FormParam
+    public String vaultKvPath;
+
     @FormParam
     public List<String> params;
 }

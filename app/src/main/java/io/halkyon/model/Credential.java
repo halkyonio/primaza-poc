@@ -39,6 +39,9 @@ public class Credential extends PanacheEntityBase {
     public Service service;
 
     @NotBlank
+    public String vaultKvPath;
+
+    @NotBlank
     public String username;
 
     @NotBlank
