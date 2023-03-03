@@ -23,8 +23,8 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -41,6 +41,8 @@ public class KubernetesClientService {
 
     private static final String SERVICE_BINDING_ROOT = "SERVICE_BINDING_ROOT";
     private static final String SERVICE_BINDING_ROOT_DEFAULT_VALUE = "/bindings";
+
+    private KubernetesClient client;
 
     /**
      * Get the deployments that are installed in the cluster. TODO: For OpenShift, we should support DeploymentConfig:
@@ -85,7 +87,7 @@ public class KubernetesClientService {
      */
     public void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
         Application application = claim.application;
-        KubernetesClient client = getClientForCluster(application.cluster);
+        client = getClientForCluster(application.cluster);
         String secretName = application.name + "-" + claim.name;
 
         // Get the Deployment resource
@@ -103,7 +105,7 @@ public class KubernetesClientService {
         logIfDebugEnabled(newDeployment);
 
         // Update deployment
-        client.apps().deployments().createOrReplace(newDeployment);
+        client.apps().deployments().resource(newDeployment).createOrReplace();
     }
 
     /**
@@ -111,7 +113,7 @@ public class KubernetesClientService {
      */
     public void mountSecretInApplication(Claim claim, Map<String, String> secretData) throws ClusterConnectException {
         Application application = claim.application;
-        KubernetesClient client = getClientForCluster(application.cluster);
+        client = getClientForCluster(application.cluster);
 
         // create secret
         String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
@@ -148,9 +150,13 @@ public class KubernetesClientService {
         }).build();
 
         logIfDebugEnabled(newDeployment);
+        try {
 
-        // update deployment
-        client.apps().deployments().inNamespace(application.namespace).resource(newDeployment).createOrReplace();
+            // update deployment
+            client.apps().deployments().inNamespace(application.namespace).resource(newDeployment).createOrReplace();
+        } catch (Exception e) {
+            client.secrets().inNamespace(application.namespace).withName(secretName).delete();
+        }
     }
 
     /**
@@ -177,7 +183,7 @@ public class KubernetesClientService {
             }
 
             // verify connection works fine:
-            KubernetesClient client = new DefaultKubernetesClient(config);
+            client = new KubernetesClientBuilder().withConfig(config).build();
             client.getKubernetesVersion();
             if (cluster.status == ClusterStatus.ERROR) {
                 cluster.status = ClusterStatus.OK;
