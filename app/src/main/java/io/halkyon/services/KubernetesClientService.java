@@ -44,10 +44,6 @@ public class KubernetesClientService {
 
     private KubernetesClient client;
 
-    public KubernetesClientService(KubernetesClient kubernetesClient) {
-        this.client = kubernetesClient;
-    }
-
     /**
      * Get the deployments that are installed in the cluster. TODO: For OpenShift, we should support DeploymentConfig:
      * https://github.com/halkyonio/primaza-poc/issues/136
