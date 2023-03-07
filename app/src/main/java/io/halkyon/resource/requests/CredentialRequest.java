@@ -20,15 +20,12 @@ public class CredentialRequest {
     @FormParam
     public Long serviceId;
 
-    @NotBlank
     @FormParam
     public String username;
 
-    @NotBlank
     @FormParam
     public String password;
 
-    @NotBlank
     @FormParam
     public String vaultKvPath;
 

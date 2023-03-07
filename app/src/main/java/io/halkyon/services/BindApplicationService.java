@@ -73,10 +73,15 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
             throws ClusterConnectException {
-        Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
-        Set<String> usernames = vaultSecret.keySet();
-        String username = usernames.iterator().next();
-        String password = vaultSecret.get(username);
+        String username = credential.username;
+        String password = credential.password;
+
+        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
+            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
+            Set<String> usernames = vaultSecret.keySet();
+            username = usernames.iterator().next();
+            password = vaultSecret.get(username);
+        }
 
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));

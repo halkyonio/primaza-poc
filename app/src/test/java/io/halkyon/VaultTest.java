@@ -18,7 +18,10 @@ import static org.mockito.Mockito.verify;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -47,6 +50,7 @@ import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
+import io.quarkus.vault.VaultKVSecretEngine;
 
 @QuarkusTest
 @QuarkusTestResource(WebPageExtension.class)
@@ -69,6 +73,9 @@ public class VaultTest {
     @Inject
     Scheduler scheduler;
 
+    @Inject
+    VaultKVSecretEngine kvSecretEngine;
+
     @Test
     public void testBindApplication() throws ClusterConnectException {
         pauseScheduler();
@@ -79,13 +86,23 @@ public class VaultTest {
         String serviceName = prefix + "service";
         String credentialName = prefix + "credential";
         String appName = prefix + "app";
+        String username = "user1";
+        String password = "pass1";
         // mock data
         configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1", "myapps/vault-quickstart/primaza");
+        createCredential(credentialName, service.id, "user1", "pass1", "myapps/app");
         createCluster(clusterName, "host:port");
+
+        Map<String, String> newsecrets = new HashMap<>();
+        newsecrets.put(username, password);
+        kvSecretEngine.writeSecret("myapps/app", newsecrets);
+        Map<String, String> secret = kvSecretEngine.readSecret("myapps/app");
+        String secrets = new TreeMap<>(secret).toString();
+        assertEquals("{user1=pass1}", secrets);
+
         serviceDiscoveryJob.execute(); // this action will change the service to available
         createClaim(claimName, serviceName + "-version");
         claimingServiceJob.execute(); // this action will link the claim with the above service

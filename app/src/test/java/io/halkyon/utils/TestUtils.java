@@ -18,6 +18,7 @@ import io.halkyon.model.Cluster;
 import io.halkyon.model.Credential;
 import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
+import io.restassured.specification.RequestSpecification;
 
 public final class TestUtils {
     private TestUtils() {
@@ -73,9 +74,13 @@ public final class TestUtils {
 
     public static Credential createCredential(String credentialName, long serviceId, String username, String password,
             String vaultPath) {
-        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", credentialName)
-                .formParam("serviceId", serviceId).formParam("username", username).formParam("password", password)
-                .formParam("vaultKvPath", vaultPath).when().post("/credentials").then().statusCode(201);
+        RequestSpecification requestSpecification = given().contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .formParam("name", credentialName).formParam("serviceId", serviceId).formParam("username", username)
+                .formParam("password", password).formParam("vaultKvPath", vaultPath);
+        if (vaultPath != null) {
+            requestSpecification = requestSpecification.formParam("vaultKvPath", vaultPath);
+        }
+        requestSpecification.when().post("/credentials").then().statusCode(201);
 
         return given().contentType(MediaType.APPLICATION_JSON).get("/credentials/name/" + credentialName).then()
                 .statusCode(200).extract().as(Credential.class);

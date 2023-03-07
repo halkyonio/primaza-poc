@@ -38,13 +38,10 @@ public class Credential extends PanacheEntityBase {
     @JoinColumn(name = "service_id", nullable = false)
     public Service service;
 
-    @NotBlank
     public String vaultKvPath;
 
-    @NotBlank
     public String username;
 
-    @NotBlank
     public String password;
 
     @OneToMany(mappedBy = "credential", cascade = CascadeType.ALL, orphanRemoval = true)
