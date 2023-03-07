@@ -18,7 +18,10 @@ import static org.mockito.Mockito.verify;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -47,6 +50,7 @@ import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
+import io.quarkus.vault.VaultKVSecretEngine;
 
 @QuarkusTest
 @QuarkusTestResource(WebPageExtension.class)
@@ -68,6 +72,9 @@ public class ApplicationsPageTest {
 
     @Inject
     Scheduler scheduler;
+
+    @Inject
+    VaultKVSecretEngine kvSecretEngine;
 
     @Test
     public void testDiscoverApplications() throws ClusterConnectException {
@@ -268,6 +275,75 @@ public class ApplicationsPageTest {
         page.assertPathIs("/applications");
         // claim is pending which is expected
         page.assertContentContains("pending");
+    }
+
+    @Test
+    public void testBindApplicationGettingCredentialsFromVault() throws ClusterConnectException {
+        pauseScheduler();
+        // names
+        String prefix = "ApplicationsPageTest.testBindApplicationGettingCredentialsFromVault.";
+        String clusterName = prefix + "cluster";
+        String claimName = prefix + "claim";
+        String serviceName = prefix + "service";
+        String credentialName = prefix + "credential";
+        String appName = prefix + "app";
+        String username = "user1";
+        String password = "pass1";
+        // mock data
+        configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
+        configureMockApplicationFor(clusterName, appName, "image2", "ns1");
+        // create data
+        Service service = createService(serviceName, "version", "type", "testbind:1111");
+        createCredential(credentialName, service.id, "user1", "pass1", "myapps/app");
+        createCluster(clusterName, "host:port");
+
+        Map<String, String> newsecrets = new HashMap<>();
+        newsecrets.put(username, password);
+        kvSecretEngine.writeSecret("myapps/app", newsecrets);
+        Map<String, String> secret = kvSecretEngine.readSecret("myapps/app");
+        String secrets = new TreeMap<>(secret).toString();
+        assertEquals("{user1=pass1}", secrets);
+
+        serviceDiscoveryJob.execute(); // this action will change the service to available
+        createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.execute(); // this action will link the claim with the above service
+        // test the job to find applications
+        applicationDiscoveryJob.execute();
+        // now the deployment should be listed in the page
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(appName);
+        });
+        // click on bind button
+        Application app = findApplicationByName(appName);
+        page.clickById("btn-application-bind-" + app.id);
+        // modal should be displayed
+        page.assertContentContains("Bind Application " + appName);
+        // select our claim
+        page.select("application_bind_claim", claimName);
+        // click on bind
+        page.clickById("application-bind-button");
+
+        // Verify the Claim has been updated with service credential and url, also status to BOUND
+        Claim actualClaim = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then()
+                .statusCode(200).extract().as(Claim.class);
+
+        assertNotNull(actualClaim.credential);
+        assertEquals("user1", actualClaim.credential.username);
+        assertEquals("pass1", actualClaim.credential.password);
+        assertEquals(ClaimStatus.BOUND.toString(), actualClaim.status);
+
+        // protocol://service_name:port
+        assertNotNull(actualClaim.url);
+        String expectedUrl = "testbind://" + serviceName + ":1111";
+        assertEquals(expectedUrl, actualClaim.url);
+
+        // then secret should have been generated
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
+                argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
+        // and application should have been rolled out.
+        verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) throws ClusterConnectException {
