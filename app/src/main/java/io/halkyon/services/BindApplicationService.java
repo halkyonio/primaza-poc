@@ -7,6 +7,7 @@ import static io.halkyon.utils.StringUtils.toBase64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 import io.halkyon.utils.StringUtils;
+import io.quarkus.vault.VaultKVSecretEngine;
 
 @ApplicationScoped
 public class BindApplicationService {
@@ -28,6 +30,11 @@ public class BindApplicationService {
     public static final String PORT_KEY = "port";
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
+
+    public static final String VAULT_KV_PATH_KEY = "vault-path";
+
+    @Inject
+    VaultKVSecretEngine kvSecretEngine;
 
     @Inject
     KubernetesClientService kubernetesClientService;
@@ -66,13 +73,23 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
             throws ClusterConnectException {
+        String username = credential.username;
+        String password = credential.password;
+
+        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
+            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
+            Set<String> usernames = vaultSecret.keySet();
+            username = usernames.iterator().next();
+            password = vaultSecret.get(username);
+        }
+
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
         secretData.put(PORT_KEY, toBase64(getPortFromUrl(url)));
         secretData.put(URL_KEY, toBase64(url));
-        secretData.put(USERNAME_KEY, toBase64(credential.username));
-        secretData.put(PASSWORD_KEY, toBase64(credential.password));
+        secretData.put(USERNAME_KEY, toBase64(username));
+        secretData.put(PASSWORD_KEY, toBase64(password));
 
         for (CredentialParameter param : credential.params) {
             secretData.put(param.paramName, toBase64(param.paramValue));

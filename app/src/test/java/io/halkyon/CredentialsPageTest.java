@@ -36,6 +36,7 @@ public class CredentialsPageTest {
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
+        page.type("credential_vault_path", "myapps/vault-quickstart/private");
         // submit credential
         page.clickById("credential-button");
 
@@ -46,6 +47,7 @@ public class CredentialsPageTest {
                 .as(Credential.class);
         assertEquals("Admin", credential.username);
         assertEquals("Supersecret", credential.password);
+        assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
         assertEquals(2, credential.params.size());
         assertEquals("a", credential.params.get(0).paramName);
         assertEquals("1", credential.params.get(0).paramValue);
@@ -64,7 +66,8 @@ public class CredentialsPageTest {
         // Create data
         String prefix = "CredentialsPageTest-testEditCredentialFromPage-";
         Service service = createService(prefix + "service", "8", "type");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
+        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+                "myapps/vault-quickstart/private");
         // Go to the page
         page.goTo("/credentials");
         // Ensure our data is listed
@@ -87,7 +90,8 @@ public class CredentialsPageTest {
     public void testDeleteCredential() {
         String prefix = "CredentialsPageTest-testDeleteCredential-";
         Service service = createService(prefix + "service", "8", "postgresql");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass");
+        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+                "myapps/vault-quickstart/private");
 
         // When, we go to the credentials page
         page.goTo("/credentials");

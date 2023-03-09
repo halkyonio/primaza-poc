@@ -2,24 +2,21 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>io.halkyon</groupId>
     <artifactId>primaza</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-
   <groupId>io.halkyon</groupId>
   <artifactId>primaza-app</artifactId>
   <name>Primaza :: REST Application</name>
   <description>Exposes CRUD operations on service resources</description>
   <properties>
-    <htmx.version>1.8.2</htmx.version>
-    <bootstrap.version>5.2.2</bootstrap.version>
     <bootstrap-icons.version>1.7.0</bootstrap-icons.version>
+    <bootstrap.version>5.2.2</bootstrap.version>
+    <htmx.version>1.8.2</htmx.version>
     <quarkus-helm.version>0.2.5</quarkus-helm.version>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -57,8 +54,6 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-kubernetes-client</artifactId>
     </dependency>
-
-    <!-- Webjars -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
@@ -74,8 +69,6 @@
       <artifactId>htmx.org</artifactId>
       <version>${htmx.version}</version>
     </dependency>
-
-    <!-- ORM - DB -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm-rest-data-panache</artifactId>
@@ -88,7 +81,16 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-h2</artifactId>
     </dependency>
-    <!-- Testing -->
+    <dependency>
+      <groupId>io.quarkiverse.vault</groupId>
+      <artifactId>quarkus-vault</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.vault</groupId>
+      <artifactId>quarkus-test-vault</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>

@@ -160,6 +160,7 @@ public class CredentialResource {
         credential.name = request.name;
         credential.username = request.username;
         credential.password = request.password;
+        credential.vaultKvPath = request.vaultKvPath;
         credential.service = Service.findById(request.serviceId);
         credential.params.clear();
         if (request.params != null) {
