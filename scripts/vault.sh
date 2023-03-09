@@ -12,6 +12,7 @@ function install() {
   echo "Installing Vault Helm"
   cat <<EOF > ./my-values.yml
 server:
+  updateStrategyType: RollingUpdate
   ha:
     enabled: false
   ingress:
@@ -73,7 +74,8 @@ case $1 in
 esac
 
 install
-sleep 15
+# DO NOT WORK -> kubectl rollout status statefulset/vault -n vault
+sleep 20
 unseal
 login
 secret-kv
