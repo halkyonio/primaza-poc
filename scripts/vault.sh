@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: To be improved using: https://github.com/redhat-appstudio/service-provider-integration-operator/blob/main/hack/vault-init.sh
+
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
 source ${SCRIPTS_DIR}/common.sh
@@ -42,20 +44,20 @@ function login() {
 }
 
 function unseal() {
-    kubectl -n vault exec vault-0 -- vault operator init \
+    vaultExec "vault operator init \
         -key-shares=1 \
         -key-threshold=1 \
-        -format=json > ./cluster-keys.json
+        -format=json" > ./cluster-keys.json
 
     VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ./cluster-keys.json)
-    kubectl -n vault exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
+    vaultExec "vault operator unseal $VAULT_UNSEAL_KEY"
     echo "##############################################################"
     echo "Vault Root Token: $(jq -r ".root_token" ./cluster-keys.json)"
     echo "##############################################################"
 }
 
 function kv() {
-  kubectl -n vault exec vault-0 -- vault secrets enable kv
+  vaultExec "vault secrets enable kv"
 }
 
 case $1 in
@@ -67,7 +69,7 @@ case $1 in
 esac
 
 install
-sleep 30
+sleep 15
 unseal
 login
 kv
