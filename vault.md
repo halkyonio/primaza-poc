@@ -36,6 +36,13 @@ kubectl -n vault exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
 ```bash
 jq -r ".root_token" tmp/cluster-keys.json
 ```
+- Creating a new key under kv path
+```bash
+kubectl -n vault exec vault-0 --  vault kv put kv/hello target=world
+kubectl -n vault exec vault-0 --  vault kv get kv/hello
+kubectl -n vault exec vault-0 --  vault kv delete kv/hello
+```
+
 - To uninstall it
 ```bash
 helm uninstall vault -n vault
