@@ -15,71 +15,85 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
-PROJECT_NAME=primaza-poc
 PROJECT_DIR=app
-GITHUB_REPO_PRIMAZA=https://github.com/halkyonio/primaza-poc.git
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=40}
 NO_WAIT=true
 
-pushd ${PROJECT_DIR}
-
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
-pe "k wait -n ingress \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=120s"
+function install_kind() {
+  pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
+  pe "k wait -n ingress \
+    --for=condition=ready pod \
+    --selector=app.kubernetes.io/component=controller \
+    --timeout=120s"
+}
 
-pe "k create namespace ${NAMESPACE}"
-pe "k config set-context --current --namespace=${NAMESPACE}"
+function build() {
+  pushd ${PROJECT_DIR}
+  pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
+     -Dquarkus.container-image.push=true \
+     -Dquarkus.container-image.registry=${REGISTRY} \
+     -Dquarkus.container-image.group=${REGISTRY_GROUP} \
+     -Dquarkus.container-image.tag=${IMAGE_VERSION} \
+     -Dquarkus.container-image.insecure=true \
+     -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
+     -Dlog.level=INFO \
+     -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
+     -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
 
-pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
-   -Dquarkus.container-image.push=true \
-   -Dquarkus.container-image.registry=${REGISTRY} \
-   -Dquarkus.container-image.group=${REGISTRY_GROUP} \
-   -Dquarkus.container-image.tag=${IMAGE_VERSION} \
-   -Dquarkus.container-image.insecure=true \
-   -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
-   -Dlog.level=INFO \
-   -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
-   -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
+  pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
+  popd
+}
 
-pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
+function deploy() {
+    pe "k create namespace ${NAMESPACE}"
+    pe "k config set-context --current --namespace=${NAMESPACE}"
+    pe "helm install --devel primaza-app \
+      --dependency-update \
+      ./target/helm/kubernetes/primaza-app \
+      -n ${NAMESPACE} \
+      --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
-pe "helm install --devel primaza-app \
-  --dependency-update \
-  ./target/helm/kubernetes/primaza-app \
-  -n ${NAMESPACE} \
-  --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
+    pe "k wait -n ${NAMESPACE} \
+      --for=condition=ready pod \
+      -l app.kubernetes.io/name=primaza-app \
+      --timeout=7m"
 
-pe "k wait -n ${NAMESPACE} \
-  --for=condition=ready pod \
-  -l app.kubernetes.io/name=primaza-app \
-  --timeout=7m"
+    p "waiting till Primaza Application is running"
+    POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
+    while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+      do sleep 1
+    done
 
-p "waiting till Primaza Application is running"
-POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
-while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
-  do sleep 1
-done
+    p "Get the kubeconf and creating a cluster"
+    KIND_URL=https://kubernetes.default.svc
+    pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
+    pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-p "Get the kubeconf and creating a cluster"
-KIND_URL=https://kubernetes.default.svc
-pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
-pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
+    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,ingress,kube-system,local-path-storage,primaza -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+    if [ "$RESULT" = *"500 Internal Server Error"* ]
+    then
+        p "Cluster failed to be saved in Primaza: $RESULT"
+        k describe $POD_NAME -n ${NAMESPACE}
+        k logs $POD_NAME -n ${NAMESPACE}
+        exit 1
+    fi
+    note "Local k8s cluster registered: $RESULT"
+}
 
-RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,ingress,kube-system,local-path-storage,primaza -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
-if [ "$RESULT" = *"500 Internal Server Error"* ]
-then
-    p "Cluster failed to be saved in Primaza: $RESULT"
-    k describe $POD_NAME -n ${NAMESPACE}
-    k logs $POD_NAME -n ${NAMESPACE}
-    exit 1
-fi
-note "Local k8s cluster registered: $RESULT"
+function remove() {
+  pe "helm uninstall primaza-app -n ${NAMESPACE}"
+}
 
-popd
+case $1 in
+    install_kind) "$@"; exit;;
+    build)        "$@"; exit;;
+    deploy)       "$@"; exit;;
+    remove)       "$@"; exit;;
+esac
+
+build
