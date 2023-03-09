@@ -54,7 +54,7 @@ function deploy() {
     pe "k config set-context --current --namespace=${NAMESPACE}"
     pe "helm install --devel primaza-app \
       --dependency-update \
-      ./target/helm/kubernetes/primaza-app \
+      ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
       --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
