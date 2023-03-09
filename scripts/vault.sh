@@ -5,10 +5,11 @@ SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 source ${SCRIPTS_DIR}/common.sh
 
 VM_IP=${VM_IP:-127.0.0.1}
+ROOT_TOKEN=""
 
 function install() {
   echo "Installing Vault Helm"
-  cat <<EOF > tmp/my-values.yml
+  cat <<EOF > ./my-values.yml
 server:
   ha:
     enabled: false
@@ -22,13 +23,22 @@ ui:
   enabled: true
   serviceType: "ClusterIP"
 EOF
-  helm install vault hashicorp/vault --create-namespace -n vault -f tmp/my-values.yml
+  helm install vault hashicorp/vault --create-namespace -n vault -f ./my-values.yml
 }
 
 function remove() {
   echo "Removing helm vault & pvc"
   helm uninstall vault -n vault
   kubectl delete pvc -n vault -lapp.kubernetes.io/name=vault
+}
+
+function vaultExec() {
+  COMMAND=${1}
+  kubectl exec vault-0 -n vault -- sh -c "${COMMAND}" 2> /dev/null
+}
+
+function login() {
+  vaultExec "vault login ${ROOT_TOKEN} > /dev/null"
 }
 
 function unseal() {
@@ -53,6 +63,7 @@ case $1 in
     remove) "$@"; exit;;
     unseal) "$@"; exit;;
     kv) "$@"; exit;;
+    login) "$@"; exit;;
 esac
 
 install
