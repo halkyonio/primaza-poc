@@ -50,7 +50,7 @@ function build() {
 }
 
 function deploy() {
-    pe "k create namespace ${NAMESPACE}"
+    pe "k create namespace ${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
     pe "k config set-context --current --namespace=${NAMESPACE}"
     pe "helm install --devel primaza-app \
       --dependency-update \
