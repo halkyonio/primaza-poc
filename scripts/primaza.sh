@@ -96,4 +96,6 @@ case $1 in
     remove)       "$@"; exit;;
 esac
 
+remove
 build
+deploy
