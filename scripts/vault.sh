@@ -56,8 +56,12 @@ function unseal() {
     echo "##############################################################"
 }
 
-function kv() {
+function secret-kv() {
   vaultExec "vault secrets enable kv"
+}
+
+function secret-kubernetes() {
+  vaultExec "vault secrets enable kubernetes"
 }
 
 case $1 in
@@ -72,4 +76,5 @@ install
 sleep 15
 unseal
 login
-kv
+secret-kv
+secret-kubernetes
