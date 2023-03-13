@@ -10,8 +10,8 @@ VM_IP=${VM_IP:-127.0.0.1}
 
 VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
-APP=${APP_POLICY:-primaza}
-KV_PREFIX=${KEY_PATH:-kv}
+APP_POLICY=${APP_POLICY:-primaza}
+KV_PREFIX=${KV_PREFIX:-kv}
 
 #########################
 ## Generic functions
@@ -89,22 +89,22 @@ function enableUserPasswordAuth() {
   vaultExec "vault auth enable userpass"
 }
 
+function createUserPolicy() {
+  POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
+  ROLES="\"read\", \"create\", \"list\", \"delete\", \"update\""
+  log BLUE "Creating policy ${POLICY_NAME} for path: ${KV_PREFIX}/${APP_POLICY}/* having as roles: ${ROLES}"
+
+  POLICY_FILE=/tmp/spi_policy.hcl
+  vaultExec "echo 'path \"${KV_PREFIX}/${APP_POLICY}/*\" { capabilities = [${ROLES}] }' > ${POLICY_FILE}"
+  vaultExec "vault policy write $POLICY_NAME $POLICY_FILE"
+}
+
 function registerUser() {
   POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
   note "User: ${VAULT_USER}"
   note "Password: ${VAULT_PASSWORD}"
-  note "Policy name: POLICY_NAME"
+  note "Policy name: ${POLICY_NAME}"
   vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${POLICY_NAME}"
-}
-
-function createUserPolicy() {
-  POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
-  ROLES="\"read\", \"create\", \"list\", \"delete\", \"update\""
-  log BLUE "Creating policy ${POLICY_NAME} for path: \"${KV_PREFIX}\"${APP}\"* having as roles: "
-
-  POLICY_FILE=/tmp/spi_policy.hcl
-  vaultExec "echo 'path \"${KV_PREFIX}/${APP}*\" { capabilities = [${ROLES}] }' > ${POLICY_FILE}"
-  vaultExec "vault policy write POLICY_NAME $POLICY_FILE"
 }
 
 case $1 in
