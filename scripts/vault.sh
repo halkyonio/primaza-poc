@@ -7,6 +7,16 @@ SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 source ${SCRIPTS_DIR}/common.sh
 
 VM_IP=${VM_IP:-127.0.0.1}
+USER=${0:-bob}
+PASSWORD=${1:-sinclair}
+PATH_PREFIX=${2:-kv/*}
+APP=${2:-primaza}
+
+echo "USER 1: ${USER}"
+echo "PASSWORD 2: ${PASSWORD}"
+echo "PATH_PREFIX 3: ${PATH_PREFIX}"
+echo "APP 4: ${APP}"
+
 
 function install() {
   echo "Installing Vault Helm"
@@ -40,8 +50,14 @@ function vaultExec() {
 }
 
 function login() {
+  echo "Logging in as Root"
   ROOT_TOKEN=$(jq -r ".root_token" ./cluster-keys.json)
-  vaultExec "vault login ${ROOT_TOKEN} > /dev/null"
+  echo "Root Token: ${ROOT_TOKEN}"
+  vaultExec "vault login ${ROOT_TOKEN}"
+}
+
+function loginAsUser() {
+  vaultExec "vault login -method=userpass username=bob password=sinclair"
 }
 
 function unseal() {
@@ -57,12 +73,33 @@ function unseal() {
     echo "##############################################################"
 }
 
-function secret-kv() {
+function enableKvSecretEngine() {
   vaultExec "vault secrets enable kv"
 }
 
-function secret-kubernetes() {
+function enableK8sSecretEngine() {
   vaultExec "vault secrets enable kubernetes"
+}
+
+function enableUserPasswordAuth() {
+  vaultExec "vault auth enable userpass"
+}
+
+function registerUser() {
+  vaultExec "vault write auth/userpass/users/${1} password=${2} policies=kv-${3}-policy"
+}
+
+function createUserPolicy() {
+  echo "Creating User Policy"
+  PATH_PREFIX=${1}
+  APP=${2}
+  echo "Creating kv-${APP}-policy User Policy for '${PATH_PREFIX}' path"
+  cat <<EOF | vault policy write kv-$APP-policy -
+path "${PATH_PREFIX}" {
+  capabilities = ["read", "create"]
+}
+EOF
+
 }
 
 case $1 in
@@ -71,6 +108,10 @@ case $1 in
     unseal) "$@"; exit;;
     kv) "$@"; exit;;
     login) "$@"; exit;;
+    createUserPolicy) "$@"; exit;;
+    enableUserPasswordAuth) "$@"; exit;;
+    registerUser) "$@"; exit;;
+    loginAsUser) "$@"; exit;;
 esac
 
 install
@@ -78,5 +119,9 @@ install
 sleep 20
 unseal
 login
-secret-kv
-secret-kubernetes
+enableKvSecretEngine
+enableK8sSecretEngine
+createUserPolicy ${PATH_PREFIX} ${APP}
+enableUserPasswordAuth
+registerUser ${USER} ${PASSWORD} kv-${APP}-policy
+loginAsUser

@@ -66,8 +66,8 @@ Note: paste the Root Token when prompted.
 
 3- Create a policy giving access to the path that will stock the secrets
 ```bash
-cat <<EOF | vault policy write vault-quickstart-policy -                                                                                                                  ✔  13:07:05
-path "kv/*" {
+cat <<EOF | vault policy write vault-primaza-policy -                                                                                                                  ✔  13:07:05
+path "kv/primaza/*" {
   capabilities = ["read", "create"]
 }
 EOF
@@ -76,7 +76,7 @@ EOF
 4- Enable the userpass auth secret engine, and create user bob with access to the vault-quickstart-policy
 ````bash
 vault auth enable userpass
-vault write auth/userpass/users/bob password=sinclair policies=vault-quickstart-policy
+vault write auth/userpass/users/bob password=sinclair policies=vault-primaza-policy
 ````
 
 5- Logging in using `bob` user:
