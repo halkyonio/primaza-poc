@@ -52,7 +52,7 @@ function remove() {
 
 function login() {
   log BLUE "Logging in as Root"
-  ROOT_TOKEN=$(jq -r ".root_token" $SCRIPTS_DIR/../cluster-keys.json)
+  ROOT_TOKEN=$(jq -r ".root_token" $SCRIPTS_DIR/cluster-keys.json)
   vaultExec "vault login ${ROOT_TOKEN}"
 }
 
@@ -131,3 +131,4 @@ enableUserPasswordAuth
 createUserPolicy
 registerUser
 loginAsUser
+vaultExec "vault kv put kv/primaza/hello target=world"
