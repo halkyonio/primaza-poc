@@ -43,7 +43,55 @@ kubectl -n vault exec vault-0 --  vault kv get kv/hello
 kubectl -n vault exec vault-0 --  vault kv delete kv/hello
 ```
 
-- To uninstall it
+
+### Using vault custom script and vault cli
+
+There is a script in the script folder ready to install and configure vault.
+
+1 - Install vault in the kind cluster.
+
+Go to the scripts folder and launch the script from its location:
+````bash
+./vault.sh
+````
+
+Copy the Root Token shown in the output.
+
+2- Authenticate as Root.
+````bash
+vault login
+````
+Note: paste the Root Token when prompted.
+
+
+3- Create a policy giving access to the path that will stock the secrets
+```bash
+cat <<EOF | vault policy write vault-primaza-policy -                                                                                                                  ✔  13:07:05
+path "kv/primaza/*" {
+  capabilities = ["read", "create"]
+}
+EOF
+```
+
+4- Enable the userpass auth secret engine, and create user bob with access to the vault-quickstart-policy
+````bash
+vault auth enable userpass
+vault write auth/userpass/users/bob password=sinclair policies=vault-primaza-policy
+````
+
+5- Logging in using `bob` user:
+
+```bash
+vault login -method=userpass username=bob password=sinclair
+```
+
+6- Try to create a secret:
+
+```bash
+vault kv put kv/hello target=world
+```
+
+## To uninstall it
 ```bash
 helm uninstall vault -n vault
 kubectl delete pvc -n vault -lapp.kubernetes.io/name=vault
