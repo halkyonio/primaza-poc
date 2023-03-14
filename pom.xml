@@ -41,6 +41,8 @@
         <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
         <formatter-maven-plugin.version>2.21.0</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.8.0</impsort-maven-plugin.version>
+        <lobmok.version>1.18.26</lobmok.version>
+        <sundrio.version>0.93.2</sundrio.version>
 
         <skipITs>true</skipITs>
         <src.format.goal>format</src.format.goal>
@@ -60,6 +62,24 @@
                 <artifactId>htmlunit</artifactId>
                 <version>${htmlunit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.sundr</groupId>
+                <artifactId>sundr-adapter-reflect</artifactId>
+                <version>${sundrio.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.sundr</groupId>
+                <artifactId>builder-annotations</artifactId>
+                <version>${sundrio.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lobmok.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
