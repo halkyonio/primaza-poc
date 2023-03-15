@@ -13,6 +13,8 @@ VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
 APP_POLICY=${APP_POLICY:-primaza}
 KV_PREFIX=${KV_PREFIX:-kv}
 
+TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+
 #########################
 ## Generic functions
 #########################
@@ -23,7 +25,7 @@ function vaultExec() {
 
 function install() {
   log BLUE "Installing Vault Helm"
-  cat <<EOF > ./my-values.yml
+  cat <<EOF > ${TMP_DIR}/my-values.yml
 server:
   updateStrategyType: RollingUpdate
   ha:
@@ -38,7 +40,7 @@ ui:
   enabled: true
   serviceType: "ClusterIP"
 EOF
-  helm install vault hashicorp/vault --create-namespace -n vault -f ./my-values.yml
+  helm install vault hashicorp/vault --create-namespace -n vault -f ${TMP_DIR}/my-values.yml
 }
 
 #########################
@@ -48,11 +50,12 @@ function remove() {
   log BLUE "Removing helm vault & pvc"
   helm uninstall vault -n vault
   kubectl delete pvc -n vault -lapp.kubernetes.io/name=vault
+  rm ${TMP_DIR}
 }
 
 function login() {
   log BLUE "Logging in as Root"
-  ROOT_TOKEN=$(jq -r ".root_token" $SCRIPTS_DIR/cluster-keys.json)
+  ROOT_TOKEN=$(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)
   vaultExec "vault login ${ROOT_TOKEN}"
 }
 
@@ -66,12 +69,10 @@ function unseal() {
     vaultExec "vault operator init \
         -key-shares=1 \
         -key-threshold=1 \
-        -format=json" > ./cluster-keys.json
+        -format=json" > ${TMP_DIR}/cluster-keys.json
 
-    VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ./cluster-keys.json)
+    VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" ${TMP_DIR}/cluster-keys.json)
     vaultExec "vault operator unseal $VAULT_UNSEAL_KEY"
-
-    log YELLOW "Vault Root Token: $(jq -r ".root_token" ./cluster-keys.json)"
 }
 
 function enableKVSecretEngine() {
@@ -132,3 +133,6 @@ createUserPolicy
 registerUser
 loginAsUser
 vaultExec "vault kv put kv/primaza/hello target=world"
+
+log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
+log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
