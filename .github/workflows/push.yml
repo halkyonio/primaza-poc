@@ -95,7 +95,7 @@ jobs:
 
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
-        run: .github/print_PRIMAZA_logs.sh
+        run: .github/print_primaza_logs.sh
 
   verify-e2e-example-in-kubernetes:
     name: Verify Super Hero workshop in Kubernetes
@@ -119,6 +119,10 @@ jobs:
       - name: Start Vault
         run: .github/install_vault.sh
 
+      - name: Create secret in Vault
+        run: |
+          kubectl exec vault-0 -n vault -- sh -c "vault kv put kv/primaza/heroes-db superman=superman"
+
       - name: Start Primaza
         run: .github/install_primaza.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
@@ -131,7 +135,7 @@ jobs:
           cd quarkus-super-heroes/rest-heroes
 
           # install service binding extension
-          mvn quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
+          ./mvnw quarkus:add-extension -Dextensions="quarkus-kubernetes-service-binding"
 
           # remove the third party installations via templates (we'll install these services using Primaza :) )
           rm -rf src/main/kubernetes
@@ -156,16 +160,16 @@ jobs:
           EOF
 
           # install application
-          mvn clean package -DskipTests \
+          ./mvnw clean package -DskipTests \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=$KIND_REGISTRY \
             -Dquarkus.kubernetes.namespace=$KUBERNETES_NAMESPACE \
             -Dquarkus.kubernetes.deploy=true
 
-      - name: Register Kind cluster in Primaza
+      - name: Register Kind cluster in Primaza excluding technical namespaces for service and application discovery
         run: .github/register_local_kind_cluster_in_primaza.sh kube-system,sb
 
-      - name: Wait until rest-heroes is registered in Primaza
+      - name: Wait until rest-heroes is discovered by Primaza
         run: |
           PRIMAZA_KUBERNETES_NAMESPACE=sb
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
@@ -181,6 +185,7 @@ jobs:
           KUBERNETES_NAMESPACE=app
           USERNAME=superman
           PASSWORD=superman
+          VAULT_KV_PATH=kv/primaza/heroes-db
           TYPE=postgresql
           DATABASE_NAME=database
 
@@ -192,13 +197,13 @@ jobs:
           # Next, we register the Postgresql service in Primaza
           .github/register_service_in_primaza.sh postgresql 11 tcp:5432 $TYPE
 
-          # And finally the credentials
-          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
+           # We create the credentials for the PostgreSQL service recently registered
+          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME $VAULT_KV_PATH
 
       - name: Register claim
         run: .github/register_claim_in_primaza.sh heroClaimDb postgresql-11
 
-      - name: Bind application to claim
+      - name: Bind the application to the service using the claim
         run: .github/bind_application_to_claim_in_primaza.sh rest-heroes heroClaimDb
 
       - id: wait-for-super-hero
@@ -210,7 +215,7 @@ jobs:
 
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
-        run: .github/print_PRIMAZA_logs.sh
+        run: .github/print_primaza_logs.sh
 
       - name: (Only if it failed) Log Rest Heroes traces at failures
         if: failure()

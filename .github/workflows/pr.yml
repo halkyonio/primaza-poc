@@ -81,6 +81,13 @@ jobs:
           version: v0.11.1
           registry: true
 
+      - name: Start Vault
+        run: .github/install_vault.sh
+
+      - name: Create secret in Vault
+        run: |
+          kubectl exec vault-0 -n vault -- sh -c "vault kv put kv/primaza/heroes-db superman=superman"
+
       - name: Start Primaza
         run: .github/install_primaza.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
@@ -143,6 +150,7 @@ jobs:
           KUBERNETES_NAMESPACE=app
           USERNAME=superman
           PASSWORD=superman
+          VAULT_KV_PATH=kv/primaza/heroes-db
           TYPE=postgresql
           DATABASE_NAME=database
 
@@ -154,8 +162,8 @@ jobs:
           # Next, we register the Postgresql service in Primaza
           .github/register_service_in_primaza.sh postgresql 11 tcp:5432 $TYPE
 
-          # We create the credentials for the PostgreSQL service recently registered
-          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
+           # We create the credentials for the PostgreSQL service recently registered
+          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME $VAULT_KV_PATH
 
       - name: Register claim
         run: .github/register_claim_in_primaza.sh heroClaimDb postgresql-11
