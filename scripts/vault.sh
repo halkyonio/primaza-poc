@@ -95,8 +95,31 @@ function createUserPolicy() {
   ROLES="\"read\", \"create\", \"list\", \"delete\", \"update\""
   log BLUE "Creating policy ${POLICY_NAME} for path: ${KV_PREFIX}/${APP_POLICY}/* having as roles: ${ROLES}"
 
-  POLICY_FILE=/tmp/spi_policy.hcl
-  vaultExec "echo 'path \"${KV_PREFIX}/${APP_POLICY}/*\" { capabilities = [${ROLES}] }' > ${POLICY_FILE}"
+  POLICY_FILE=${TMP_DIR}/spi_policy.hcl
+  #vaultExec "echo 'path \"${KV_PREFIX}/${APP_POLICY}/*\" { capabilities = [${ROLES}] }' > ${POLICY_FILE}"
+
+  cat <<EOF > ${POLICY_FILE}
+path "${KV_PREFIX}/${APP_POLICY}/*" {
+    "capabilities"=[${ROLES}]
+}
+
+path "secret/*" {
+    "capabilities"=["read","list"]
+}
+
+path "sys/mounts" {
+    "capabilities"=["read","list"]
+}
+
+path "sys/internal/ui/mounts" {
+    "capabilities"=["read"]
+}
+
+path "sys/policies/acl" {
+    "capabilities"=["read","list"]
+}
+EOF
+
   vaultExec "vault policy write $POLICY_NAME $POLICY_FILE"
 }
 
