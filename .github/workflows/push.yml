@@ -116,6 +116,9 @@ jobs:
           version: v0.11.1
           registry: true
 
+      - name: Start Vault
+        run: .github/install_vault.sh
+
       - name: Start Primaza
         run: .github/install_primaza.sh ${{ github.repository }} ${{ github.event.pull_request.head.sha }}
 
