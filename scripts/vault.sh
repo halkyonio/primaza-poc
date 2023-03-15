@@ -50,7 +50,7 @@ function remove() {
   log BLUE "Removing helm vault & pvc"
   helm uninstall vault -n vault
   kubectl delete pvc -n vault -lapp.kubernetes.io/name=vault
-  rm ${TMP_DIR}
+  rm -rf ${TMP_DIR} || true
 }
 
 function login() {
