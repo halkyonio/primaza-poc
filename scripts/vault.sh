@@ -118,7 +118,8 @@ path "sys/policies/acl" {
     "capabilities"=["read","list"]
 }
 EOF
-  vaultExec "vault policy write $POLICY_NAME $POLICY_FILE"
+  kubectl -n vault cp ${POLICY_FILE} vault-0:/tmp/spi_policy.hcl
+  vaultExec "vault policy write $POLICY_NAME /tmp/spi_policy.hcl"
 }
 
 function registerUser() {
