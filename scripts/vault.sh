@@ -12,6 +12,7 @@ VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
 APP_POLICY=${APP_POLICY:-primaza}
 KV_PREFIX=${KV_PREFIX:-kv}
+POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
 
 TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 
@@ -91,12 +92,10 @@ function enableUserPasswordAuth() {
 }
 
 function createUserPolicy() {
-  POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
   ROLES="\"read\",\"create\",\"list\",\"delete\",\"update\""
   log BLUE "Creating policy ${POLICY_NAME} for path: ${KV_PREFIX}/${APP_POLICY}/* having as roles: ${ROLES}"
 
   POLICY_FILE=${TMP_DIR}/spi_policy.hcl
-  #vaultExec "echo 'path \"${KV_PREFIX}/${APP_POLICY}/*\" { capabilities = [${ROLES}] }' > ${POLICY_FILE}"
 
   cat <<EOF > $POLICY_FILE
 path "${KV_PREFIX}/${APP_POLICY}/*" {
@@ -123,7 +122,6 @@ EOF
 }
 
 function registerUser() {
-  POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
   note "User: ${VAULT_USER}"
   note "Password: ${VAULT_PASSWORD}"
   note "Policy name: ${POLICY_NAME}"
