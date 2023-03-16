@@ -28,6 +28,8 @@ function install() {
   log BLUE "Installing Vault Helm"
   cat <<EOF > ${TMP_DIR}/my-values.yml
 server:
+  image:
+    tag: 1.13.0
   updateStrategyType: RollingUpdate
   ha:
     enabled: false
