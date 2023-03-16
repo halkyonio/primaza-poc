@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
@@ -86,15 +87,7 @@ public class ApplicationsPageTest {
         // test the job
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
-        page.goTo("/applications");
-        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
-            page.refresh();
-            page.assertContentContains(prefix + "app");
-            page.assertContentContains("image1");
-            page.assertContentContains(prefix + "cluster");
-        });
-        // and cluster should have only one application
-        assertEquals(1, Cluster.findByName(cluster.name).applications.size());
+        assertApplicationIsDiscovered(prefix, cluster);
 
         // test the same application is not created again
         applicationDiscoveryJob.execute();
@@ -111,6 +104,49 @@ public class ApplicationsPageTest {
             page.refresh();
             page.assertContentDoesNotContain(prefix + "app");
         });
+    }
+
+    @Test
+    public void testEditClusterToExcludeNamespaceWithExistingAppFromPage() throws ClusterConnectException {
+        String prefix = "ApplicationsPageTest.testEditClusterToExcludeNamespace.";
+        pauseScheduler();
+        // create data
+        String namespaceToExclude = prefix + "ns";
+        Cluster cluster = createCluster(prefix + "cluster", "host:port");
+        configureMockApplicationFor(cluster.name, prefix + "app", "image1", namespaceToExclude);
+        // test the job
+        applicationDiscoveryJob.execute();
+        // now the deployment should be listed in the page
+        assertApplicationIsDiscovered(prefix, cluster);
+        // because we're not using a real connection, we need to mock the excluded namespaces update behaviour by doing:
+        configureMockApplicationWithEmptyFor(cluster);
+        // Now, let's go to the clusters page to edit the cluster
+        page.goTo("/clusters");
+        // Ensure our data is listed
+        page.assertContentContains(cluster.name);
+        // Let's change the owner
+        page.clickById("btn-cluster-edit-" + cluster.id);
+        page.assertPathIs("/clusters/" + cluster.id);
+        page.assertContentContains("Update Cluster");
+        page.assertContentContains(cluster.name);
+        page.type("clusterExcludedNamespaces", cluster.excludedNamespaces + "," + namespaceToExclude);
+        page.clickById("cluster-button");
+        // Verify the entity was properly updated:
+        page.assertContentContains("Updated successfully for id: " + cluster.id);
+        // Go back to the clusters list and check whether the owner is displayed
+        page.goTo("/clusters");
+        page.assertContentContains(cluster.name);
+        page.assertContentContains(cluster.excludedNamespaces + "," + namespaceToExclude);
+        // Now, the application should be gone:
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentDoesNotContain(prefix + "app");
+            page.assertContentDoesNotContain("image1");
+            page.assertContentDoesNotContain(prefix + "cluster");
+        });
+        // and cluster should have no applications
+        assertNoApplicationsInCluster(cluster);
     }
 
     @Test
@@ -344,6 +380,23 @@ public class ApplicationsPageTest {
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void assertNoApplicationsInCluster(Cluster cluster) {
+        assertEquals(0, Cluster.findByName(cluster.name).applications.size());
+    }
+
+    private void assertApplicationIsDiscovered(String prefix, Cluster cluster) {
+        page.goTo("/applications");
+        await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> {
+            page.refresh();
+            page.assertContentContains(prefix + "app");
+            page.assertContentContains("image1");
+            page.assertContentContains(prefix + "cluster");
+        });
+        // and cluster should have only one application
+        assertEquals(1, Cluster.findByName(cluster.name).applications.size());
     }
 
     private void configureMockApplicationWithEmptyFor(Cluster cluster) throws ClusterConnectException {
