@@ -24,10 +24,11 @@ function usage() {
   fmt "Usage: $0 [option]"
   fmt ""
   fmt "\tWhere option is:"
-  fmt "\t-h       \tPrints help"
-  fmt "\tremove   \tUninstall the helm chart and additional kubernetes resources"
-  fmt "\tlogin    \tLog in to vault using the root token"
-  fmt "\tvaultExec\tExecute a vault command within the vault pod"
+  fmt "\t-h        \tPrints help"
+  fmt "\tremove    \tUninstall the helm chart and additional kubernetes resources"
+  fmt "\tlogin     \tLog in to vault using the root token"
+  fmt "\trootToken \tDisplay the vault root token"
+  fmt "\tvaultExec \tExecute a vault command within the vault pod"
   fmt ""
 }
 
@@ -76,6 +77,10 @@ function login() {
   log BLUE "Logging in as Root"
   ROOT_TOKEN=$(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)
   vaultExec "vault login ${ROOT_TOKEN}"
+}
+
+function rootToken() {
+  kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d
 }
 
 function loginAsUser() {
@@ -175,6 +180,7 @@ case $1 in
     enableKVSecretEngine) "$@"; exit;;
     enableK8sSecretEngine) "$@"; exit;;
     login) "$@"; exit;;
+    rootToken) "$@"; exit;;
     enableUserPasswordAuth) "$@"; exit;;
     createUserPolicy) "$@"; exit;;
     registerUser) "$@"; exit;;
