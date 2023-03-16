@@ -100,18 +100,37 @@ function createUserPolicy() {
   POLICY_FILE=${TMP_DIR}/spi_policy.hcl
 
   cat <<EOF > $POLICY_FILE
+#
+# Rule to access kv keys (read, list)
+# Example: vault kv list or vault kv read default
+#
 path "kv/*" {
   "capabilities"=["read","list"]
 }
+#
+# Rule to access kv/${APP_POLICY} keys (CRUD)
+# Example: vault kv read ${KV_PREFIX}/${APP_POLICY}/hello
+#
 path "${KV_PREFIX}/${APP_POLICY}/*" {
     "capabilities"=[${ROLES}]
 }
+#
+# Rule to access the secret engines (list)
+# Example: vault secrets list
+#
 path "sys/secrets/*" {
   "capabilities"=["read","list"]
 }
+#
+# Rule to access secrets engine mounted (read, list)
+#
 path "sys/mounts" {
   "capabilities"=["read","list"]
 }
+#
+# Rule to access the ACL policies (read, list)
+# Example: vault policy list or vault policy read default
+#
 path "sys/policies/acl/*" {
   "capabilities"=["read","list"]
 }
