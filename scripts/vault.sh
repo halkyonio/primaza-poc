@@ -93,6 +93,11 @@ function enableUserPasswordAuth() {
   vaultExec "vault auth enable userpass"
 }
 
+function createTokensKubernetesSecret() {
+  log BLUE "Creating a kubernetes secret storing the Vault Root Token"
+  kubectl create secret generic -n vault tokens --from-literal=root_token=$(jq -r '.root_token' ${TMP_DIR}/cluster-keys.json)
+}
+
 function createUserPolicy() {
   ROLES="\"read\",\"create\",\"list\",\"delete\",\"update\""
   log BLUE "Creating policy ${POLICY_NAME} for path: ${KV_PREFIX}/${APP_POLICY}/* having as roles: ${ROLES}"
@@ -167,6 +172,7 @@ login
 enableKVSecretEngine
 enableK8sSecretEngine
 enableUserPasswordAuth
+createTokensKubernetesSecret
 createUserPolicy
 registerUser
 loginAsUser
@@ -174,3 +180,5 @@ vaultExec "vault kv put kv/primaza/hello target=world"
 
 log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
+
+log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n vault tokens -ojson | jq -r '.data/root_token' | base64 -d\""
