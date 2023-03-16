@@ -31,7 +31,7 @@ p "Kind server: ${KIND_URL}"
 
 CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 p "Creating a Primaza DEV cluster for local kind usage ..."
-p "curl -X POST -H 'Content-Type: multipart/form-data' ${PRIMAZA_URL}/clusters -s -i -F excludedNamespaces="default,kube-system,ingress" -F name=${CONTEXT_TO_USE} -F environment=DEV -F url=${KIND_URL} -F kubeConfig=\"NOT_SHOW\" -o /dev/null"
+p "curl -X POST -H 'Content-Type: multipart/form-data' ${PRIMAZA_URL}/clusters -s -i -F excludedNamespaces="default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault" -F name=${CONTEXT_TO_USE} -F environment=DEV -F url=${KIND_URL} -F kubeConfig=\"NOT_SHOW\" -o /dev/null"
 
 curl -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces="default,kube-system,ingress"\
