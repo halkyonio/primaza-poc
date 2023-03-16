@@ -52,7 +52,8 @@ EOF
 function remove() {
   log BLUE "Removing helm vault & pvc"
   helm uninstall vault -n vault
-  kubectl delete pvc -n vault -lapp.kubernetes.io/name=vault
+  kubectl delete -n vault pvc  -lapp.kubernetes.io/name=vault
+  kubectl delete -n vault secret tokens
   rm -rf ${TMP_DIR} || true
 }
 
