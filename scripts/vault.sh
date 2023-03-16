@@ -8,11 +8,13 @@ source ${SCRIPTS_DIR}/common.sh
 #####################
 VM_IP=${VM_IP:-127.0.0.1}
 
+KV_APP_NAME=${KV_APP_NAME:-primaza}
+KV_PREFIX=${KV_PREFIX:-kv}
+
 VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
-APP_POLICY=${APP_POLICY:-primaza}
-KV_PREFIX=${KV_PREFIX:-kv}
-POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
+VAULT_POLICY_NAME=${KV_PREFIX}-${KV_APP_NAME}-policy
+
 
 TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 
@@ -121,7 +123,7 @@ function createTokensKubernetesSecret() {
 
 function createUserPolicy() {
   ROLES="\"read\",\"create\",\"list\",\"delete\",\"update\""
-  log BLUE "Creating policy ${POLICY_NAME} for path: ${KV_PREFIX}/${APP_POLICY}/* having as roles: ${ROLES}"
+  log BLUE "Creating policy ${VAULT_POLICY_NAME} for path: ${KV_PREFIX}/${KV_APP_NAME}/* having as roles: ${ROLES}"
 
   POLICY_FILE=${TMP_DIR}/spi_policy.hcl
 
@@ -134,10 +136,10 @@ path "kv/*" {
   "capabilities"=["read","list"]
 }
 #
-# Rule to access kv/${APP_POLICY} keys (CRUD)
-# Example: vault kv read ${KV_PREFIX}/${APP_POLICY}/hello
+# Rule to access kv/${KV_APP_NAME} keys (CRUD)
+# Example: vault kv read ${KV_PREFIX}/${KV_APP_NAME}/hello
 #
-path "${KV_PREFIX}/${APP_POLICY}/*" {
+path "${KV_PREFIX}/${KV_APP_NAME}/*" {
     "capabilities"=[${ROLES}]
 }
 #
@@ -162,14 +164,14 @@ path "sys/policies/acl/*" {
 }
 EOF
   kubectl -n vault cp ${POLICY_FILE} vault-0:/tmp/spi_policy.hcl
-  vaultExec "vault policy write $POLICY_NAME /tmp/spi_policy.hcl"
+  vaultExec "vault policy write $VAULT_POLICY_NAME /tmp/spi_policy.hcl"
 }
 
 function registerUser() {
   note "User: ${VAULT_USER}"
   note "Password: ${VAULT_PASSWORD}"
-  note "Policy name: ${POLICY_NAME}"
-  vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${POLICY_NAME}"
+  note "Policy name: ${VAULT_POLICY_NAME}"
+  vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
 }
 
 case $1 in
