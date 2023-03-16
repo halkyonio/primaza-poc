@@ -80,7 +80,7 @@ function login() {
 }
 
 function rootToken() {
-  warn "Vault root token: $(kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d)"
+  log "YELLOW" "Vault root token: $(kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d)"
 }
 
 function loginAsUser() {
