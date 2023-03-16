@@ -8,15 +8,24 @@ ROOT_TOKEN=${ROOT_TOKEN:=TOTO}
 POLICY_NAME=primaza-policy
 
 #path "*" {
-#  "capabilities"=["create", "read", "update", "delete", "list"]
+#  "capabilities"=["create","read","update","delete","list"]
 #}
 
 cat <<EOF > spi_policy.hcl
+path "kv/*" {
+  "capabilities"=["read","list"]
+}
 path "kv/primaza/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+  "capabilities"=["create","read","update","delete","list"]
+}
+path "sys/secrets/*" {
+  "capabilities"=["read","list"]
+}
+path "sys/mounts" {
+  "capabilities"=["read","list"]
 }
 path "sys/policies/acl/*" {
-  capabilities = ["read","list"]
+  "capabilities"=["read","list"]
 }
 EOF
 
@@ -26,6 +35,7 @@ vault policy delete ${POLICY_NAME} ; vault policy write ${POLICY_NAME} spi_polic
 vault write auth/userpass/users/quark password=admin policies=${POLICY_NAME}
 
 vault login -method=userpass username=quark password=admin
-vault policy list
+
 vault secrets list
+vault policy list
 vault policy read ${POLICY_NAME}
