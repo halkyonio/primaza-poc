@@ -21,7 +21,7 @@ path "sys/policies/acl/*" {
 EOF
 
 export VAULT_ADDR=http://vault.${VM_IP}.nip.io
-vault login $(jq -r ."root_token" ${ROOT_TOKEN}
+vault login $(jq -r ."root_token" ${ROOT_TOKEN})
 vault policy delete ${POLICY_NAME} ; vault policy write ${POLICY_NAME} spi_policy.hcl
 vault write auth/userpass/users/quark password=admin policies=${POLICY_NAME}
 
