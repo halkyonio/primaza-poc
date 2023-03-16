@@ -1,6 +1,6 @@
 package io.halkyon.model;
 
-import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.PERSIST;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,7 +16,7 @@ public class Application extends PanacheEntity {
     public String namespace;
     public String image;
 
-    @ManyToOne(cascade = ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")
     public Cluster cluster;
 
