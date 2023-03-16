@@ -26,11 +26,12 @@ function usage() {
   fmt "Usage: $0 [option]"
   fmt ""
   fmt "\tWhere option is:"
-  fmt "\t-h        \tPrints help"
-  fmt "\tremove    \tUninstall the helm chart and additional kubernetes resources"
-  fmt "\tlogin     \tLog in to vault using the root token"
-  fmt "\trootToken \tDisplay the vault root token"
-  fmt "\tvaultExec \tExecute a vault command within the vault pod"
+  fmt "\t-h           \tPrints help"
+  fmt "\tremove       \tUninstall the helm chart and additional kubernetes resources"
+  fmt "\tlogin        \tLog in to vault using the root token"
+  fmt "\trootToken    \tDisplay the vault root token"
+  fmt "\tregisterUser \tRegister a new vault user and assign a policy using as parameters: <user> <password> <policy_name>"
+  fmt "\tvaultExec    \tExecute a vault command within the vault pod"
   fmt ""
 }
 
@@ -168,10 +169,18 @@ EOF
 }
 
 function registerUser() {
-  note "User: ${VAULT_USER}"
-  note "Password: ${VAULT_PASSWORD}"
-  note "Policy name: ${VAULT_POLICY_NAME}"
-  vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
+  if [ -v 1 ]; then
+    VAULT_USER=$1
+  fi
+  if [ -v 2 ]; then
+    VAULT_PASSWORD=$2
+  fi
+  if [ -v 3 ]; then
+    VAULT_POLICY_NAME=$3
+  fi
+
+  log BLUE "Creating a new vault user: ${VAULT_USER}, password: ${VAULT_PASSWORD} having as policy: ${VAULT_POLICY_NAME}"
+  #vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
 }
 
 case $1 in
