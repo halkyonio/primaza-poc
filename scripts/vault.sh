@@ -103,21 +103,8 @@ function createUserPolicy() {
 path "${KV_PREFIX}/${APP_POLICY}/*" {
     "capabilities"=[${ROLES}]
 }
-
-path "secret/*" {
-    "capabilities"=["read","list"]
-}
-
-path "sys/mounts" {
-    "capabilities"=["read","list"]
-}
-
-path "sys/internal/ui/mounts" {
-    "capabilities"=["read"]
-}
-
-path "sys/policies/acl" {
-    "capabilities"=["read","list"]
+path "*" {
+    "capabilities"=["create", "read", "update", "delete", "list"]
 }
 EOF
   kubectl -n vault cp ${POLICY_FILE} vault-0:/tmp/spi_policy.hcl
