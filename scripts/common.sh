@@ -31,6 +31,12 @@ repeat_char(){
 	for i in {1..70}; do echo -ne "${!COLOR}$2${NC}"; done
 }
 
+fmt() {
+  COLOR="CYAN"
+  MSG="${@:1}"
+  echo -e "${!COLOR} ${MSG}${NC}"
+}
+
 msg() {
   COLOR=${1}
   MSG="${@:2}"

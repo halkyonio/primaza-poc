@@ -17,6 +17,21 @@ POLICY_NAME=${KV_PREFIX}-${APP_POLICY}-policy
 TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 
 #########################
+## Help / Usage
+#########################
+function usage() {
+  fmt ""
+  fmt "Usage: $0 [option]"
+  fmt ""
+  fmt "\tWhere option is:"
+  fmt "\t-h       \tPrints help"
+  fmt "\tremove   \tUninstall the helm chart and additional kubernetes resources"
+  fmt "\tlogin    \tLog in to vault using the root token"
+  fmt "\tvaultExec\tExecute a vault command within the vault pod"
+  fmt ""
+}
+
+#########################
 ## Generic functions
 #########################
 function vaultExec() {
@@ -153,6 +168,7 @@ function registerUser() {
 }
 
 case $1 in
+    -h) usage; exit;;
     install) "$@"; exit;;
     remove) "$@"; exit;;
     unseal) "$@"; exit;;
