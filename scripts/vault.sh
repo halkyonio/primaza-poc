@@ -182,4 +182,4 @@ vaultExec "vault kv put kv/primaza/hello target=world"
 log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
 
-log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n vault tokens -ojson | jq -r '.data/root_token' | base64 -d\""
+log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d\""
