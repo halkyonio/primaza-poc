@@ -180,7 +180,7 @@ function registerUser() {
   fi
 
   log BLUE "Creating a new vault user: ${VAULT_USER}, password: ${VAULT_PASSWORD} having as policy: ${VAULT_POLICY_NAME}"
-  #vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
+  vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
 }
 
 case $1 in
