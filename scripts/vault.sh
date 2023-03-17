@@ -180,7 +180,7 @@ function registerUser() {
   fi
 
   log BLUE "Creating a new vault user: ${VAULT_USER}, password: ${VAULT_PASSWORD} having as policy: ${VAULT_POLICY_NAME}"
-  #vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
+  vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
 }
 
 case $1 in
@@ -210,7 +210,6 @@ createTokensKubernetesSecret
 createUserPolicy
 registerUser
 loginAsUser
-vaultExec "vault kv put kv/primaza/hello target=world"
 
 log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
