@@ -16,7 +16,8 @@ VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
 VAULT_POLICY_NAME=${KV1_PREFIX}-${KV_APP_NAME}-policy
 
-TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+TMP_DIR=.vault
+mkdir -p ${TMP_DIR}
 
 #########################
 ## Help / Usage
@@ -236,7 +237,7 @@ vaultExec "vault kv put ${KV1_PREFIX}/${KV_APP_NAME}/hello target=world"
 log BLUE "Put the key hello = world at the mounted path: ${KV2_PREFIX}/${KV_APP_NAME}"
 vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 
-log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
+log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
 
 log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d\""
