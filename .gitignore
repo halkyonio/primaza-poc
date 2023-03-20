@@ -65,4 +65,4 @@ nb-configuration.xml
 .env
 
 # Vault tmp files
-/tmp/
+.vault/
