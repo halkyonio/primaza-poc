@@ -9,12 +9,12 @@ source ${SCRIPTS_DIR}/common.sh
 VM_IP=${VM_IP:-127.0.0.1}
 
 KV_APP_NAME=${KV_APP_NAME:-primaza}
-KV_PREFIX=${KV_PREFIX:-kv}
+KV1_PREFIX=${KV1_PREFIX:-kv1}
+KV2_PREFIX=${KV2_PREFIX:-kv2}
 
 VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
-VAULT_POLICY_NAME=${KV_PREFIX}-${KV_APP_NAME}-policy
-
+VAULT_POLICY_NAME=${KV1_PREFIX}-${KV_APP_NAME}-policy
 
 TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 
@@ -29,6 +29,7 @@ function usage() {
   fmt "\t-h           \tPrints help"
   fmt "\tremove       \tUninstall the helm chart and additional kubernetes resources"
   fmt "\tlogin        \tLog in to vault using the root token"
+  fmt "\tloginAsUser  \tLog in to vault using parameters: <user> <password>. Default: bob/sinclair"
   fmt "\trootToken    \tDisplay the vault root token"
   fmt "\tregisterUser \tRegister a new vault user and assign a policy using as parameters: <user> <password> <policy_name>"
   fmt "\tvaultExec    \tExecute a vault command within the vault pod"
@@ -70,9 +71,9 @@ EOF
 #########################
 function remove() {
   log BLUE "Removing helm vault & pvc"
-  helm uninstall vault -n vault
-  kubectl delete -n vault pvc  -lapp.kubernetes.io/name=vault
-  kubectl delete -n vault secret tokens
+  helm uninstall vault -n vault || true
+  kubectl delete -n vault pvc -lapp.kubernetes.io/name=vault
+  kubectl delete -n vault secret tokens || true
   rm -rf ${TMP_DIR} || true
 }
 
@@ -87,8 +88,14 @@ function rootToken() {
 }
 
 function loginAsUser() {
+    if [ -v 1 ]; then
+      VAULT_USER=$1
+    fi
+    if [ -v 2 ]; then
+      VAULT_PASSWORD=$2
+    fi
   log BLUE "Login as user: ${VAULT_USER}"
-  vaultExec "vault login -method=userpass username=bob password=sinclair"
+  vaultExec "vault login -method=userpass username=${VAULT_USER} password=${VAULT_PASSWORD}"
 }
 
 function unseal() {
@@ -102,9 +109,14 @@ function unseal() {
     vaultExec "vault operator unseal $VAULT_UNSEAL_KEY"
 }
 
-function enableKVSecretEngine() {
-  log BLUE "Enable KV secret engine"
-  vaultExec "vault secrets enable kv"
+function enableKV1SecretEngine() {
+  log BLUE "Enable the KV version 1 secret engine. The secrets engine will be mounted to the path: ${KV1_PREFIX}"
+  vaultExec "vault secrets enable -path=${KV1_PREFIX} -version=1 kv"
+}
+
+function enableKV2SecretEngine() {
+  log BLUE "Enable KV version 2 secret engine. The secrets engine will be mounted to the path: ${KV2_PREFIX}"
+  vaultExec "vault secrets enable -path=${KV2_PREFIX} -version=2 kv"
 }
 
 function enableK8sSecretEngine() {
@@ -124,23 +136,29 @@ function createTokensKubernetesSecret() {
 
 function createUserPolicy() {
   ROLES="\"read\",\"create\",\"list\",\"delete\",\"update\""
-  log BLUE "Creating policy ${VAULT_POLICY_NAME} for path: ${KV_PREFIX}/${KV_APP_NAME}/* having as roles: ${ROLES}"
+  log BLUE "Creating policy ${VAULT_POLICY_NAME} for path: ${KV1_PREFIX}/${KV_APP_NAME}/* having as roles: ${ROLES}"
 
   POLICY_FILE=${TMP_DIR}/spi_policy.hcl
 
   cat <<EOF > $POLICY_FILE
 #
-# Rule to access kv keys (read, list)
+# Rule to access kv keys (read, list) - version 1 or 2
 # Example: vault kv list or vault kv read default
 #
-path "kv/*" {
+path "${KV1_PREFIX}/*" {
+  "capabilities"=["read","list"]
+}
+path "${KV2_PREFIX}/*" {
   "capabilities"=["read","list"]
 }
 #
-# Rule to access kv/${KV_APP_NAME} keys (CRUD)
-# Example: vault kv read ${KV_PREFIX}/${KV_APP_NAME}/hello
+# Rule to access ${KV1_PREFIX}/${KV_APP_NAME} keys (CRUD) for version 1 or 2
+# Example: vault kv read ${KV1_PREFIX}/${KV_APP_NAME}/hello
 #
-path "${KV_PREFIX}/${KV_APP_NAME}/*" {
+path "${KV1_PREFIX}/${KV_APP_NAME}/*" {
+    "capabilities"=[${ROLES}]
+}
+path "${KV2_PREFIX}/data/${KV_APP_NAME}/*" {
     "capabilities"=[${ROLES}]
 }
 #
@@ -188,7 +206,8 @@ case $1 in
     install) "$@"; exit;;
     remove) "$@"; exit;;
     unseal) "$@"; exit;;
-    enableKVSecretEngine) "$@"; exit;;
+    enableKV1SecretEngine) "$@"; exit;;
+    enableKV2SecretEngine) "$@"; exit;;
     enableK8sSecretEngine) "$@"; exit;;
     login) "$@"; exit;;
     rootToken) "$@"; exit;;
@@ -203,13 +222,19 @@ install
 sleep 20
 unseal
 login
-enableKVSecretEngine
+enableKV1SecretEngine
+enableKV2SecretEngine
 enableK8sSecretEngine
 enableUserPasswordAuth
 createTokensKubernetesSecret
 createUserPolicy
 registerUser
 loginAsUser
+log BLUE "Put the key hello = world at the mounted path: ${KV1_PREFIX}/${KV_APP_NAME}"
+vaultExec "vault kv put ${KV1_PREFIX}/${KV_APP_NAME}/hello target=world"
+
+log BLUE "Put the key hello = world at the mounted path: ${KV2_PREFIX}/${KV_APP_NAME}"
+vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 
 log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
