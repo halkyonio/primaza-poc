@@ -248,4 +248,4 @@ jobs:
         run: docker login quay.io -u="${{secrets.QUAY_USER}}" -p="${{secrets.QUAY_TOKEN}}"
 
       - name: Push
-        run: mvn clean install -DskipTests -Ppush-images -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.registry=quay.io -Dquarkus.container-image.group=snowdrop
+        run: mvn clean install -DskipTests -Ppush-images -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.registry=quay.io -Dquarkus.container-image.group=halkyonio
