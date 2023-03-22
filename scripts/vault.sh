@@ -10,11 +10,11 @@ VM_IP=${VM_IP:-127.0.0.1}
 
 KV_APP_NAME=${KV_APP_NAME:-primaza}
 KV1_PREFIX=${KV1_PREFIX:-kv1}
-KV2_PREFIX=${KV2_PREFIX:-kv2}
+KV2_PREFIX=${KV2_PREFIX:-secret}
 
 VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
-VAULT_POLICY_NAME=${KV1_PREFIX}-${KV_APP_NAME}-policy
+VAULT_POLICY_NAME=kv-${KV_APP_NAME}-policy
 
 TMP_DIR=.vault
 mkdir -p ${TMP_DIR}
@@ -216,6 +216,7 @@ case $1 in
     createUserPolicy) "$@"; exit;;
     registerUser) "$@"; exit;;
     loginAsUser) "$@"; exit;;
+    vaultExec) "$@"; exit;;
 esac
 
 install
@@ -223,7 +224,7 @@ install
 sleep 20
 unseal
 login
-enableKV1SecretEngine
+#enableKV1SecretEngine
 enableKV2SecretEngine
 enableK8sSecretEngine
 enableUserPasswordAuth
@@ -231,10 +232,12 @@ createTokensKubernetesSecret
 createUserPolicy
 registerUser
 loginAsUser
-log BLUE "Put the key hello = world at the mounted path: ${KV1_PREFIX}/${KV_APP_NAME}"
-vaultExec "vault kv put ${KV1_PREFIX}/${KV_APP_NAME}/hello target=world"
 
-log BLUE "Put the key hello = world at the mounted path: ${KV2_PREFIX}/${KV_APP_NAME}"
+# As we don't install KV v1, we will not create a key
+# log BLUE "Put the key hello = world at the mounted path: ${KV1_PREFIX}/${KV_APP_NAME}"
+#vaultExec "vault kv put ${KV1_PREFIX}/${KV_APP_NAME}/hello target=world"
+
+log BLUE "Executing: vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 
 log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
