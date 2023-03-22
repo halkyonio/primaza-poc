@@ -1,6 +1,6 @@
 <form class="form-horizontal" action="/clusters/filter" hx-get="/clusters/filter" hx-target="#cluster-table" hx-swap="innerHTML"
       hx-trigger="input from:#cluster_search_by_name,input from:#cluster_search_by_environment,input from:#cluster_search_by_url,input from:#cluster_search_by_status">
-  <div class="table-responsive">
+  <div class="container table-responsive">
         <table class="table">
             <thead>
               <tr>
@@ -42,7 +42,8 @@
             </tbody>
         </table>
     </div>
-    <!-- Showing the number of clusters. Returned by the template key: items of ClusterResource -->
-    <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
-  </div>
+    <div class="container">
+      <!-- Showing the number of clusters. Returned by the template key: items of ClusterResource -->
+      <strong>{items}</strong> {#if items == 1}item{#else}items{/if}
+    </div>
 </form>
