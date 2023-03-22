@@ -11,9 +11,6 @@ import io.quarkus.vault.VaultKVSecretEngine;
 
 @Path("/hello")
 public class GreetingResource {
-    //
-    // @ConfigProperty(name = "a-private-key")
-    // String privateKey;
 
     @Inject
     VaultKVSecretEngine kvSecretEngine;
@@ -22,13 +19,7 @@ public class GreetingResource {
     @Path("/secrets/{vault-path}")
     @Produces(MediaType.TEXT_PLAIN)
     public String getSecrets(@PathParam("vault-path") String vaultPath) {
-        return kvSecretEngine.readSecret("myapps/vault-quickstart/" + vaultPath).toString();
+        return kvSecretEngine.readSecret("primaza/" + vaultPath).toString();
     }
 
-    // @GET
-    // @Path("/private-key")
-    // @Produces(MediaType.TEXT_PLAIN)
-    // public String privateKey() {
-    // return privateKey;
-    // }
 }

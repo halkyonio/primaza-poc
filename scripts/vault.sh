@@ -210,7 +210,6 @@ createTokensKubernetesSecret
 createUserPolicy
 registerUser
 loginAsUser
-vaultExec "vault kv put kv/primaza/hello target=world"
 
 log YELLOW "Temporary folder containing created files: ${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
