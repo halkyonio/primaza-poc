@@ -255,7 +255,7 @@ jobs:
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=quay.io \
             -Dquarkus.container-image.group=halkyonio \
-            -Dquarkus.container-image.tag=latest \
+            -Dquarkus.container-image.tag=$(git rev-parse --short HEAD) \
             -Dgithub.repo=${{ github.repository }} \
             -Dgit.sha.commit=$(git rev-parse --short HEAD)
         

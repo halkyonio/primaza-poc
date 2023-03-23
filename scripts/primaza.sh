@@ -24,7 +24,7 @@ GIT_SHA_COMMIT=$(git rev-parse --short HEAD)
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
 PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
-PRIMAZA_IMAGE_NAME=quay.io/halkyonio/primaza-app:0.0.1-SNAPSHOT
+PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GIT_SHA_COMMIT}}
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=40}
@@ -52,7 +52,7 @@ function build() {
      -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
      -Dlog.level=INFO \
      -Dgit.sha.commit=${GIT_SHA_COMMIT} \
-     -Dgithub.repo=${PRIMAZA_IMAGE_NAME}"
+     -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
   pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
   popd
@@ -70,7 +70,7 @@ function deploy() {
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       --set app.host=${INGRESS_HOST} \
       --set app.envs.git.sha.commit=${GIT_SHA_COMMIT} \
-      --set app.envs.github.repo=${PRIMAZA_IMAGE_NAME} \
+      --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO} \
       2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
