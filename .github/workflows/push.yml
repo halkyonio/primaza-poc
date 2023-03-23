@@ -247,8 +247,17 @@ jobs:
       - name: Quay.io Login
         run: docker login quay.io -u="${{secrets.QUAY_USER}}" -p="${{secrets.QUAY_TOKEN}}"
 
-      - name: Push
-        run: mvn clean install -DskipTests -Ppush-images -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.registry=quay.io -Dquarkus.container-image.group=halkyonio -Dquarkus.container-image.tag=latest
+      - name: Build the image and push it
+        run: |
+          mvn clean install \
+            -DskipTests -Ppush-images \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.registry=quay.io \
+            -Dquarkus.container-image.group=halkyonio \
+            -Dquarkus.container-image.tag=latest \
+            -Dgithub.repo=${{ github.repository }} \
+            -Dgit.sha.commit=$(git rev-parse --short HEAD)
         
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
