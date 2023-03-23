@@ -18,9 +18,11 @@ REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
+GIT_SHA_COMMIT=$(git rev-parse --short HEAD)
 
 # Parameters used when using the image from an external container registry: quay.io/halkyonio/primaza-app
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
+PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
 PRIMAZA_IMAGE_NAME=quay.io/halkyonio/primaza-app:0.0.1-SNAPSHOT
 
@@ -49,8 +51,8 @@ function build() {
      -Dquarkus.container-image.insecure=true \
      -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
      -Dlog.level=INFO \
-     -Dgit.sha.commit=\"$(git rev-parse --short HEAD)\" \
-     -Dgithub.repo=https://github.com/halkyonio/primaza-poc"
+     -Dgit.sha.commit=${GIT_SHA_COMMIT} \
+     -Dgithub.repo=${PRIMAZA_IMAGE_NAME}"
 
   pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
   popd
@@ -66,7 +68,9 @@ function deploy() {
       primaza-app \
       -n ${NAMESPACE} \
       --set app.image=${PRIMAZA_IMAGE_NAME} \
-      --set app.host=\"${INGRESS_HOST}\" \
+      --set app.host=${INGRESS_HOST} \
+      --set app.envs.git.sha.commit=${GIT_SHA_COMMIT} \
+      --set app.envs.github.repo=${PRIMAZA_IMAGE_NAME} \
       2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
