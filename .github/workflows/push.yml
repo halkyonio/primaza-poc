@@ -10,8 +10,6 @@ jobs:
     strategy:
       matrix:
         java: [
-          { 'version': '11', opts: '' },
-          { 'version': '16', 'opts': '' },
           { 'version': '17', 'opts': '' }
         ]
     name: build with jdk ${{matrix.java.version}}
