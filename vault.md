@@ -107,13 +107,13 @@ or
 
 When testing or running in dev mode Quarkus can provide you with a zero-config Vault out of the box. 
 Since the Vault extension is included in the classpath, Quarkus will provide the Vault server inside a Docker container. 
-So, to use the Vault provided by Quarkus, start the application in dev mode: 
+So, to use the Vault instance provided by Quarkus, start the application in dev mode: 
 
 ```bash
 mvn quarkus:dev
 ```
 
-Tape `h` key as indicated in the prompt for more options:  
+There are various hotkeys you can use to control continuous testing. Pressing h will display the following list of commands:
 
 ```bash
 The following commands are currently available:
@@ -145,7 +145,7 @@ The following commands are currently available:
 
 
 ```
-Then tape `c` in order to show the Dev Services containers running. You should see something like:
+Then press `c` in order to show the Dev Services containers running. You should see something like:
 
 ```bash
 
@@ -155,7 +155,7 @@ Then tape `c` in order to show the Dev Services containers running. You should s
 
 ```
 
-If you want to use this Vault in command line for creating or reading secrets, you can configure the address and token as follows:
+If you want to use the vault client within a terminal, export the following ENV variables:
 
 ```bash
 export VAULT_TOKEN=root
