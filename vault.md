@@ -155,7 +155,7 @@ Then press `c` in order to show the Dev Services containers running. You should 
 
 ```
 
-If you want to it using the vault client within a terminal, export the following ENV variables:
+If you want to use the vault client within a terminal, export the following ENV variables:
 
 ```bash
 export VAULT_TOKEN=root
