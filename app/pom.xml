@@ -55,6 +55,19 @@
       <artifactId>quarkus-kubernetes-client</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-container-image-docker</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-kubernetes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.helm</groupId>
+      <artifactId>quarkus-helm</artifactId>
+      <version>${quarkus-helm.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.sundr</groupId>
       <artifactId>sundr-adapter-reflect</artifactId>
       <scope>compile</scope>
@@ -232,35 +245,6 @@
         <skipITs>false</skipITs>
         <quarkus.package.type>native</quarkus.package.type>
       </properties>
-    </profile>
-    <profile>
-      <id>push-images</id>
-      <properties>
-        <quarkus.profile>postgresql</quarkus.profile>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>io.quarkus</groupId>
-          <artifactId>quarkus-container-image-docker</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>kubernetes</id>
-      <properties>
-        <quarkus.profile>kubernetes</quarkus.profile>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>io.quarkus</groupId>
-          <artifactId>quarkus-kubernetes</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>io.quarkiverse.helm</groupId>
-          <artifactId>quarkus-helm</artifactId>
-          <version>${quarkus-helm.version}</version>
-        </dependency>
-      </dependencies>
     </profile>
   </profiles>
 </project>

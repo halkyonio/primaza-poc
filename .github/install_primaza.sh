@@ -8,7 +8,7 @@ KIND_REGISTRY_GROUP=local
 VERSION=latest
 kubectl create namespace $KUBERNETES_NAMESPACE
 
-mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
+mvn clean install -DskipTests -Dquarkus.container-image.build=true \
   -Dquarkus.container-image.push=true \
   -Dquarkus.container-image.registry=$KIND_REGISTRY \
   -Dquarkus.container-image.group=$KIND_REGISTRY_GROUP \

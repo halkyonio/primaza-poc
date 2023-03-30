@@ -248,7 +248,7 @@ jobs:
       - name: Build the image and push it
         run: |
           mvn clean install \
-            -DskipTests -Ppush-images \
+            -DskipTests \
             -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.registry=quay.io \
