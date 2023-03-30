@@ -73,7 +73,7 @@ kubectl config set-context --current --namespace=primaza
 
 Next, build the Quarkus application and provide additional parameters used to build/push the image to the docker registry and to generate a helm chart
 ```bash
-mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
+mvn clean install -DskipTests -Dquarkus.container-image.build=true \
     -Dquarkus.container-image.push=true    \
     -Dquarkus.container-image.registry=kind-registry:5000    \
     -Dquarkus.container-image.group=local    \

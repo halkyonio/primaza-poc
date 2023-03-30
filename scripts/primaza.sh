@@ -46,7 +46,7 @@ function install_kind() {
 
 function build() {
   pushd ${PROJECT_DIR}
-  pe "mvn clean install -DskipTests -Ppush-images,kubernetes -Dquarkus.container-image.build=true \
+  pe "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
      -Dquarkus.container-image.group=${REGISTRY_GROUP} \
