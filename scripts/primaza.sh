@@ -25,9 +25,6 @@ GIT_SHA_COMMIT=$(git rev-parse --short HEAD)
 PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
 PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GIT_SHA_COMMIT}}
-VAULT_URL=${VAULT_URL:-vault.127.0.0.1.nip.io}
-VAULT_USER=${VAULT_USER:-bob}
-VAULT_PWD=${VAULT_PWD:-sinclair}
 
 # Parameters to play the demo
 TYPE_SPEED=${TYPE_SPEED:=40}
@@ -73,10 +70,7 @@ function deploy() {
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       --set app.host=${INGRESS_HOST} \
       --set app.envs.git.sha.commit=${GIT_SHA_COMMIT} \
-      --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO} \
-      --set app.envs.VAULT_URL=${VAULT_URL} \
-      --set app.envs.VAULT_USER=${VAULT_USER} \
-      --set app.envs.VAULT_PWD=${VAULT_PWD} \
+      --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO}
       2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
