@@ -59,6 +59,11 @@ function build() {
 }
 
 function deploy() {
+    ENVARGS=""
+    if [[ -n "${VAULT_URL}" ]]; then ENVARGS+="--set app.envs.VAULT_URL=${VAULT_URL}"; fi
+    if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.VAULT_USER=${VAULT_USER}"; fi
+    if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.VAULT_PASSWORD=${VAULT_PASSWORD}"; fi
+
     pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
     pe "k config set-context --current --namespace=${NAMESPACE}"
     pe "helm install \
@@ -70,7 +75,8 @@ function deploy() {
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       --set app.host=${INGRESS_HOST} \
       --set app.envs.git.sha.commit=${GIT_SHA_COMMIT} \
-      --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO}
+      --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO} \
+      ${ENVARGS} \
       2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
