@@ -44,15 +44,16 @@
             <td>{application.cluster.name}</td>
             <td>
                 {#if application.claim != null}
-                <a href="/claims/{application.claim.id}">{application.claim.status}</a>
+                    <button id="btn-application-bind-{application.id}"
+                            class="btn btn-secondary btn-sm rounded-2 disabled">{application.claim.status}</button>
                 {#else}
-                <button hx-get="/applications/claim/{application.id}"
-                        hx-target="#app_bind_modal-container"
-                        hx-trigger="click"
-                        onclick="stopPolling()"
-                        id="btn-application-bind-{application.id}"
-                        class="btn btn-success btn-sm rounded-2"
-                        _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Claim</button>
+                     <button hx-get="/applications/claim/{application.id}"
+                             hx-target="#app_bind_modal-container"
+                             hx-trigger="click"
+                             onclick="stopPolling()"
+                             id="btn-application-bind-{application.id}"
+                             class="btn btn-success btn-sm rounded-2"
+                             _="on htmx:afterOnLoad wait 10ms then add .show to #app_bind_modal then add .show to #app_bind_modal-container-backdrop">Claim</button>
                 {/if}
             </td>
         </tr>
