@@ -60,9 +60,9 @@ function build() {
 
 function deploy() {
     ENVARGS=""
-    if [[ -n "${VAULT_URL}" ]]; then ENVARGS+="--set app.envs.VAULT_URL=${VAULT_URL}"; fi
-    if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.VAULT_USER=${VAULT_USER}"; fi
-    if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.VAULT_PASSWORD=${VAULT_PASSWORD}"; fi
+    if [[ -n "${VAULT_URL}" ]]; then ENVARGS+="--set app.envs.vault.url=${VAULT_URL}"; fi
+    if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
+    if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
 
     pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
     pe "k config set-context --current --namespace=${NAMESPACE}"
