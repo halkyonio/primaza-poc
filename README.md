@@ -216,7 +216,7 @@ Everything is in place to claim a Service using the following commands:
   ```bash
   export PRIMAZA_URL=primaza.$VM_IP.nip.io
   export SERVICE_ID=1 // To be defined for deployment on a kind cluster as the Service id is different from local development
-  $(pwd)/scripts/data/cluster.sh
+  $(pwd)/scripts/data/cluster.sh // To be executed for local development
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
   ```
