@@ -97,7 +97,8 @@ function deploy() {
     pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+    NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,primaza,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault,local-path-storage,kube-node-lease}
+    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
         p "Cluster failed to be saved in Primaza: $RESULT"

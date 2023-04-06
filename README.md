@@ -156,7 +156,7 @@ which is available using by example this `kind` command `kind get kubeconfig > l
 If you prefer to use our bash script playing all the commands defined previously on a `kind` k8s cluster, execute these commands:
 ```bash
 VM_IP=<VM_IP>
-VAULT_URL=http://vault.<VM_IP>.nip.io
+VAULT_URL=http://vault.vault:8200
 CONTEXT_TO_USE=kind
 $(pwd)/scripts/vault.sh
 $(pwd)/scripts/primaza.sh
@@ -214,11 +214,12 @@ Everything is in place to claim a Service using the following commands:
   ```
 - Create the following records
   ```bash
+  export PRIMAZA_URL=primaza.$VM_IP.nip.io
+  export SERVICE_ID=1 // TO BE USED FOR DEPLOYMENT ON A KIND CLUSTER
   $(pwd)/scripts/data/cluster.sh
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
-  ```
-  **Note**: As the list of the `services` created is different between `dev` and `k8s` deployment, it is then needed to set the en var `export SERVICE_ID=1` for kind deployment. 
+  ``` 
 - 
 - Open the browser ate the address: `http://localhost:8080`   
 - Click on the different UI screens to verify if the cluster has been well registered and if its status is `OK`, that the application `atomic fruits`, if primaza has discovered the postgresql db
