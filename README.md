@@ -61,10 +61,15 @@ Primaza introduces new concepts supporting such a vision:
 ## How it works 
 
 To bind a service to a runtime, it is needed to create a Claim CRD. This claim contains the name of the service, its version and optional some additional parameters like: role, target environment.
+
 When the controller detects such a new Claim CRD, then it will populate a request and will call the Primaza Claim REST endpoint.
-According to the infirmation received, Primaza will check if a match exists between a `claim` and a `service` registered and will discover it on the target cluster (dev test, etc).
+
+According to the information received, Primaza will check if a match exists between a `claim` and a `service` registered and will discover it on the target cluster (dev test, etc).
+
 To determine if a kubernetes service is available, Primaza will use the service endpoint definition and more specifically the `protocol:port` of the service to be watched.
+
 Next, the credential associated with the service will be retrieved locally or using a secret store and a secret will be created containing as information:
+
 ```text
 type     // Service Type: postgresql, mysql
 provider // Service provider: bitnami, etc
