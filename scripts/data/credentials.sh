@@ -14,7 +14,7 @@ source ${SCRIPTS_DIR}/../common.sh
 source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
-TYPE_SPEED=200
+export TYPE_SPEED=400
 NO_WAIT=true
 
 # Script parameters
@@ -22,8 +22,7 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "serviceId=1&name=user&username=healthy&password=healthy&params=database:postgres"
-  "serviceId=3&name=admin&username=supermario&password=supermario&params=database:demo-db"
+  "name=fruits_database-vault-creds&serviceId=2&vaultKvPath=primaza/fruits&params=database:fruits_database"
 )
 
 for i in "${arr[@]}"
