@@ -219,8 +219,8 @@ Everything is in place to claim a Service using the following commands:
   $(pwd)/scripts/data/cluster.sh
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
-  ``` 
-- 
+  ```
+
 - Open the browser ate the address: `http://localhost:8080`   
 - Click on the different UI screens to verify if the cluster has been well registered and if its status is `OK`, that the application `atomic fruits`, if primaza has discovered the postgresql db
 - Select the `Atomic Fruits application` from the screen `applications` and click on the button `claim`
