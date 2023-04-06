@@ -110,52 +110,58 @@ If you plan to play with a quarkus application and bind it to a service, follow 
 
 TODO: to be reviewed
 
-In order to use Primaza on kubernetes, it is needed first to setup a cluster (kind, minikube, etc) and to install an ingress controller like a docker container registry.
-To simplify this process, you can use the following bash script able to setup such environment using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and [helm](https://helm.sh/docs/helm/helm_install/).
+In order to use Primaza on kubernetes, it is needed first to setup a cluster (kind, minikube, etc) and to install an ingress controller.
+To simplify this process, you can use the following bash script able to set up such environment using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and [helm](https://helm.sh/docs/helm/helm_install/).
 
 ```bash
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest 0"
+VM_IP=<IP_ADDRESS_OF_THE_CLUSTER>
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest kind 0 ${VM_IP}
 ```
-**Remark**: The kubernetes's version can be changed if you replace `latest` with one of the version supported by kind `1.25, etc`
+**Remark**: The kubernetes's version can be changed if you replace `latest` with one of the version supported by kind `1.23 .. 1.25`
+
+Install vault using the following script `./scripts/vault.sh`. We recommend to use this script as it is needed to perform different steps
+post vault installation such as: unseal, store root token, install kv2 secret engine, populate a policy, assign the policy to a user `bob` and password` sinclair`,etc.
+
+**Note**: If creation of the vault's pod is taking more than 60s as the container image must be downloaded, then the process will stop.
+In this case, remove the helm chart `./scripts/vault.sh remove` and repeat the operation.
+
+**Note**: Notice the message displayed as they told you how to get the root token and where they are stored !
 
 Create a namespace and set the context
 ```bash
 kubectl create namespace primaza
 kubectl config set-context --current --namespace=primaza
 ```
-
-Next, build the Quarkus application and provide additional parameters used to build/push the image to the docker registry and to generate a helm chart
+Set the `VAULT_URL` variable to let primaza to access it:
 ```bash
-mvn clean install -DskipTests -Dquarkus.container-image.build=true \
-    -Dquarkus.container-image.push=true    \
-    -Dquarkus.container-image.registry=kind-registry:5000    \
-    -Dquarkus.container-image.group=local    \
-    -Dquarkus.container-image.tag=latest    \
-    -Dquarkus.container-image.insecure=true    \
-    -Dquarkus.kubernetes.ingress.host=primaza.<VM_IP>.nip.io
+export VAULT_URL=http://vault.<VM_IP>.nip.io
 ```
-**Remark**: Don't forget to define the `<VM_IP>`
-
-Push the image to the kind container
+Next, deploy Primaza and its Postgresql DB using the following helm chart
 ```bash
-kind load docker-image kind-registry:5000/local/primaza-app
-```
-When this is done, you can install the helm chart populated by Quarkus
-```bash
-helm install --devel primaza-app \
-  --dependency-update \
-  ./target/helm/kubernetes/primaza-app \
+helm install \
+  --devel \
+  --repo https://halkyonio.github.io/helm-charts \
+  primaza-app \
+  primaza-app \
   -n primaza \
-  --set app.image=localhost:5000/local/primaza-app:latest
+  --set app.image=quay.io/halkyonio/primaza-app:latest \
+  --set app.host=primaza.${VM_IP}.nip.io \
+  --set app.envs.vault.url=${VAULT_URL}
 ```
+Access Primaza using its ingress host url: `http://primaza.<VM_IP>.nip.io`
 
-To play with the local k8s cluster, you will have to create a [cluster](https://primaza.<VM_IP>.nip.io/clusters) where you will import the `kubeconfig` file
-which is available using this command `kind get kubeconfig > local-kind-kubeconfig`
+**NOte**: To let Primaza to access a k8s cluster, you will have to create a [cluster](https://primaza.<VM_IP>.nip.io/clusters) where you will import the `kubeconfig` file
+which is available using by example this `kind` command `kind get kubeconfig > local-kind-kubeconfig`
 
-If you prefer to use our bash script playing all the commands defined previously, execute this command:
+If you prefer to use our bash script playing all the commands defined previously on a `kind` k8s cluster, execute these commands:
 ```bash
-VM_IP=<VM_IP> ./scripts/primaza.sh
+VM_IP=<VM_IP>
+VAULT_URL=http://vault.<VM_IP>.nip.io
+CONTEXT_TO_USE=kind
+$(pwd)/scripts/vault.sh
+$(pwd)/scripts/primaza.sh
 ```
+And now, you can demo it ;-)
 
 ## Demo time
 
@@ -200,7 +206,7 @@ Everything is in place to claim a Service using the following commands:
   kubectl delete -f $(pwd)/scripts/data/atomic-fruits.yml
   kubectl apply -f $(pwd)/scripts/data//atomic-fruits.yml
   ```
-- Populate within the secret store engine the `healthy` key at the path `primaza/fruits`
+- This step is optional and is needed when you use `mvn quarkus:dev`. It will populate within the secret store engine the `healthy` key at the path `primaza/fruits`
   ```bash
   export VAULT_ADDR=http://localhost:<VAULT_PORT> // If you run vault locally, then got it using its quarkus dev service 
   vault kv put -mount=secret primaza/fruits healthy=healthy
@@ -212,6 +218,8 @@ Everything is in place to claim a Service using the following commands:
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
   ```
+  **Note**: As the list of the `services` created is different between `dev` and `k8s` deployment, it is then needed to set the en var `export SERVICE_ID=1` for kind deployment. 
+- 
 - Open the browser ate the address: `http://localhost:8080`   
 - Click on the different UI screens to verify if the cluster has been well registered and if its status is `OK`, that the application `atomic fruits`, if primaza has discovered the postgresql db
 - Select the `Atomic Fruits application` from the screen `applications` and click on the button `claim`

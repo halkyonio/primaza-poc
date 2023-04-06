@@ -19,10 +19,12 @@ NO_WAIT=true
 
 # Script parameters
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
+SERVICE_ID=${SERVICE_ID:-2}
+
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=fruits-claim&description=postgresql-fruits-db&serviceId=2&owner=snowdrop"
+  "name=fruits-claim&description=postgresql-fruits-db&serviceId=$SERVICE_ID&owner=snowdrop"
 )
 
 for i in "${arr[@]}"

@@ -13,12 +13,14 @@ VM_IP=${VM_IP:=127.0.0.1}
 NAMESPACE=primaza
 PROJECT_DIR=app
 
+CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
+GIT_SHA_COMMIT=${GIT_SHA_COMMIT:-$(git rev-parse --short HEAD)}
+
 # Parameters to be used when we build and push to a local container registry
 REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
 INGRESS_HOST=primaza.${VM_IP}.nip.io
-GIT_SHA_COMMIT=$(git rev-parse --short HEAD)
 
 # Parameters used when using the image from an external container registry: quay.io/halkyonio/primaza-app
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
@@ -27,7 +29,7 @@ HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
 PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GIT_SHA_COMMIT}}
 
 # Parameters to play the demo
-TYPE_SPEED=${TYPE_SPEED:=40}
+export TYPE_SPEED=400
 NO_WAIT=true
 
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
@@ -54,7 +56,7 @@ function build() {
      -Dgit.sha.commit=${GIT_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
-  pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n primaza"
+  pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
   popd
 }
 
@@ -92,7 +94,7 @@ function deploy() {
 
     p "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
-    pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
+    pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
@@ -128,7 +130,7 @@ function localDeploy() {
 
     p "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
-    pe "kind get kubeconfig -n primaza > local-kind-kubeconfig"
+    pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")

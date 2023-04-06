@@ -19,10 +19,12 @@ NO_WAIT=true
 
 # Script parameters
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
+SERVICE_ID=${SERVICE_ID:-2}
+
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=fruits_database-vault-creds&serviceId=2&vaultKvPath=primaza/fruits&params=database:fruits_database"
+  "name=fruits_database-vault-creds&serviceId=$SERVICE_ID&vaultKvPath=primaza/fruits&params=database:fruits_database"
 )
 
 for i in "${arr[@]}"
