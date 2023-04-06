@@ -15,6 +15,7 @@ public class Application extends PanacheEntity {
     public String name;
     public String namespace;
     public String image;
+    public String ingress;
 
     @ManyToOne(cascade = PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "cluster_id")

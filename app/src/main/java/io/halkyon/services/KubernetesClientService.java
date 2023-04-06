@@ -167,6 +167,15 @@ public class KubernetesClientService {
                 .withName(application.name).rolling().restart();
     }
 
+    /**
+     * Get the ingress resource of the application
+     */
+    public String getIngressHost(Application application) throws ClusterConnectException {
+        return "http://"
+                + getClientForCluster(application.cluster).network().v1().ingresses().inNamespace(application.namespace)
+                        .withName(application.name).get().getSpec().getRules().get(0).getHost();
+    }
+
     @Transactional
     public KubernetesClient getClientForCluster(Cluster cluster) throws ClusterConnectException {
         try {
