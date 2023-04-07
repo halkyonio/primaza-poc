@@ -159,6 +159,9 @@ VAULT_URL=http://vault-internal.vault:8200
 $(pwd)/scripts/vault.sh
 $(pwd)/scripts/primaza.sh
 ```
+
+> **Note**: Before to execute the `./primaza.sh` script, check the latest image pushed on quay.io as set the version to the one you want to test using the variable `GIT_SHA_COMMIT` !
+
 And now, you can demo it ;-)
 
 ## Demo time
