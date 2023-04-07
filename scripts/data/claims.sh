@@ -19,7 +19,7 @@ NO_WAIT=true
 
 # Script parameters
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
-SERVICE_ID=${SERVICE_ID:-2}
+SERVICE_ID=${SERVICE_ID:-1}
 
 p "Primaza server: ${PRIMAZA_URL}"
 
