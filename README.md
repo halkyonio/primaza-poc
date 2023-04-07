@@ -78,7 +78,7 @@ username // user to be used to access the service
 password // Password to be used to access the service
 database // (optional): Database name to connect to a SQL database
 ```
-The secret is crated under the namespace of the application and a volume is crated, part of the application to mount the secret using the [workload projection](https://github.com/servicebinding/spec#workload-projection) convention.
+The secret is created under the namespace of the application and a volume is created, part of the application to mount the secret using the [workload projection](https://github.com/servicebinding/spec#workload-projection) convention.
 
 ## How to play/demo
 
@@ -104,7 +104,12 @@ but will also run different containers:  database (h2) & vault secret engine if 
 
 You can discover the [quarkus dev services](https://quarkus.io/guides/dev-services) and injected config by pressing on the key `c` within your terminal.
 
-If you plan to play with a quarkus application and bind it to a service, follow then the instructions of the [Demo time](#demo-time) section :-)
+If you plan to play with a quarkus demo application and bind it to a service, then install a kind cluster locally
+```bash
+VM_IP=<IP_OR_HOSTNAME_OF_THE_MACHINE/VM> // e.g. VM_IP=127.0.0.1
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest kind 0 ${VM_IP}
+```
+and next follow then the instructions of the [Demo time](#demo-time) section :-)
 
 ### Using Primaza on a k8s cluster
 
@@ -112,7 +117,7 @@ In order to use Primaza on kubernetes, it is needed first to setup a cluster (ki
 To simplify this process, you can use the following bash script able to set up such environment using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and [helm](https://helm.sh/docs/helm/helm_install/).
 
 ```bash
-VM_IP=<IP_ADDRESS_OF_THE_CLUSTER>
+VM_IP=<IP_OR_HOSTNAME_OF_THE_MACHINE/VM>
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest kind 0 ${VM_IP}
 ```
 **Remark**: The kubernetes's version can be changed if you replace `latest` with one of the version supported by kind `1.23 .. 1.25`
@@ -175,15 +180,15 @@ To play with Primaza, you can use the following scenario:
 - Go back to the screen of the `discover`. It should be there
 - Create for the `registered service` its `credential`
 - Install the Quarkus Atomic Fruits application
-- When the application will start, then it will crash as atomic fruits cannot yet access database
+- When the application will start, then it will crash as atomic fruits cannot yet access the `fruits` database
 - Create a `claim` to tell to Primaza that the Atomic fruits app would like to access a Posgresql DB
-- Select the `Atomic Fruits application` from the screen `applications` and click on the button `claim`
+- Select the `Quarkus Fruits application` from the screen `applications` and click on the button `claim`
 - Select the claim to bind from the list
 - If the binding succeeded, then the status should be `bound` and the ingress URL should be displayed
 
 Everything is in place to claim a Service using the following commands:
 
-- Install the postgresql DB that the Quarkus Fruits application will access
+- Install the `fruits` postgresql DB that the Quarkus Fruits application will access
   ```bash
   DB_USERNAME=healthy
   DB_PASSWORD=healthy
@@ -207,18 +212,34 @@ Everything is in place to claim a Service using the following commands:
   kubectl delete -f $(pwd)/scripts/data/atomic-fruits.yml
   kubectl apply -f $(pwd)/scripts/data/atomic-fruits.yml
   ```
-- Create an entry within the secret store engine at the path `primaza/fruits` to configure for the username/password
+- Create an entry within the secret store engine at the path `primaza/fruits`. This path will be used to configure the credentials to access the `fruits_database`.
   ```bash
-  export VAULT_ADDR=http://localhost:<VAULT_PORT>  // If you run vault locally as a TestContainer, then find its port using the "quarkus dev service"
-  export VAULT_ADDR=http://vault.<VM_IP>.nip.io    // If you deploy vault on a k8s cluster
-  vault login -method=userpass username=bob password=sinclair // If you use vault on a k8s cluster
+  // When vault runs on kubernetes
+  export VAULT_ADDR=http://vault.<VM_IP>.nip.io
+  vault login -method=userpass username=bob password=sinclair
+  
+  // When using mvn quarkus:dev
+  export VAULT_TOKEN=root
+  export VAULT_ADDR=http://localhost:<VAULT_PORT>
+  
+  // Next create a key
   vault kv put -mount=secret primaza/fruits healthy=healthy
   vault kv get -mount=secret primaza/fruits
   ```
+  
 - Create now different records to let Primaza to access the local cluster, 
   ```bash
-  export PRIMAZA_URL=primaza.<VM_IP>.nip.io
-  $(pwd)/scripts/data/cluster.sh // To be executed when steps are done manually or when using quarkus:dev
+  // When deployed on kubernetes
+  export PRIMAZA_URL=primaza.<VM_IP>.nip.io 
+  
+  // When using quarkus:dev
+  export PRIMAZA_URL=localhost:8080
+  
+  // To be executed when steps are done manually or when using quarkus:dev
+  export KIND_URL=$(kubectl config view -o json | jq -r --arg ctx kind-kind '.clusters[] | select(.name == $ctx) | .cluster.server')
+  $(pwd)/scripts/data/cluster.sh 
+  
+  // Common steps
   $(pwd)/scripts/data/services.sh
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
