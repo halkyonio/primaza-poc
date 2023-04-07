@@ -14,7 +14,7 @@ source ${SCRIPTS_DIR}/../common.sh
 source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
-TYPE_SPEED=200
+export TYPE_SPEED=400
 NO_WAIT=true
 
 # Script parameters
