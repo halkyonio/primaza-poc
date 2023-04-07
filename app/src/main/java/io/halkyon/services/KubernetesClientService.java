@@ -171,9 +171,14 @@ public class KubernetesClientService {
      * Get the ingress resource of the application
      */
     public String getIngressHost(Application application) throws ClusterConnectException {
-        return "http://"
-                + getClientForCluster(application.cluster).network().v1().ingresses().inNamespace(application.namespace)
-                        .withName(application.name).get().getSpec().getRules().get(0).getHost();
+        KubernetesClient client = getClientForCluster(application.cluster);
+        try {
+            String host =  client.network().v1().ingresses().inNamespace(application.namespace)
+                    .withName(application.name).get().getSpec().getRules().get(0).getHost();
+            return "http://" + host;
+        } catch (NullPointerException e) {
+            return "No host found";
+        }
     }
 
     @Transactional
