@@ -160,7 +160,7 @@ $(pwd)/scripts/vault.sh
 $(pwd)/scripts/primaza.sh
 ```
 
-> **Note**: Before to execute the `./primaza.sh` script, check the latest image pushed on quay.io as set the version to the one you want to test using the variable `GIT_SHA_COMMIT` !
+> **Note**: Before to execute the `./primaza.sh` script, check the latest image pushed on quay.io as set the version to the one you want to test using the variable `export GIT_SHA_COMMIT=` !
 
 And now, you can demo it ;-)
 
@@ -205,7 +205,7 @@ Everything is in place to claim a Service using the following commands:
   ```bash
   kubectl create ns app
   kubectl delete -f $(pwd)/scripts/data/atomic-fruits.yml
-  kubectl apply -f $(pwd)/scripts/data//atomic-fruits.yml
+  kubectl apply -f $(pwd)/scripts/data/atomic-fruits.yml
   ```
 - Create an entry within the secret store engine at the path `primaza/fruits` to configure for the username/password
   ```bash
@@ -218,7 +218,7 @@ Everything is in place to claim a Service using the following commands:
 - Create now different records to let Primaza to access the local cluster, 
   ```bash
   export PRIMAZA_URL=primaza.<VM_IP>.nip.io
-  $(pwd)/scripts/data/cluster.sh
+  $(pwd)/scripts/data/cluster.sh // To be executed when steps are done manually or when using quarkus:dev
   $(pwd)/scripts/data/services.sh
   $(pwd)/scripts/data/credentials.sh
   $(pwd)/scripts/data/claims.sh
