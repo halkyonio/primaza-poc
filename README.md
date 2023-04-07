@@ -227,7 +227,7 @@ Everything is in place to claim a Service using the following commands:
   vault kv get -mount=secret primaza/fruits
   ```
   
-- Create now different records to let Primaza to access the local cluster, 
+- Create now different records to let Primaza to access the local cluster, discover the services, claim a service using the credentials stored under vault
   ```bash
   // When deployed on kubernetes
   export PRIMAZA_URL=primaza.<VM_IP>.nip.io 
