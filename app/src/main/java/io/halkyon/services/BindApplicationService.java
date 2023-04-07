@@ -42,7 +42,14 @@ public class BindApplicationService {
     public void unBindApplication(Claim claim) throws ClusterConnectException {
         unMountSecretVolumeEnvInApplication(claim);
         deleteSecretInNamespace(claim);
+        removeIngressHostFromApplication(claim);
         rolloutApplication(claim);
+    }
+
+    private void removeIngressHostFromApplication(Claim claim) {
+        Application app = claim.application;
+        app.ingress = "";
+        app.persist();
     }
 
     public void bindApplication(Claim claim) throws ClusterConnectException {
@@ -56,11 +63,20 @@ public class BindApplicationService {
             // scenario is supported
             createSecretForApplication(claim, credential, url);
             rolloutApplication(claim);
+            if (claim.status.equals(ClaimStatus.BOUND.toString())) {
+                Application app = claim.application;
+                app.ingress = getIngressHost(app);
+                app.persist();
+            }
         }
     }
 
     private void rolloutApplication(Claim claim) throws ClusterConnectException {
         kubernetesClientService.rolloutApplication(claim.application);
+    }
+
+    private String getIngressHost(Application application) throws ClusterConnectException {
+        return kubernetesClientService.getIngressHost(application);
     }
 
     private void deleteSecretInNamespace(Claim claim) throws ClusterConnectException {

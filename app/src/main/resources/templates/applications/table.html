@@ -9,6 +9,7 @@
             <th aria-valuetext="left">Namespace</th>
             <th aria-valuetext="left">Image</th>
             <th aria-valuetext="left">Cluster</th>
+            <th aria-valuetext="left">Ingress host</th>
             <th aria-valuetext="left">Claim</th>
         </tr>
       </thead>
@@ -42,6 +43,7 @@
             <td>{application.namespace}</td>
             <td>{application.image}</td>
             <td>{application.cluster.name}</td>
+            <td><a href="{application.ingress}" target="_blank">{application.ingress}</a></td>
             <td>
                 {#if application.claim != null}
                     <button id="btn-application-bind-{application.id}"

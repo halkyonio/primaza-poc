@@ -221,7 +221,7 @@ esac
 
 install
 # DO NOT WORK -> kubectl rollout status statefulset/vault -n vault
-sleep 20
+sleep 60
 unseal
 login
 #enableKV1SecretEngine

@@ -2,10 +2,10 @@
 
 #
 # Usage:
-# ./scripts/data/services.sh
+# ./scripts/data/claims.sh
 #
 # To create the records on a different Primaza server which is not localhost:8080
-# PRIMAZA_URL=myprimaza:8080 ./scripts/data/services.sh
+# PRIMAZA_URL=myprimaza:8080 ./scripts/data/claims.sh
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
@@ -19,16 +19,15 @@ NO_WAIT=true
 
 # Script parameters
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
+SERVICE_ID=${SERVICE_ID:-1}
+
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=postgresql&version=14.5&type=postgresql&endpoint=tcp:5432"
-  "name=mysql&version=8.0&type=mysql&endpoint=tcp:3306"
-  "name=activemq-artemis&version=2.26&type=activemq&endpoint=tcp:8161"
-  "name=mariadb&version=10.9&type=mariadb&endpoint=tcp:3306"
+  "name=fruits-claim&description=postgresql-fruits-db&serviceId=$SERVICE_ID&owner=snowdrop"
 )
 
 for i in "${arr[@]}"
 do
-  pe "curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\" -o /dev/null"
+  pe "curl -X POST ${PRIMAZA_URL}/claims -s -k -d \"${i}\" -o /dev/null"
 done
