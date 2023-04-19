@@ -3,8 +3,8 @@ package io.halkyon.validation;
 import static io.halkyon.utils.StringUtils.isNotEmpty;
 import static io.halkyon.utils.StringUtils.isNullOrEmpty;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import io.halkyon.resource.requests.ClaimRequest;
 

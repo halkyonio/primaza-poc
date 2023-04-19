@@ -3,8 +3,8 @@ package io.halkyon.utils;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.ws.rs.core.Response;
+import jakarta.validation.ConstraintViolation;
+import jakarta.ws.rs.core.Response;
 
 public final class AcceptedResponseBuilder {
 

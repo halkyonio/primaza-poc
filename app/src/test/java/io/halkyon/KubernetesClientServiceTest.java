@@ -13,13 +13,15 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.halkyon.exceptions.ClusterConnectException;
@@ -70,6 +72,14 @@ public class KubernetesClientServiceTest {
         secretData.put("password", toBase64("password"));
 
         Deployment deployment = buildNewDeployment("test2-app", "atomic-fruits:1.0.0");
+
+        // Kubernetes client will retry if an error is thrown, we avoid this because we are explicitly triggering this
+        // error above.
+        System.setProperty("kubernetes.request.retry.backoffLimit", "0");
+
+        new KubernetesClientBuilder().withConfig(
+                new ConfigBuilder(mockServer.getClient().getConfiguration()).withRequestRetryBackoffLimit(0).build())
+                .build();
 
         // We will work in `Expectations mode` in order to set up expectations for the behavior we want when a certain
         // Kubernetes resource endpoints the KubernetesClient requests:

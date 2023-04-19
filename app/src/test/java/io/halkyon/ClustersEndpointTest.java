@@ -6,7 +6,7 @@ import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsNot.not;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
