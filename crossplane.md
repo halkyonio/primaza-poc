@@ -1,6 +1,6 @@
 ## How to use Crossplane & Helm provider
 
-- Install first the clients: `kubectl crossplane`:
+- Install first the `kubectl crossplane` client (optional):
 ```bash
 curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
 mv kubectl-crossplane /usr/local/bin
