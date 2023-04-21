@@ -20,7 +20,14 @@ helm install crossplane \
 
 - Install the Helm provider
 ```bash
-kubectl crossplane install provider crossplanecontrib/provider-helm:master
+cat <<EOF | kubectl apply -f -
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-helm
+spec:
+  package: "crossplanecontrib/provider-helm:master"
+EOF  
 ```
 - Give more RBAC rights to the crossplane SA
 ```bash
