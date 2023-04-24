@@ -188,7 +188,7 @@ public class KubernetesClientService {
             if (StringUtils.isNotEmpty(cluster.kubeConfig)) {
                 config = Config.fromKubeconfig(cluster.kubeConfig);
             } else {
-                config = Config.empty();
+                config = Config.autoConfigure(null);
             }
 
             config.setMasterUrl(cluster.url);
