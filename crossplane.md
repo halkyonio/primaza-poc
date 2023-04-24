@@ -27,7 +27,7 @@ metadata:
   name: provider-helm
 spec:
   package: "crossplanecontrib/provider-helm:master"
-EOF  
+EOF
 ```
 - Give more RBAC rights to the crossplane SA
 ```bash

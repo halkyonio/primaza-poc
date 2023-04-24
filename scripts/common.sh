@@ -32,7 +32,7 @@ repeat_char(){
 }
 
 fmt() {
-  COLOR="CYAN"
+  COLOR="WHITE"
   MSG="${@:1}"
   echo -e "${!COLOR} ${MSG}${NC}"
 }
