@@ -60,9 +60,9 @@ Primaza introduces new concepts supporting such a vision:
 
 ## How it works 
 
-To bind a service to a runtime, it is needed to create a Claim CRD. This claim contains the name of the service, its version and optional some additional parameters like: role, target environment.
+To bind a service to a runtime, it is needed to create a Claim CR. This claim contains the name of the service, its version and optional some additional parameters like: role, target environment.
 
-When the controller detects such a new Claim CRD, then it will populate a request and will call the Primaza Claim REST endpoint.
+When the controller detects such a new Claim CR, then it will populate a request and will call the Primaza Claim REST endpoint.
 
 According to the information received, Primaza will check if a match exists between a `claim` and a `service` registered and will discover it on the target cluster (dev test, etc).
 
