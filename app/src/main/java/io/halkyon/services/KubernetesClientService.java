@@ -12,11 +12,13 @@ import java.util.regex.Pattern;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
-import io.crossplane.helm.v1beta1.Release;
-import io.crossplane.helm.v1beta1.ReleaseBuilder;
-import io.crossplane.helm.v1beta1.releasespec.forprovider.Chart;
+import io.crossplane.helm.v1beta1.releasespec.ForProviderBuilder;
+import io.crossplane.helm.v1beta1.releasespec.ProviderRefBuilder;
+import io.crossplane.helm.v1beta1.releasespec.forprovider.ChartBuilder;
 import org.jboss.logging.Logger;
 
+import io.crossplane.helm.v1beta1.Release;
+import io.crossplane.helm.v1beta1.ReleaseBuilder;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -188,15 +190,21 @@ public class KubernetesClientService {
      */
     public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
         // Create Release object
+        ProviderRefBuilder providerRefBuilder = new ProviderRefBuilder();
+        ForProviderBuilder forProviderBuilder = new ForProviderBuilder();
+        ChartBuilder chartBuilder = new ChartBuilder();
+
         ReleaseBuilder release = new ReleaseBuilder();
-        release.withApiVersion("")
-               .withKind("")
-               .withNewMetadata()
-                 .withName("")
-               .endMetadata();
+        release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName("postgresql").endMetadata()
+                .withNewSpec()
+                .withForProvider(forProviderBuilder.withChart(chartBuilder.withName("postgresql").withRepository("https://charts.bitnami.com/bitnami").withVersion("11.9.1").build()).build())
+                .withProviderRef(providerRefBuilder.withName("helm-provider").build())
+                .endSpec();
+        ;
 
         client = getClientForCluster(cluster);
-        MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client.resources(Release.class);
+        MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
+                .resources(Release.class);
         releaseClient.inNamespace("db").resource(release.build()).create();
     }
 
