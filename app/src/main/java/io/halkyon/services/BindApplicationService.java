@@ -12,12 +12,11 @@ import java.util.Set;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import io.crossplane.helm.v1beta1.Release;
+import io.crossplane.helm.v1beta1.ReleaseBuilder;
+import io.crossplane.helm.v1beta1.ReleaseSpec;
 import io.halkyon.exceptions.ClusterConnectException;
-import io.halkyon.model.Application;
-import io.halkyon.model.Claim;
-import io.halkyon.model.Credential;
-import io.halkyon.model.CredentialParameter;
-import io.halkyon.model.Service;
+import io.halkyon.model.*;
 import io.halkyon.utils.StringUtils;
 import io.quarkus.vault.VaultKVSecretEngine;
 
@@ -85,6 +84,10 @@ public class BindApplicationService {
 
     private void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
         kubernetesClientService.unMountSecretVolumeEnvInApplication(claim);
+    }
+
+    private void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
+        kubernetesClientService.createCrossplaneHelmRelease(cluster);
     }
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)

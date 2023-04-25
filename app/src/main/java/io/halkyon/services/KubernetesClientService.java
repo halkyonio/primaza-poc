@@ -12,6 +12,9 @@ import java.util.regex.Pattern;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
+import io.crossplane.helm.v1beta1.Release;
+import io.crossplane.helm.v1beta1.ReleaseBuilder;
+import io.crossplane.helm.v1beta1.releasespec.forprovider.Chart;
 import org.jboss.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -178,6 +181,23 @@ public class KubernetesClientService {
         } catch (NullPointerException e) {
             return "No host found";
         }
+    }
+
+    /**
+     * Create the Crossplane Helm Release CR
+     */
+    public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
+        // Create Release object
+        ReleaseBuilder release = new ReleaseBuilder();
+        release.withApiVersion("")
+               .withKind("")
+               .withNewMetadata()
+                 .withName("")
+               .endMetadata();
+
+        client = getClientForCluster(cluster);
+        MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client.resources(Release.class);
+        releaseClient.inNamespace("db").resource(release.build()).create();
     }
 
     @Transactional
