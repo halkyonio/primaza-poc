@@ -1,0 +1,22 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: postgresql
+spec:
+  forProvider:
+    chart:
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    namespace: db
+    skipCreateNamespace: false
+    wait: true
+    set:
+    - name: auth.username
+      value: healthy
+    - name: auth.password
+      value: healthy
+    - name: auth.database
+      value: fruits_database
+  providerConfigRef:
+    name: helm-provider

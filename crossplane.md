@@ -46,81 +46,35 @@ spec:
     source: InjectedIdentity
 EOF
 ```
-- Install a helm chart using a release
+- To test crossplane and the helm provider, install the following helm chart using a `Release` CR
 ```bash
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -f 
 apiVersion: helm.crossplane.io/v1beta1
 kind: Release
 metadata:
-  name: wordpress-example
+  name: postgresql
 spec:
-# rollbackLimit: 3
   forProvider:
     chart:
-      name: wordpress
+      name: postgresql
       repository: https://charts.bitnami.com/bitnami
-      version: 15.2.5 ## To use development versions, set ">0.0.0-0"
-#     pullSecretRef:
-#       name: museum-creds
-#       namespace: default
-#     url: "https://charts.bitnami.com/bitnami/wordpress-9.3.19.tgz"
-    namespace: wordpress
-#   insecureSkipTLSVerify: true
-#   skipCreateNamespace: true
-#   wait: true
-#   skipCRDs: true
-    values:
-      service:
-        type: ClusterIP
+      version: 11.9.1
+    namespace: db
+    skipCreateNamespace: false
+    wait: true
     set:
-      - name: param1
-        value: value2
-#   valuesFrom:
-#     - configMapKeyRef:
-#         key: values.yaml
-#         name: default-vals
-#         namespace: wordpress
-#         optional: false
-#     - secretKeyRef:
-#         key: svalues.yaml
-#         name: svals
-#         namespace: wordpress
-#         optional: false
-#  connectionDetails:
-#    - apiVersion: v1
-#      kind: Service
-#      name: wordpress-example
-#      namespace: wordpress
-#      fieldPath: spec.clusterIP
-#      #fieldPath: status.loadBalancer.ingress[0].ip
-#      toConnectionSecretKey: ip
-#    - apiVersion: v1
-#      kind: Service
-#      name: wordpress-example
-#      namespace: wordpress
-#      fieldPath: spec.ports[0].port
-#      toConnectionSecretKey: port
-#    - apiVersion: v1
-#      kind: Secret
-#      name: wordpress-example
-#      namespace: wordpress
-#      fieldPath: data.wordpress-password
-#      toConnectionSecretKey: password
-#    - apiVersion: v1
-#      kind: Secret
-#      name: manual-api-secret
-#      namespace: wordpress
-#      fieldPath: data.api-key
-#      toConnectionSecretKey: api-key
-#      # this secret created manually (not via Helm chart), so skip 'part of helm release' check
-#      skipPartOfReleaseCheck: true
-#  writeConnectionSecretToRef:
-#    name: wordpress-credentials
-#    namespace: crossplane-system
+    - name: auth.username
+      value: healthy
+    - name: auth.password
+      value: healthy
+    - name: auth.database
+      value: fruits_database
   providerConfigRef:
     name: helm-provider
 EOF
 ```
+>**Note**: You can deploy the release file using the command `kubectl apply -f ./scripts/data/release-postgresql.yml`
+
 ## How to use Upbound
 
 Documentation page: https://docs.upbound.io/uxp/install/
