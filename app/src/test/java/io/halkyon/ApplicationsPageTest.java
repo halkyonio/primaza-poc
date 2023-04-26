@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

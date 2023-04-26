@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
@@ -117,10 +117,9 @@ public class KubernetesClientService {
 
         // create secret
         String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
-        client.secrets().inNamespace(application.namespace)
-                .resource(new SecretBuilder().withNewMetadata().withName(secretName)
-                        .withNamespace(application.namespace).endMetadata().withData(secretData).build())
-                .createOrReplace();
+        client.secrets().inNamespace(application.namespace).resource(new SecretBuilder().withNewMetadata()
+                .withName(secretName).withNamespace(application.namespace).endMetadata().withData(secretData).build())
+                .create();
 
         /*
          * Get the Deployment resource to be updated
@@ -153,7 +152,7 @@ public class KubernetesClientService {
         try {
 
             // update deployment
-            client.apps().deployments().inNamespace(application.namespace).resource(newDeployment).createOrReplace();
+            client.apps().deployments().inNamespace(application.namespace).resource(newDeployment).patch();
         } catch (Exception e) {
             client.secrets().inNamespace(application.namespace).withName(secretName).delete();
         }

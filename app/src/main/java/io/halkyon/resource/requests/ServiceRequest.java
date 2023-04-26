@@ -1,7 +1,7 @@
 package io.halkyon.resource.requests;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 

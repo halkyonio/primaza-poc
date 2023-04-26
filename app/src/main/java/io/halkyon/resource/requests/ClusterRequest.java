@@ -2,8 +2,8 @@ package io.halkyon.resource.requests;
 
 import java.io.InputStream;
 
-import javax.validation.constraints.NotBlank;
-import javax.ws.rs.core.MediaType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
