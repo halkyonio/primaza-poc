@@ -16,8 +16,6 @@ import org.jboss.logging.Logger;
 
 import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
-import io.crossplane.helm.v1beta1.releasespec.ForProviderBuilder;
-import io.crossplane.helm.v1beta1.releasespec.ProviderRefBuilder;
 import io.crossplane.helm.v1beta1.releasespec.forprovider.ChartBuilder;
 import io.crossplane.helm.v1beta1.releasespec.forprovider.SetBuilder;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -192,26 +190,14 @@ public class KubernetesClientService {
     public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
-        release.withApiVersion("helm.crossplane.io")
-               .withKind("v1beta1")
-               .withNewMetadata()
-                  .withName("postgresql")
-               .endMetadata()
-               .withNewSpec()
-                 .withNewV1beta1ForProvider()
-                    .withNewV1beta1Chart()
-                       .withName("postgresql")
-                       .withRepository("https://charts.bitnami.com/bitnami")
-                       .withVersion("11.9.1")
-                    .endV1beta1Chart()
-                    .withNewV1beta1Values()
-                      .addToAdditionalProperties("auth.username","healthy")
-                      .addToAdditionalProperties("auth.password","healthy")
-                      .addToAdditionalProperties("auth.database","fruits_database")
-                    .endV1beta1Values()
-                 .endV1beta1ForProvider()
-                 .withNewV1beta1ProviderConfigRef().withName("helm-provider").endV1beta1ProviderConfigRef()
-               .endSpec();
+        release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName("postgresql")
+                .endMetadata().withNewSpec().withNewV1beta1ForProvider().withNewV1beta1Chart().withName("postgresql")
+                .withRepository("https://charts.bitnami.com/bitnami").withVersion("11.9.1").endV1beta1Chart()
+                .withNewV1beta1Values().addToAdditionalProperties("auth.username", "healthy")
+                .addToAdditionalProperties("auth.password", "healthy")
+                .addToAdditionalProperties("auth.database", "fruits_database").endV1beta1Values()
+                .endV1beta1ForProvider().withNewV1beta1ProviderConfigRef().withName("helm-provider")
+                .endV1beta1ProviderConfigRef().endSpec();
 
         client = getClientForCluster(cluster);
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
