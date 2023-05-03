@@ -48,9 +48,9 @@ public class Service extends PanacheEntityBase {
     public String externalEndpoint;
     public Boolean available;
     public Boolean installable;
-    public String HelmRepo;
-    public String HelmChart;
-    public String HelmChartVersion;
+    public String helmRepo;
+    public String helmChart;
+    public String helmChartVersion;
     @CreationTimestamp
     public Date created;
     @UpdateTimestamp
