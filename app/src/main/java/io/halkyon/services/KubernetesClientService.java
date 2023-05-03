@@ -191,14 +191,27 @@ public class KubernetesClientService {
      */
     public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
         // Create Release object
-        ProviderRefBuilder providerRefBuilder = new ProviderRefBuilder();
-        ForProviderBuilder forProviderBuilder = new ForProviderBuilder();
-
         ReleaseBuilder release = new ReleaseBuilder();
-        release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName("postgresql")
-                .endMetadata().withNewSpec()
-                .withForProvider(forProviderBuilder.withChart(getChart().build()).withSet(getValues().build()).build())
-                .withProviderRef(providerRefBuilder.withName("helm-provider").build()).endSpec();
+        release.withApiVersion("helm.crossplane.io")
+               .withKind("v1beta1")
+               .withNewMetadata()
+                  .withName("postgresql")
+               .endMetadata()
+               .withNewSpec()
+                 .withNewV1beta1ForProvider()
+                    .withNewV1beta1Chart()
+                       .withName("postgresql")
+                       .withRepository("https://charts.bitnami.com/bitnami")
+                       .withVersion("11.9.1")
+                    .endV1beta1Chart()
+                    .withNewV1beta1Values()
+                      .addToAdditionalProperties("auth.username","healthy")
+                      .addToAdditionalProperties("auth.password","healthy")
+                      .addToAdditionalProperties("auth.database","fruits_database")
+                    .endV1beta1Values()
+                 .endV1beta1ForProvider()
+                 .withNewV1beta1ProviderConfigRef().withName("helm-provider").endV1beta1ProviderConfigRef()
+               .endSpec();
 
         client = getClientForCluster(cluster);
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
