@@ -32,6 +32,17 @@ function deploy() {
 }
 
 function helmProvider() {
+    p "Set the debug arg"
+    cat <<EOF | kubectl apply -f -
+apiVersion: pkg.crossplane.io/v1alpha1
+kind: ControllerConfig
+metadata:
+  name: debug-config
+spec:
+  args:
+    - --debug
+EOF
+
   p "Installing the Helm provider ..."
   cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1
@@ -40,6 +51,8 @@ metadata:
   name: helm-provider
 spec:
   package: crossplanecontrib/provider-helm:v0.14.0
+  controllerConfigRef:
+      name: debug-config
 EOF
 
   pe "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
