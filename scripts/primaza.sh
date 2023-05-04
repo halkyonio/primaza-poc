@@ -38,7 +38,7 @@ p "Ingress host is: ${INGRESS_HOST}"
 #########################
 ## Help / Usage
 #########################
-function usage() {
+function primazaUsage() {
   fmt ""
   fmt "Usage: $0 [option]"
   fmt ""
@@ -158,12 +158,12 @@ function remove() {
 }
 
 case $1 in
-    -h)           usage; exit;;
+    -h)           primazaUsage; exit;;
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; "$@"; exit;;
     remove)       "$@"; exit;;
-    *)            usage; exit;;
+    *)            primazaUsage; exit;;
 esac
 
 remove
