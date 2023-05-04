@@ -105,8 +105,8 @@ public class ApplicationResource {
                 try {
                     bindService.createCrossplaneHelmRelease(claim.service);
                 } catch (ClusterConnectException ex) {
-                    throw new InternalServerErrorException(
-                            "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+                    throw new InternalServerErrorException("Can't deploy the service with the cluster "
+                            + ex.getCluster() + ". Cause: " + ex.getMessage());
                 }
             }
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
