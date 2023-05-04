@@ -105,7 +105,7 @@ function deploy() {
     pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,primaza,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault,local-path-storage,kube-node-lease}
+    NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,primaza,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault,local-path-storage,local-path-storage,kube-node-lease}
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
@@ -118,13 +118,20 @@ function deploy() {
 }
 
 function localDeploy() {
+    ENVARGS=""
+    if [[ -n "${VAULT_URL}" ]]; then ENVARGS+="--set app.envs.vault.url=${VAULT_URL}"; fi
+    if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
+    if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
+
     pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
     pe "k config set-context --current --namespace=${NAMESPACE}"
     pe "helm install --devel primaza-app \
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
-      --set app.image=${PRIMAZA_IMAGE_NAME} 2>&1 1>/dev/null"
+      --set app.image=${PRIMAZA_IMAGE_NAME} \
+      ${ENVARGS} \
+      2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
