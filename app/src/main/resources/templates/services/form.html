@@ -5,7 +5,7 @@
       <div class="container" id="form">
         {#if service.id == null }
         <h1>New Service</h1>
-        <div class="form-horizontal" action="/services" hx-post="/services" hx-target="#response" method="POST"
+        <form class="form-horizontal" action="/services" hx-post="/services" hx-target="#response" method="POST"
         hx-swap="innerHTML">
         {#else}
         <h1>Update Service</h1>
@@ -117,7 +117,7 @@
         <div class="container">
             <div id="response"/>
         </div>
-      </div>
+      </form>
     {/body}
 {/include}
 <script>
