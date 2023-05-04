@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
+import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;

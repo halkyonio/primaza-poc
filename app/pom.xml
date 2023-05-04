@@ -180,7 +180,6 @@
           <compilerArgs>
             <arg>-parameters</arg>
           </compilerArgs>
-          <generatedSourcesDirectory>target/generated</generatedSourcesDirectory>
         </configuration>
       </plugin>
       <plugin>
@@ -223,7 +222,6 @@
           </execution>
         </executions>
         <configuration>
-          <target>target/generated</target>
           <extraAnnotations>true</extraAnnotations>
           <urls>
             <!-- Primaza CRDs -->
