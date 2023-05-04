@@ -27,6 +27,8 @@ public class BindApplicationService {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
 
+    public static final String DATABASE_KEY = "database";
+
     public static final String VAULT_KV_PATH_KEY = "vault-path";
 
     @Inject
@@ -89,27 +91,48 @@ public class BindApplicationService {
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
             throws ClusterConnectException {
-        String username = credential.username;
-        String password = credential.password;
-
-        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
-            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
-            Set<String> usernames = vaultSecret.keySet();
-            username = usernames.iterator().next();
-            password = vaultSecret.get(username);
-        }
-
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(claim.type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
         secretData.put(PORT_KEY, toBase64(getPortFromUrl(url)));
         secretData.put(URL_KEY, toBase64(url));
+
+        String username = "";
+        String password = "";
+        String database = "";
+
+        if (StringUtils.isNotEmpty(credential.username) && StringUtils.isNotEmpty(credential.password)) {
+            username = credential.username;
+            password = credential.password;
+            for (CredentialParameter param : credential.params) {
+                secretData.put(param.paramName, toBase64(param.paramValue));
+            }
+        }
+
+        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
+            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
+            Set<String> vaultSet = vaultSecret.keySet();
+            for (String key : vaultSet) {
+                if (key.equals(USERNAME_KEY)) {
+                    username = vaultSecret.get(USERNAME_KEY);
+                    credential.username = username;
+                } else if (key.equals(PASSWORD_KEY)) {
+                    password = vaultSecret.get(PASSWORD_KEY);
+                    credential.password = password;
+                } else if (key.equals(DATABASE_KEY)) {
+                    database = vaultSecret.get(DATABASE_KEY);
+                } else {
+                    secretData.put(key, vaultSecret.get(key));
+                    CredentialParameter credentialParameter = new CredentialParameter();
+                    credentialParameter.paramName = key;
+                    credentialParameter.paramValue = vaultSecret.get(key);
+                    credential.params.add(credentialParameter);
+                }
+            }
+        }
         secretData.put(USERNAME_KEY, toBase64(username));
         secretData.put(PASSWORD_KEY, toBase64(password));
-
-        for (CredentialParameter param : credential.params) {
-            secretData.put(param.paramName, toBase64(param.paramValue));
-        }
+        secretData.put(DATABASE_KEY, toBase64(database));
 
         kubernetesClientService.mountSecretInApplication(claim, secretData);
     }
