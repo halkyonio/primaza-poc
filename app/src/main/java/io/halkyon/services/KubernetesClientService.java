@@ -187,7 +187,7 @@ public class KubernetesClientService {
     /**
      * Create the Crossplane Helm Release CR
      */
-    public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
+    public void createCrossplaneHelmRelease() throws ClusterConnectException {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName("postgresql")

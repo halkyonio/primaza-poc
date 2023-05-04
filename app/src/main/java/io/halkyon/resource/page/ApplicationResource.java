@@ -101,6 +101,9 @@ public class ApplicationResource {
             throw new NotFoundException(String.format("Claim %s not found", claimId));
         }
         if (claim.service == null) {
+            if (claim.service.installable) {
+                bindService.createCrossplaneHelmRelease();
+            }
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
         }
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
