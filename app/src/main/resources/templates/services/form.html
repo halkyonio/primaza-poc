@@ -68,11 +68,21 @@
         </div>
         <div class="col">
         <div class="form-group">
-            <label class="form-check-label col-sm-2" for="is_installable">To be provisioned (yes/no)</label>
+            <label class="form-check-label col-sm-5" for="is_installable">To be provisioned (yes/no)</label>
             <div class="col-sm-5">
                 <input id="is_installable" class="form-check-input new-service" type="checkbox"
                        name="installable"
                        value="{#if service.installable}{service.installable}{/if}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-5" for="service_type">Provisioner :</label>
+            <div class="col-sm-5">
+                <select id="provisioner_type" class="form-control new-service" name="type"
+                        placeholder="Select the provisioner ?">
+                    <option value="crossplane" selected>Crossplane</option>
+                    <option value="helm">Helm</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
