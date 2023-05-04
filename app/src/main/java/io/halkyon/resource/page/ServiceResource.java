@@ -210,6 +210,10 @@ public class ServiceResource {
         service.type = request.type;
         service.endpoint = request.endpoint;
         service.externalEndpoint = request.externalEndpoint;
+        service.installable = request.installable;
+        service.helmRepo = request.helmRepo;
+        service.helmChart = request.helmChart;
+        service.helmChartVersion = request.helmChartVersion;
 
         if (StringUtils.isNotEmpty(service.externalEndpoint)) {
             service.available = true;

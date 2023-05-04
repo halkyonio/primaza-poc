@@ -23,4 +23,12 @@ public class ServiceRequest {
     public String endpoint;
     @FormParam
     public String externalEndpoint;
+    @FormParam
+    public boolean installable;
+    @FormParam
+    public String helmRepo;
+    @FormParam
+    public String helmChart;
+    @FormParam
+    public String helmChartVersion;
 }
