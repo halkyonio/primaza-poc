@@ -84,7 +84,7 @@ public class BindApplicationService {
     }
 
     public void createCrossplaneHelmRelease(Service service) throws ClusterConnectException {
-        kubernetesClientService.createCrossplaneHelmRelease(service.cluster);
+        kubernetesClientService.createCrossplaneHelmRelease(service);
     }
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
