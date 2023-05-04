@@ -180,6 +180,7 @@
           <compilerArgs>
             <arg>-parameters</arg>
           </compilerArgs>
+          <generatedSourcesDirectory>target/generated</generatedSourcesDirectory>
         </configuration>
       </plugin>
       <plugin>
