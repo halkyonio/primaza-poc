@@ -210,9 +210,11 @@ Everything is in place to claim a Service using the following commands:
   ```
 - Deploy the Quarkus Fruits application within the namespace `app`
   ```bash
-  kubectl create ns app
-  kubectl delete -f $(pwd)/scripts/data/atomic-fruits.yml
-  kubectl apply -f $(pwd)/scripts/data/atomic-fruits.yml
+  helm install fruits-app halkyonio/fruits-app \
+    -n app --create-namespace \
+    --set app.image=quay.io/halkyonio/atomic-fruits:latest \
+    --set app.host=atomic-fruits.<VM_IP>.nip.io \
+    --set app.serviceBinding.enabled=false
   ```
 - Create an entry within the secret store engine at the path `primaza/fruits`. This path will be used to configure the credentials to access the `fruits_database`.
   ```bash
@@ -239,7 +241,7 @@ Everything is in place to claim a Service using the following commands:
   
   // To be executed when steps are done manually or when using quarkus:dev
   export KIND_URL=$(kubectl config view -o json | jq -r --arg ctx kind-kind '.clusters[] | select(.name == $ctx) | .cluster.server')
-  $(pwd)/scripts/data/cluster.sh 
+  $(pwd)/scripts/data/cluster.sh
   
   // Common steps
   $(pwd)/scripts/data/services.sh
