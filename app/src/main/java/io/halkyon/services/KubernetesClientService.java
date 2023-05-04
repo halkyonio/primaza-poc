@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
-import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
 import io.crossplane.helm.v1beta1.releasespec.forprovider.ChartBuilder;
 import io.crossplane.helm.v1beta1.releasespec.forprovider.SetBuilder;
@@ -187,7 +186,7 @@ public class KubernetesClientService {
     /**
      * Create the Crossplane Helm Release CR
      */
-    public void createCrossplaneHelmRelease() throws ClusterConnectException {
+    public void createCrossplaneHelmRelease(Cluster cluster) throws ClusterConnectException {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName("postgresql")

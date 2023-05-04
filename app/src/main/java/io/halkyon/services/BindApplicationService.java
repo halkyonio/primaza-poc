@@ -83,9 +83,8 @@ public class BindApplicationService {
         kubernetesClientService.unMountSecretVolumeEnvInApplication(claim);
     }
 
-    public void createCrossplaneHelmRelease() throws ClusterConnectException {
-        // TODO: How could we get the Cluster object which is needed here to get the Kubernetes Client !!
-        kubernetesClientService.createCrossplaneHelmRelease();
+    public void createCrossplaneHelmRelease(Service service) throws ClusterConnectException {
+        kubernetesClientService.createCrossplaneHelmRelease(service.cluster);
     }
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
