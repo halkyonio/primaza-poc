@@ -189,9 +189,9 @@ public class KubernetesClientService {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
-                .endMetadata().withNewSpec().withNewV1beta1ForProvider().withNewV1beta1Chart().withName(service.helmChart)
-                .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endV1beta1Chart()
-                .withNewV1beta1Values().addToAdditionalProperties("auth.username", "healthy")
+                .endMetadata().withNewSpec().withNewV1beta1ForProvider().withNewV1beta1Chart()
+                .withName(service.helmChart).withRepository(service.helmRepo).withVersion(service.helmChartVersion)
+                .endV1beta1Chart().withNewV1beta1Values().addToAdditionalProperties("auth.username", "healthy")
                 .addToAdditionalProperties("auth.password", "healthy")
                 .addToAdditionalProperties("auth.database", "fruits_database").endV1beta1Values()
                 .endV1beta1ForProvider().withNewV1beta1ProviderConfigRef().withName("helm-provider")
