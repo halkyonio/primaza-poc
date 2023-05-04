@@ -325,20 +325,23 @@ public class ApplicationsPageTest {
         String appName = prefix + "app";
         String username = "user1";
         String password = "pass1";
+        String database = "database1";
         // mock data
         configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1", "myapps/app");
+        createCredential(credentialName, service.id, null, null, "myapps/app");
         createCluster(clusterName, "host:port");
 
         Map<String, String> newsecrets = new HashMap<>();
-        newsecrets.put(username, password);
+        newsecrets.put("username", username);
+        newsecrets.put("password", password);
+        newsecrets.put("database", database);
         kvSecretEngine.writeSecret("myapps/app", newsecrets);
         Map<String, String> secret = kvSecretEngine.readSecret("myapps/app");
         String secrets = new TreeMap<>(secret).toString();
-        assertEquals("{user1=pass1}", secrets);
+        assertEquals("{database=database1, password=pass1, username=user1}", secrets);
 
         serviceDiscoveryJob.execute(); // this action will change the service to available
         createClaim(claimName, serviceName + "-version");
@@ -368,6 +371,7 @@ public class ApplicationsPageTest {
         assertNotNull(actualClaim.credential);
         assertEquals("user1", actualClaim.credential.username);
         assertEquals("pass1", actualClaim.credential.password);
+
         assertEquals(ClaimStatus.BOUND.toString(), actualClaim.status);
 
         // protocol://service_name:port
