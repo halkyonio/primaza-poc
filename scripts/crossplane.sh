@@ -67,8 +67,8 @@ EOF
 
 function remove() {
   kubectl delete statefulset/postgresql -n db || true
-  kubectl delete provider/helm-provider || true
   kubectl delete providerconfig/helm-provider || true
+  kubectl delete provider/helm-provider || true
   kubectl delete clusterrolebinding/helm-provider-admin-binding || true
   helm uninstall crossplane -n crossplane-system
 }
