@@ -15,8 +15,6 @@ import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
-import io.crossplane.helm.v1beta1.releasespec.forprovider.ChartBuilder;
-import io.crossplane.helm.v1beta1.releasespec.forprovider.SetBuilder;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -202,18 +200,6 @@ public class KubernetesClientService {
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
                 .resources(Release.class);
         releaseClient.inNamespace("db").resource(release.build()).create();
-    }
-
-    private static SetBuilder getValues() {
-        SetBuilder setBuilder = new SetBuilder();
-        return setBuilder.withName("auth.username").withValue("healthy").withName("auth.password").withValue("healthy")
-                .withName("auth.database").withValue("fruits_database");
-    }
-
-    private static ChartBuilder getChart() {
-        ChartBuilder chartBuilder = new ChartBuilder();
-        return chartBuilder.withName("postgresql").withRepository("https://charts.bitnami.com/bitnami")
-                .withVersion("11.9.1");
     }
 
     @Transactional
