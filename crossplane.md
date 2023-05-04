@@ -24,15 +24,15 @@ cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-helm
+  name: helm-provider
 spec:
   package: "crossplanecontrib/provider-helm:master"
 EOF
 ```
 - Give more RBAC rights to the crossplane SA
 ```bash
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-helm | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-helm-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+SA=$(kubectl -n crossplane-system get sa -o name | grep helm-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
+kubectl create clusterrolebinding helm-provider-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
 ```
 - Create the ProviderConfig
 ```bash
@@ -48,7 +48,7 @@ EOF
 ```
 - To test crossplane and the helm provider, install the following helm chart using a `Release` CR
 ```bash
-cat <<EOF | kubectl apply -f 
+cat <<EOF | kubectl apply -f -
 apiVersion: helm.crossplane.io/v1beta1
 kind: Release
 metadata:
