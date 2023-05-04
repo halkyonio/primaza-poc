@@ -35,12 +35,20 @@ NO_WAIT=true
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-function install_kind() {
-  pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
-  pe "k wait -n ingress \
-    --for=condition=ready pod \
-    --selector=app.kubernetes.io/component=controller \
-    --timeout=120s"
+#########################
+## Help / Usage
+#########################
+function usage() {
+  fmt ""
+  fmt "Usage: $0 [option]"
+  fmt ""
+  fmt "\tWhere option is:"
+  fmt "\t-h            \tPrints help"
+  fmt "\tremove        \tUninstall Primaza helm chart and additional kubernetes resources"
+  fmt "\tbuild         \tBuild the Primaza quarkus application"
+  fmt "\tdeploy        \tDeploy the primaza helm chart using Halkyon Helm repo"
+  fmt "\tlocaldeploy   \tDeploy the primaza helm chart using local build application"
+  fmt ""
 }
 
 function build() {
@@ -116,7 +124,7 @@ function localDeploy() {
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
-      --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
+      --set app.image=${PRIMAZA_IMAGE_NAME}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
@@ -150,11 +158,12 @@ function remove() {
 }
 
 case $1 in
-    install_kind) "$@"; exit;;
+    -h)           usage; exit;;
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
-    localDeploy) "$@"; exit;;
+    localdeploy)  localDeploy; "$@"; exit;;
     remove)       "$@"; exit;;
+    *)            usage; exit;;
 esac
 
 remove
