@@ -128,7 +128,7 @@ In this case, remove the helm chart `./scripts/vault.sh remove` and repeat the o
 
 > **Tip**: Notice the messages displayed within the terminal as they told you how to get the root token and where they are stored, where to access the keys, etc !
 
-We can now install Crossplane and the Helm provider
+We can now install Crossplane and its Helm provider
 ```bash
 ./scripts/crossplane.sh
 ```
@@ -160,10 +160,15 @@ If you prefer to install everything all-in-one, use our bash scripts on a `kind`
 ```bash
 VM_IP=<VM_IP>
 export VAULT_URL=http://vault-internal.vault:8200
-export PRIMAZA_IMAGE_NAME=kind-registry:5000/primaza-app
+export PRIMAZA_IMAGE_NAME=kind-registry:5000/local/primaza-app
 $(pwd)/scripts/vault.sh
-$(pwd)/scripts/primaza.sh localDeploy
+$(pwd)/scripts/crossplane.sh
+$(pwd)/scripts/primaza.sh build
+$(pwd)/scripts/primaza.sh localdeploy
 ```
+
+> **Note**: If you prefer to use the helm chart pushed on [Halkyon repository](https://github.com/halkyonio/helm-charts), don't use the parameters `build` and `localdeploy`
+
 And now, you can demo it ;-)
 
 ## Demo time

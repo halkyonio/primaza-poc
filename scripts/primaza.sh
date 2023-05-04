@@ -124,7 +124,7 @@ function localDeploy() {
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
-      --set app.image=${PRIMAZA_IMAGE_NAME}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
+      --set app.image=${PRIMAZA_IMAGE_NAME} 2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
@@ -161,7 +161,7 @@ case $1 in
     -h)           primazaUsage; exit;;
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
-    localdeploy)  localDeploy; "$@"; exit;;
+    localdeploy)  localDeploy; exit;;
     remove)       "$@"; exit;;
     *)            primazaUsage; exit;;
 esac
