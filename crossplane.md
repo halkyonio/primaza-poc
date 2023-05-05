@@ -92,7 +92,7 @@ cat <<EOF | kubectl apply -f -
 apiVersion: snowdrop.dev/v1alpha1
 kind: Database
 metadata:
-  name: postgresql-db
+  name: postgresql
 spec:
   compositionSelector:
     matchLabels:
@@ -106,10 +106,10 @@ EOF
 ```
 Check the `database` status
 ```bash
-kubectl describe database/postgresql-db
-Name:         postgresql-db
+kubectl describe database/postgresql -n db
+Name:         postgresql
 Namespace:    
-Labels:       crossplane.io/composite=postgresql-db
+Labels:       crossplane.io/composite=postgresql
 Annotations:  <none>
 API Version:  snowdrop.dev/v1alpha1
 Kind:         Database

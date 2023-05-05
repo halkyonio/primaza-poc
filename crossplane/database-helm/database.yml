@@ -1,7 +1,7 @@
 apiVersion: snowdrop.dev/v1alpha1
 kind: Database
 metadata:
-  name: my-db
+  name: postgresql
 spec:
   compositionSelector:
     matchLabels:
