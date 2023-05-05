@@ -210,7 +210,11 @@ public class ServiceResource {
         service.type = request.type;
         service.endpoint = request.endpoint;
         service.externalEndpoint = request.externalEndpoint;
-        service.installable = request.installable;
+        if(request.installable != null && request.installable.equals("on")) {
+            service.installable = true;
+        } else {
+            service.installable = false;
+        }
         service.helmRepo = request.helmRepo;
         service.helmChart = request.helmChart;
         service.helmChartVersion = request.helmChartVersion;

@@ -24,7 +24,7 @@ public class ServiceRequest {
     @FormParam
     public String externalEndpoint;
     @FormParam
-    public boolean installable;
+    public String installable;
     @FormParam
     public String helmRepo;
     @FormParam

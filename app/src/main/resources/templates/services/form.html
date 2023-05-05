@@ -71,8 +71,7 @@
             <label class="form-check-label col-sm-5" for="is_installable">To be provisioned (yes/no)</label>
             <div class="col-sm-5">
                 <input id="is_installable" class="form-check-input new-service" type="checkbox"
-                       name="installable"
-                       value="{#if service.installable}checked{/if}">
+                       name="installable" {#if service.installable}checked{/if}>
             </div>
         </div>
         <div class="form-group">
