@@ -190,31 +190,14 @@ To play with Primaza, you can use the following scenario:
 
 Everything is in place to claim a Service using the following commands:
 
-- Install the `fruits` postgresql DB that the Quarkus Fruits application will access
-  ```bash
-  DB_USERNAME=healthy
-  DB_PASSWORD=healthy
-  DB_DATABASE=fruits_database
-  RELEASE_NAME=postgresql
-  VERSION=11.9.13
-  helm uninstall postgresql -n db
-  kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n db
-  
-  helm install $RELEASE_NAME bitnami/postgresql \
-    --version $VERSION \
-    --set auth.username=$DB_USERNAME \
-    --set auth.password=$DB_PASSWORD \
-    --set auth.database=$DB_DATABASE \
-    --create-namespace \
-    -n db
-  ```
 - Deploy the Quarkus Fruits application within the namespace `app`
   ```bash
   helm install fruits-app halkyonio/fruits-app \
     -n app --create-namespace \
     --set app.image=quay.io/halkyonio/atomic-fruits:latest \
     --set app.host=atomic-fruits.<VM_IP>.nip.io \
-    --set app.serviceBinding.enabled=false
+    --set app.serviceBinding.enabled=false \
+    --set db.enabled=false
   ```
 - Create an entry within the secret store engine at the path `primaza/fruits`. This path will be used to configure the credentials to access the `fruits_database`.
   ```bash
@@ -226,8 +209,8 @@ Everything is in place to claim a Service using the following commands:
   export VAULT_TOKEN=root
   export VAULT_ADDR=http://localhost:<VAULT_PORT>
   
-  // Next create a key
-  vault kv put -mount=secret primaza/fruits healthy=healthy
+  // Next create the key that we need to access the Postgresql fruits db
+  vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database
   vault kv get -mount=secret primaza/fruits
   ```
   
