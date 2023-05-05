@@ -36,6 +36,7 @@ import io.halkyon.model.Service;
 import io.halkyon.resource.requests.ClaimRequest;
 import io.halkyon.services.BindApplicationService;
 import io.halkyon.services.ClaimStatus;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
@@ -50,6 +51,9 @@ public class ClaimResource {
     private final Validator validator;
     private final UpdateClaimJob claimingService;
     private final BindApplicationService bindService;
+
+    @Inject
+    KubernetesClientService kubernetesClientService;
 
     @Inject
     public ClaimResource(Validator validator, UpdateClaimJob claimingService, BindApplicationService bindService) {
@@ -209,6 +213,25 @@ public class ClaimResource {
         }
 
         claimingService.updateClaim(claim);
+        if (claim.service.installable) {
+            try {
+                System.out.println("Service is installable using crossplane. Let's do it :-)");
+                bindService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
+                if (kubernetesClientService.getServiceInCluster(claim.application.cluster, claim.service.getProtocol(),
+                        claim.service.getPort()).isPresent()) {
+                    claim.service.cluster = claim.application.cluster;
+                }
+            } catch (ClusterConnectException ex) {
+                throw new InternalServerErrorException(
+                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+            }
+        }
+        // TODO: We must update the claim.service object with the port/protocol/name & namespace
+        // as the claim.service don't include them when we call generateUrlByClaimService(claim) !!
+        LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
+        LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
+        LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
+        LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
 
         if (claim.service != null && claim.service.credentials != null && claim.application != null) {
             try {

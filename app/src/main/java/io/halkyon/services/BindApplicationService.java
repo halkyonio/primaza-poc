@@ -12,6 +12,8 @@ import java.util.Set;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.jboss.logging.Logger;
+
 import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.*;
 import io.halkyon.utils.StringUtils;
@@ -19,6 +21,8 @@ import io.quarkus.vault.VaultKVSecretEngine;
 
 @ApplicationScoped
 public class BindApplicationService {
+
+    private static final Logger LOG = Logger.getLogger(BindApplicationService.class);
 
     public static final String TYPE_KEY = "type";
     public static final String URL_KEY = "url";
@@ -66,6 +70,8 @@ public class BindApplicationService {
                 app.ingress = getIngressHost(app);
                 app.persist();
             }
+        } else {
+            LOG.infof("Credential: %s; url: %s ", credential.vaultKvPath, url);
         }
     }
 
@@ -85,8 +91,8 @@ public class BindApplicationService {
         kubernetesClientService.unMountSecretVolumeEnvInApplication(claim);
     }
 
-    public void createCrossplaneHelmRelease(Service service) throws ClusterConnectException {
-        kubernetesClientService.createCrossplaneHelmRelease(service);
+    public void createCrossplaneHelmRelease(Cluster cluster, Service service) throws ClusterConnectException {
+        kubernetesClientService.createCrossplaneHelmRelease(cluster, service);
     }
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
@@ -148,12 +154,22 @@ public class BindApplicationService {
     private String generateUrlByClaimService(Claim claim) {
         Application application = claim.application;
         Service service = claim.service;
+        LOG.infof("Application cluster: %s, namespace: %s", application.cluster.name, application.namespace);
+        LOG.infof("Service name: %s", service.name == null ? "" : service.name);
+        LOG.infof("Service namespace: %s", service.namespace == null ? "" : service.namespace);
+        LOG.infof("Service port: %s", service.getPort() == null ? "" : service.getPort());
+        LOG.infof("Service protocol: %s", service.getProtocol() == null ? "" : service.getProtocol());
         if (Objects.equals(application.cluster, service.cluster)
                 && Objects.equals(application.namespace, service.namespace)) {
             // rule 1: app + service within same ns, cluster
             // -> app can access the service using: protocol://service_name:port
             return String.format("%s://%s:%s", service.getProtocol(), service.name, service.getPort());
         } else if (Objects.equals(application.cluster, service.cluster)) {
+            // rule 2: app + service in different ns, same cluster
+            // -> app can access the service using: protocol://service_name.namespace:port
+            return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
+                    service.getPort());
+        } else if (Objects.equals(application.cluster.name, service.cluster.name)) {
             // rule 2: app + service in different ns, same cluster
             // -> app can access the service using: protocol://service_name.namespace:port
             return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,

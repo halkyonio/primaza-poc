@@ -106,7 +106,7 @@ public class ApplicationResource {
         if (claim.service.installable) {
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
-                bindService.createCrossplaneHelmRelease(claim.service);
+                bindService.createCrossplaneHelmRelease(application.cluster, claim.service);
             } catch (ClusterConnectException ex) {
                 throw new InternalServerErrorException(
                         "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
