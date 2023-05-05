@@ -101,16 +101,16 @@ public class ApplicationResource {
             throw new NotFoundException(String.format("Claim %s not found", claimId));
         }
         if (claim.service == null) {
-            if (claim.service.installable) {
-                try {
-                    System.out.println("Service is installable using crossplane. Let's do it :-)");
-                    bindService.createCrossplaneHelmRelease(claim.service);
-                } catch (ClusterConnectException ex) {
-                    throw new InternalServerErrorException("Can't deploy the service with the cluster "
-                            + ex.getCluster() + ". Cause: " + ex.getMessage());
-                }
-            }
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
+        }
+        if (claim.service.installable) {
+            try {
+                System.out.println("Service is installable using crossplane. Let's do it :-)");
+                bindService.createCrossplaneHelmRelease(claim.service);
+            } catch (ClusterConnectException ex) {
+                throw new InternalServerErrorException(
+                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+            }
         }
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));

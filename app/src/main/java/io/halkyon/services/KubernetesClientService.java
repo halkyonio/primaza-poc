@@ -189,7 +189,7 @@ public class KubernetesClientService {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
-                .endMetadata().withNewSpec().withNewV1beta1ForProvider().withNewV1beta1Chart()
+                .endMetadata().withNewSpec().withNewV1beta1ForProvider().withNamespace("db").withNewV1beta1Chart()
                 .withName(service.helmChart).withRepository(service.helmRepo).withVersion(service.helmChartVersion)
                 .endV1beta1Chart().withNewV1beta1Values().addToAdditionalProperties("auth.username", "healthy")
                 .addToAdditionalProperties("auth.password", "healthy")
@@ -200,7 +200,7 @@ public class KubernetesClientService {
         client = getClientForCluster(service.cluster);
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
                 .resources(Release.class);
-        releaseClient.inNamespace("db").resource(release.build()).create();
+        releaseClient.resource(release.build()).create();
     }
 
     @Transactional
