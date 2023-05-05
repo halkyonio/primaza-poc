@@ -49,7 +49,7 @@ spec:
         - type: MatchString
           fieldPath: status.atProvider.state
           matchString: deployed
-    - name: password
+    - name: secret
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
@@ -65,8 +65,6 @@ spec:
                   database: fruits_database
                   username: healthy
                   password: healthy
-          providerConfigRef:
-            name:
       patches:
         - fromFieldPath: spec.parameters.namespace
           toFieldPath: spec.forProvider.manifest.metadata.namespace
