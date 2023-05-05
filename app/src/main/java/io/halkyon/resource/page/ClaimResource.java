@@ -226,12 +226,18 @@ public class ClaimResource {
                         "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
             }
         }
-        // TODO: We must update the claim.service object with the port/protocol/name & namespace
-        // as the claim.service don't include them when we call generateUrlByClaimService(claim) !!
+        // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
+        // generateUrlByClaimService(claim) will be null
         LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
         LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
         LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
         LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
+
+        // TODO: Do a temporary workaround and hard code the values :-(
+        claim.service.cluster = claim.application.cluster;
+        claim.service.name = "postgresql";
+        claim.service.namespace = "db";
+        claim.persist();
 
         if (claim.service != null && claim.service.credentials != null && claim.application != null) {
             try {
