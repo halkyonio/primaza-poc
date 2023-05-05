@@ -75,6 +75,74 @@ EOF
 ```
 >**Note**: You can deploy the release file using the command `kubectl apply -f ./scripts/data/release-postgresql.yml`
 
+## Deploy a Helm DB chart using Composite and Compose resources
+
+Instead of deploying a Helm Release to request directly to the Crossplane Helm provider to deploy a Helm chart, we will now use
+a `Database` composite resource (aka our own CRD) and a `Composition` resource containing the template and patches to generate the needed resources: `Release`, etc
+
+Deploy first the Database CRD and composition resource
+```bash
+kubectl apply -f ./crossplane/database-helm/composite.yml
+kubectl apply -f ./crossplane/database-helm/composition.yml
+```
+
+To install by example a postgresql helm chart under the namespace `db` using the version `11.9.1`, creat and deploy the following resource:
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: snowdrop.dev/v1alpha1
+kind: Database
+metadata:
+  name: postgresql-db
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: local
+      type: dev
+  parameters:
+    type: postgresql
+    version: 11.9.1
+    namespace: db
+EOF
+```
+Check the `database` status
+```bash
+kubectl describe database/postgresql-db
+Name:         postgresql-db
+Namespace:    
+Labels:       crossplane.io/composite=postgresql-db
+Annotations:  <none>
+API Version:  snowdrop.dev/v1alpha1
+Kind:         Database
+...
+Spec:
+  Parameters:
+    Namespace:  db
+    Type:       postgresql
+    Version:    11.9.1
+...
+Events:
+  Type    Reason                   Age                From                                                             Message
+  ----    ------                   ----               ----                                                             -------
+  Normal  CompositionUpdatePolicy  15s                defined/compositeresourcedefinition.apiextensions.crossplane.io  Default composition update policy has been selected
+  Normal  PublishConnectionSecret  15s                defined/compositeresourcedefinition.apiextensions.crossplane.io  Successfully published connection details
+  Normal  ComposeResources         15s (x2 over 15s)  defined/compositeresourcedefinition.apiextensions.crossplane.io  Composed resource "postgresql-helm-release" is not yet ready
+  Normal  SelectComposition        14s (x4 over 15s)  defined/compositeresourcedefinition.apiextensions.crossplane.io  Successfully selected composition
+  Normal  ComposeResources         14s (x4 over 15s)  defined/compositeresourcedefinition.apiextensions.crossplane.io  Successfully composed resources
+```
+
+A podtgresql pod should be created soon:
+```bash
+kubectl get pod -lapp.kubernetes.io/name=postgresql -n db
+NAME              READY   STATUS    RESTARTS   AGE
+postgresql-db-0   1/1     Running   0          2m41s
+```
+To clean up:
+
+```bash
+kubectl delete -f ./crossplane/database-helm
+```
+
+
 ## How to use Upbound
 
 Documentation page: https://docs.upbound.io/uxp/install/
