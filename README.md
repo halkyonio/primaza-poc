@@ -154,7 +154,7 @@ helm install \
   --set app.host=primaza.${VM_IP}.nip.io \
   --set app.envs.vault.url=${VAULT_URL}
 ```
-> **Tip**: When the pod is started, you can access Primaza using its ingress host url: `http://primaza.<VM_IP>.nip.io``
+> **Tip**: When the pod is started, you can access Primaza using its ingress host url: `http://primaza.<VM_IP>.nip.io`
 
 If you prefer to install everything all-in-one, use our bash scripts on a `kind` k8s cluster:
 ```bash
