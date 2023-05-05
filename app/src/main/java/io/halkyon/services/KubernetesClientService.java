@@ -185,7 +185,8 @@ public class KubernetesClientService {
     /**
      * Create the Crossplane Helm Release CR
      */
-    public void createCrossplaneHelmRelease(io.halkyon.model.Service service) throws ClusterConnectException {
+    public void createCrossplaneHelmRelease(Cluster cluster, io.halkyon.model.Service service)
+            throws ClusterConnectException {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
@@ -197,7 +198,15 @@ public class KubernetesClientService {
                 .endV1beta1ForProvider().withNewV1beta1ProviderConfigRef().withName("helm-provider")
                 .endV1beta1ProviderConfigRef().endSpec();
 
-        client = getClientForCluster(service.cluster);
+        // TODO: Logic to be reviewed as we have 2 use cases:
+        // Service(s) instances has been discovered in cluster x.y.z
+        // Service is not yet installed and will be installed in cluster x.y.z and namespace t.u.v
+        if (cluster != null) {
+            client = getClientForCluster(cluster);
+        } else {
+            client = getClientForCluster(service.cluster);
+        }
+
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
                 .resources(Release.class);
         releaseClient.resource(release.build()).create();
