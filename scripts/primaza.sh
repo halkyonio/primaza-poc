@@ -64,7 +64,7 @@ function build() {
      -Dgit.sha.commit=${GIT_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
-  pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
+  #pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
   popd
 }
 
