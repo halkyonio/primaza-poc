@@ -210,7 +210,7 @@ public class ServiceResource {
         service.type = request.type;
         service.endpoint = request.endpoint;
         service.externalEndpoint = request.externalEndpoint;
-        if(request.installable != null && request.installable.equals("on")) {
+        if (request.installable != null && request.installable.equals("on")) {
             service.installable = true;
         } else {
             service.installable = false;
