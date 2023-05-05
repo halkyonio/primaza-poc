@@ -65,6 +65,8 @@ spec:
                   database: fruits_database
                   username: healthy
                   password: healthy
+          providerConfigRef:
+            name:
       patches:
         - fromFieldPath: spec.parameters.namespace
           toFieldPath: spec.forProvider.manifest.metadata.namespace

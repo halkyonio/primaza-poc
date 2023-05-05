@@ -62,21 +62,9 @@ EOF
     p "Give more RBAC rights to the crossplane service account"
     SA=$(kubectl -n crossplane-system get sa -o name | grep kubernetes-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
     kubectl create clusterrolebinding kubernetes-provider-admin-binding --clusterrole cluster-admin --serviceaccount=${SA}
-
-    p "Configure the Crossplane Kubernetes Provider"
-    cat <<EOF | kubectl apply -f -
-apiVersion: kubernetes.crossplane.io/v1alpha1
-kind: ProviderConfig
-metadata:
-  name: kubernetes-provider
-spec:
-  credentials:
-    source: InjectedIdentity
-EOF
 }
 
 function helmProvider() {
-
   p "Installing the Helm provider ..."
   cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1
