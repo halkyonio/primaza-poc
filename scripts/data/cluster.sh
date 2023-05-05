@@ -21,10 +21,10 @@ export TYPE_SPEED=400
 NO_WAIT=true
 
 # Script parameters
-NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault}
+NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault}
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind-kind}
-KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
+KIND_URL=${KIND_URL:-$(pwd)/scripts/data/cluster.sh }
 
 p "Primaza server: ${PRIMAZA_URL}"
 p "Kubernetes API server: ${KIND_URL}"
