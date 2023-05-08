@@ -31,7 +31,6 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
-import io.halkyon.model.Service;
 import io.halkyon.model.ServiceDiscovered;
 import io.halkyon.utils.StringUtils;
 import io.quarkus.panache.common.Sort;
@@ -59,12 +58,12 @@ public class KubernetesClientService {
      */
     public List<ServiceDiscovered> discoverServicesInCluster() throws ClusterConnectException {
         List<io.halkyon.model.Service> serviceCatalog = io.halkyon.model.Service.findAll(Sort.ascending("name")).list();
-        List<ServiceDiscovered> servicesDiscovered = null;
+        List<ServiceDiscovered> servicesDiscovered = new ArrayList<ServiceDiscovered>();
 
         for (Cluster cluster : Cluster.listAll()) {
             List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
             for (Service service : kubernetesServices) {
-                for (io.halkyon.model.Service serviceIdentity : serviceCatalog.list()) {
+                for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
                     boolean found = service.getSpec().getPorts().stream()
                             .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
                                     && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
@@ -72,6 +71,7 @@ public class KubernetesClientService {
                         ServiceDiscovered serviceDiscovered = new ServiceDiscovered();
                         serviceDiscovered.clusterName = cluster.name;
                         serviceDiscovered.namespace = service.getMetadata().getNamespace();
+                        serviceDiscovered.kubernetesSvcName = service.getMetadata().getName();
                         serviceDiscovered.serviceIdentity = serviceIdentity;
                         servicesDiscovered.add(serviceDiscovered);
                     }

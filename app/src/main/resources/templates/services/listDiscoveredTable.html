@@ -12,26 +12,21 @@
       <tbody>
         {#for service in services}
         <tr>
-            <td>{service.name}</td>
-            <td>{service.version}</td>
+            <td>{service.kubernetesSvcName}</td>
+            <td>{service.serviceIdentity.version}</td>
             <td>
-                {#if service.isStandalone()}
-                {service.externalEndpoint}
+                {#if service.serviceIdentity.isStandalone()}
+                   {service.serviceIdentity.externalEndpoint}
                 {#else}
-                {service.protocol}://{service.name}.{service.namespace}:{service.port}
+                   {service.serviceIdentity.protocol}://{service.serviceIdentity.name}.{service.namespace}:{service.serviceIdentity.port}
                 {/if}
             </td>
             <td>{service.namespace}</td>
             <td>
-                {#if service.isStandalone()}
-                Standalone
+                {#if service.serviceIdentity.isStandalone()}
+                  Standalone
                 {#else}
-                  <!-- TODO: To be checked why the service cluster name is is null -->
-                  {#if service.cluster && service.cluster.name != null}
-                    {service.cluster.name}
-                  {#else}
-                  n/a
-                  {/if}
+                  {service.clusterName}
                 {/if}
             </td>
         </tr>
