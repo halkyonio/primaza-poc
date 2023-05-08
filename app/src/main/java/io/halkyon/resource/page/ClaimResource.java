@@ -213,7 +213,7 @@ public class ClaimResource {
         }
 
         claimingService.updateClaim(claim);
-        if (claim.service.installable) {
+        if (claim.service.installable && claim.application != null) {
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
                 bindService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
@@ -233,14 +233,13 @@ public class ClaimResource {
         LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
         LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
 
-        // TODO: Do a temporary workaround and hard code the values :-(
-        claim.service.cluster = claim.application.cluster;
-        claim.service.name = "postgresql";
-        claim.service.namespace = "db";
-        claim.persist();
-
         if (claim.service != null && claim.service.credentials != null && claim.application != null) {
             try {
+                // TODO: Do a temporary workaround and hard code the values :-(
+                claim.service.cluster = claim.application.cluster;
+                claim.service.name = "postgresql";
+                claim.service.namespace = "db";
+                claim.persist();
                 bindService.bindApplication(claim);
             } catch (ClusterConnectException e) {
                 LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
