@@ -31,8 +31,10 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.Service;
 import io.halkyon.model.ServiceDiscovered;
 import io.halkyon.utils.StringUtils;
+import io.quarkus.panache.common.Sort;
 
 @ApplicationScoped
 public class KubernetesClientService {
@@ -56,14 +58,13 @@ public class KubernetesClientService {
      * Return the list of the services available for each cluster by excluding the black listed namespaces
      */
     public List<ServiceDiscovered> discoverServicesInCluster() throws ClusterConnectException {
-        List<io.halkyon.model.Service> serviceCatalog = (List<io.halkyon.model.Service>) io.halkyon.model.Service
-                .findAll();
+        List<io.halkyon.model.Service> serviceCatalog = io.halkyon.model.Service.findAll(Sort.ascending("name")).list();
         List<ServiceDiscovered> servicesDiscovered = null;
 
         for (Cluster cluster : Cluster.listAll()) {
             List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
             for (Service service : kubernetesServices) {
-                for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
+                for (io.halkyon.model.Service serviceIdentity : serviceCatalog.list()) {
                     boolean found = service.getSpec().getPorts().stream()
                             .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
                                     && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
