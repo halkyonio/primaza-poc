@@ -106,8 +106,8 @@ public class Service extends PanacheEntityBase {
         // part of the catalog as the property available = true
         // instead of checking if a service is running within the cluster(s).
         // This service must check using the cache, the available services
-
-        return Service.findAll(Sort.ascending("name")).list();
-        // return Service.find("available=true").list();
+        // old code -->
+        // return Service.findAll(Sort.ascending("name")).list();
+        return Service.find("available=true").list();
     }
 }

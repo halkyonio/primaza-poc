@@ -31,6 +31,7 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.ServiceDiscovered;
 import io.halkyon.utils.StringUtils;
 
 @ApplicationScoped
@@ -48,6 +49,35 @@ public class KubernetesClientService {
      */
     public List<Deployment> getDeploymentsInCluster(Cluster cluster) throws ClusterConnectException {
         return filterByCluster(getClientForCluster(cluster).apps().deployments(), cluster);
+    }
+
+    /**
+     *
+     * Return the list of the services available for each cluster by excluding the black listed namespaces
+     */
+    public List<ServiceDiscovered> discoverServicesInCluster() throws ClusterConnectException {
+        List<io.halkyon.model.Service> serviceCatalog = (List<io.halkyon.model.Service>) io.halkyon.model.Service
+                .findAll();
+        List<ServiceDiscovered> servicesDiscovered = null;
+
+        for (Cluster cluster : Cluster.listAll()) {
+            List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
+            for (Service service : kubernetesServices) {
+                for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
+                    boolean found = service.getSpec().getPorts().stream()
+                            .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
+                                    && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
+                    if (found) {
+                        ServiceDiscovered serviceDiscovered = new ServiceDiscovered();
+                        serviceDiscovered.clusterName = cluster.name;
+                        serviceDiscovered.namespace = service.getMetadata().getNamespace();
+                        serviceDiscovered.serviceIdentity = serviceIdentity;
+                        servicesDiscovered.add(serviceDiscovered);
+                    }
+                }
+            }
+        }
+        return servicesDiscovered;
     }
 
     /**

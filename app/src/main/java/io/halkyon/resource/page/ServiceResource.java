@@ -27,8 +27,11 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Service;
+import io.halkyon.model.ServiceDiscovered;
 import io.halkyon.resource.requests.ServiceRequest;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
@@ -43,6 +46,9 @@ public class ServiceResource {
 
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
+
+    @Inject
+    KubernetesClientService kubernetesClientService;
 
     @GET
     @Path("/new")
@@ -190,18 +196,20 @@ public class ServiceResource {
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered")
-    public TemplateInstance listDiscoveredServices() {
-        List<Service> discoveredServices = Service.findAvailableServices();
-        return Templates.Services.listDiscovered("Services available", discoveredServices, discoveredServices.size());
+    public TemplateInstance listDiscoveredServices() throws ClusterConnectException {
+        List<ServiceDiscovered> servicesDiscovered = kubernetesClientService.discoverServicesInCluster();
+        return Templates.Services.listDiscovered("Services available", servicesDiscovered, servicesDiscovered.size());
+        // List<Service> services = Service.findAvailableServices();
+        // return Templates.Services.listDiscoveredTable(services, services.size());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/discovered/polling")
-    public TemplateInstance pollingDiscoveredServices() {
-        List<Service> discoveredServices = Service.findAvailableServices();
-        return Templates.Services.listDiscoveredTable(discoveredServices, discoveredServices.size());
+    public TemplateInstance pollingDiscoveredServices() throws ClusterConnectException {
+        List<ServiceDiscovered> servicesDiscovered = kubernetesClientService.discoverServicesInCluster();
+        return Templates.Services.listDiscovered("Services available", servicesDiscovered, servicesDiscovered.size());
     }
 
     private void doUpdateService(Service service, ServiceRequest request) {
