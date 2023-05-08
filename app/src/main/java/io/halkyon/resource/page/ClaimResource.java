@@ -85,7 +85,7 @@ public class ClaimResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
     public Response filter(@QueryParam("name") String name, @QueryParam("serviceRequested") String serviceRequested,
-            @QueryParam("owner") String owner, @QueryParam("status") String status) {
+                           @QueryParam("owner") String owner, @QueryParam("status") String status) {
         FilterableQueryBuilder query = new FilterableQueryBuilder();
         if (!StringUtils.isNullOrEmpty(name)) {
             query.containsIgnoreCase("name", name);
@@ -213,7 +213,9 @@ public class ClaimResource {
         }
 
         claimingService.updateClaim(claim);
-        if (claim.service.installable && claim.application != null) {
+
+        // TODO: Logic to be reviewed
+        if (claim.service.installable != null && claim.service.installable && claim.application != null) {
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
                 bindService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
@@ -226,6 +228,7 @@ public class ClaimResource {
                         "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
             }
         }
+
         // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
         // generateUrlByClaimService(claim) will be null
         LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
