@@ -46,6 +46,7 @@ public class BindApplicationService {
         deleteSecretInNamespace(claim);
         removeIngressHostFromApplication(claim);
         rolloutApplication(claim);
+        deleteCrossplaneHelmRelease(claim);
     }
 
     private void removeIngressHostFromApplication(Claim claim) {
@@ -93,6 +94,10 @@ public class BindApplicationService {
 
     public void createCrossplaneHelmRelease(Cluster cluster, Service service) throws ClusterConnectException {
         kubernetesClientService.createCrossplaneHelmRelease(cluster, service);
+    }
+
+    public void deleteCrossplaneHelmRelease(Claim claim) throws ClusterConnectException {
+        kubernetesClientService.deleteRelease(claim);
     }
 
     private void createSecretForApplication(Claim claim, Credential credential, String url)
