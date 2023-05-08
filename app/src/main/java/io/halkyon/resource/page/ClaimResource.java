@@ -85,7 +85,7 @@ public class ClaimResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/filter")
     public Response filter(@QueryParam("name") String name, @QueryParam("serviceRequested") String serviceRequested,
-                           @QueryParam("owner") String owner, @QueryParam("status") String status) {
+            @QueryParam("owner") String owner, @QueryParam("status") String status) {
         FilterableQueryBuilder query = new FilterableQueryBuilder();
         if (!StringUtils.isNullOrEmpty(name)) {
             query.containsIgnoreCase("name", name);
