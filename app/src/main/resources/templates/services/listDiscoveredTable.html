@@ -26,7 +26,12 @@
                 {#if service.isStandalone()}
                 Standalone
                 {#else}
-                {service.cluster.name}
+                  <!-- TODO: To be checked why the service cluster name is is null -->
+                  {#if service.cluster && service.cluster.name != null}
+                    {service.cluster.name}
+                  {#else}
+                  n/a
+                  {/if}
                 {/if}
             </td>
         </tr>

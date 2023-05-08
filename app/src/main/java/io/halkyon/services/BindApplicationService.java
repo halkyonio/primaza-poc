@@ -46,7 +46,10 @@ public class BindApplicationService {
         deleteSecretInNamespace(claim);
         removeIngressHostFromApplication(claim);
         rolloutApplication(claim);
-        deleteCrossplaneHelmRelease(claim);
+        // TODO: Test should be improved to test if the service has been deployed using Crossplane
+        if (claim.service.installable) {
+            deleteCrossplaneHelmRelease(claim);
+        }
     }
 
     private void removeIngressHostFromApplication(Claim claim) {
