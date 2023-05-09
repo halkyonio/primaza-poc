@@ -17,6 +17,9 @@ Table of Contents
     * [Running the application locally](#running-the-application-locally)
     * [Using Primaza on a k8s cluster](#using-primaza-on-a-k8s-cluster)
   * [Demo time](#demo-time)
+  * [Use cases](#use-cases)
+    * [Service discovered](#service-discovered)
+    * [Service deployed using Crossplane](#service-deployed-using-crossplane)
 
 # Introduction
 
@@ -241,3 +244,53 @@ Everything is in place to claim a Service using the following commands:
 - Click on the URL to access the application's screen
 - Alternatively `curl` or `httpie` the URL (`http http://atomic-fruits.127.0.0.1.nip.io/fruits`)
 - Enjoy :-)
+
+## Use cases
+
+This section describes different use cases that you can play manually top of a k8s cluster where:
+- Primaza, vault and crossplane have been deployed
+- Service catalog, cluster and credentials records has been populated (use for that purpose the scripts of: ./scripts/data/*.sh)
+- Vault path has been created: `vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database`
+- Deploy the Atomic Fruits helm chart
+```bash
+VM_IP=127.0.0.1
+helm uninstall fruits-app -n app
+helm install fruits-app halkyonio/fruits-app \
+  -n app --create-namespace \
+  --set app.image=quay.io/halkyonio/atomic-fruits:latest \
+  --set app.host=atomic-fruits.$VM_IP.nip.io \
+  --set app.serviceBinding.enabled=false \
+  --set db.enabled=false
+```
+
+### Service discovered
+
+- Install a Helm chart (or a YAML static file) of a service part of the catalog (e.g. postgresql)
+```bash
+DB_PASSWORD=healthy
+DB_DATABASE=fruits_database
+RELEASE_NAME=postgresql
+VERSION=11.9.13
+
+helm uninstall postgresql -n db
+kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n db
+
+helm install $RELEASE_NAME bitnami/postgresql \
+  --version $VERSION \
+  --set auth.username=$DB_USERNAME \
+  --set auth.password=$DB_PASSWORD \
+  --set auth.database=$DB_DATABASE \
+  --create-namespace \
+  -n db
+```
+- Open the primaza `applications` screen and next to the line of the `fruits` application, click on the claim button
+- Create a new claim
+- Wait a few moments till the status is `bound` and open the ingress URL
+
+### Service deployed using Crossplane
+
+- Open the primaza `services catalog` screen and click on the `installable` checkbox of the service `postgresql`
+- If not yet done, specify the Helm repo `https://charts.bitnami.com/bitnami`, chart name `postgresql` and version `11.9.13` to be deployed
+- Next, open the primaza `applications` screen and next to the line of the `fruits` application, click on the claim button
+- Create a new claim
+- Wait a few moments till the status is `bound` and open the ingress URL
