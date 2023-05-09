@@ -214,28 +214,29 @@ function check_pv() {
 }
 
 check_pv
+
 #
 # handle some default params
 # -h for help
 # -d for disabling simulated typing
 #
-while getopts ":dhncw:" opt; do
-  case $opt in
-    h)
-      usage
-      exit 1
-      ;;
-    d)
-      unset TYPE_SPEED
-      ;;
-    n)
-      NO_WAIT=true
-      ;;
-    c)
-      SHOW_CMD_NUMS=true
-      ;;
-    w)
-      PROMPT_TIMEOUT=$OPTARG
-      ;;
-  esac
-done
+#while getopts ":dhncw:" opt; do
+#  case $opt in
+#    h)
+#      usage
+#      exit 1
+#      ;;
+#    d)
+#      unset TYPE_SPEED
+#      ;;
+#    n)
+#      NO_WAIT=true
+#      ;;
+#    c)
+#      SHOW_CMD_NUMS=true
+#      ;;
+#    w)
+#      PROMPT_TIMEOUT=$OPTARG
+#      ;;
+#  esac
+#done

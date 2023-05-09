@@ -3,11 +3,7 @@ package io.halkyon;
 import java.util.List;
 import java.util.Map;
 
-import io.halkyon.model.Application;
-import io.halkyon.model.Claim;
-import io.halkyon.model.Cluster;
-import io.halkyon.model.Credential;
-import io.halkyon.model.Service;
+import io.halkyon.model.*;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
@@ -40,9 +36,10 @@ public class Templates {
 
         public static native TemplateInstance form(String title, Service service);
 
-        public static native TemplateInstance listDiscovered(String title, List<Service> services, long items);
+        public static native TemplateInstance listDiscovered(String title, List<ServiceDiscovered> services,
+                long items);
 
-        public static native TemplateInstance listDiscoveredTable(List<Service> services, long items);
+        public static native TemplateInstance listDiscoveredTable(List<ServiceDiscovered> services, long items);
     }
 
     @CheckedTemplate(basePath = "credentials", requireTypeSafeExpressions = false)

@@ -2,11 +2,7 @@ package io.halkyon.services;
 
 import static io.halkyon.utils.StringUtils.equalsIgnoreCase;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +10,8 @@ import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
+import io.crossplane.helm.v1beta1.Release;
+import io.crossplane.helm.v1beta1.ReleaseBuilder;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -33,7 +31,9 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
+import io.halkyon.model.ServiceDiscovered;
 import io.halkyon.utils.StringUtils;
+import io.quarkus.panache.common.Sort;
 
 @ApplicationScoped
 public class KubernetesClientService {
@@ -50,6 +50,35 @@ public class KubernetesClientService {
      */
     public List<Deployment> getDeploymentsInCluster(Cluster cluster) throws ClusterConnectException {
         return filterByCluster(getClientForCluster(cluster).apps().deployments(), cluster);
+    }
+
+    /**
+     *
+     * Return the list of the services available for each cluster by excluding the black listed namespaces
+     */
+    public List<ServiceDiscovered> discoverServicesInCluster() throws ClusterConnectException {
+        List<io.halkyon.model.Service> serviceCatalog = io.halkyon.model.Service.findAll(Sort.ascending("name")).list();
+        List<ServiceDiscovered> servicesDiscovered = new ArrayList<ServiceDiscovered>();
+
+        for (Cluster cluster : Cluster.listAll()) {
+            List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
+            for (Service service : kubernetesServices) {
+                for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
+                    boolean found = service.getSpec().getPorts().stream()
+                            .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
+                                    && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
+                    if (found) {
+                        ServiceDiscovered serviceDiscovered = new ServiceDiscovered();
+                        serviceDiscovered.clusterName = cluster.name;
+                        serviceDiscovered.namespace = service.getMetadata().getNamespace();
+                        serviceDiscovered.kubernetesSvcName = service.getMetadata().getName();
+                        serviceDiscovered.serviceIdentity = serviceIdentity;
+                        servicesDiscovered.add(serviceDiscovered);
+                    }
+                }
+            }
+        }
+        return servicesDiscovered;
     }
 
     /**
@@ -80,6 +109,20 @@ public class KubernetesClientService {
         String secretName = application.name + "-" + claim.name;
         client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().build());
+    }
+
+    /**
+     * Delete the Crossplane Release
+     */
+    public void deleteRelease(Claim claim) throws ClusterConnectException {
+        // TODO: To be reviewed in order to user the proper cluster
+        KubernetesClient client = getClientForCluster(claim.application.cluster);
+        LOG.infof("Application cluster: ", claim.application.cluster);
+        LOG.infof("Helm chart name: ", claim.service.helmChart);
+        ReleaseBuilder release = new ReleaseBuilder();
+        release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata()
+                .withName(claim.service.helmChart).endMetadata();
+        client.resource(release.build()).delete();
     }
 
     /**
@@ -178,6 +221,37 @@ public class KubernetesClientService {
         } catch (NullPointerException e) {
             return "No host found";
         }
+    }
+
+    /**
+     * Create the Crossplane Helm Release CR
+     */
+    public void createCrossplaneHelmRelease(Cluster cluster, io.halkyon.model.Service service)
+            throws ClusterConnectException {
+
+        // Create Release object
+        ReleaseBuilder release = new ReleaseBuilder();
+        release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
+                .endMetadata().withNewSpec().withNewV1beta1ForProvider().addNewV1beta1Set().withName("auth.database")
+                .withValue("fruits_database").endV1beta1Set().addNewV1beta1Set().withName("auth.username")
+                .withValue("healthy").endV1beta1Set().addNewV1beta1Set().withName("auth.password").withValue("healthy")
+                .endV1beta1Set().withNamespace("db").withWait(true).withNewV1beta1Chart().withName(service.helmChart)
+                .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endV1beta1Chart()
+                .endV1beta1ForProvider().withNewV1beta1ProviderConfigRef().withName("helm-provider")
+                .endV1beta1ProviderConfigRef().endSpec();
+
+        // TODO: Logic to be reviewed as we have 2 use cases:
+        // Service(s) instances has been discovered in cluster x.y.z
+        // Service is not yet installed and will be installed in cluster x.y.z and namespace t.u.v
+        if (cluster != null) {
+            client = getClientForCluster(cluster);
+        } else {
+            client = getClientForCluster(service.cluster);
+        }
+
+        MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
+                .resources(Release.class);
+        releaseClient.resource(release.build()).create();
     }
 
     @Transactional

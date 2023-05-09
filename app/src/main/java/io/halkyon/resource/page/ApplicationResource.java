@@ -103,11 +103,25 @@ public class ApplicationResource {
         if (claim.service == null) {
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
         }
+        if (claim.service.installable) {
+            try {
+                System.out.println("Service is installable using crossplane. Let's do it :-)");
+                bindService.createCrossplaneHelmRelease(application.cluster, claim.service);
+            } catch (ClusterConnectException ex) {
+                throw new InternalServerErrorException(
+                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+            }
+        }
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));
         }
         claim.application = application;
         try {
+            // TODO: Do a temporary workaround and hard code the values :-(
+            claim.service.cluster = claim.application.cluster;
+            claim.service.name = "postgresql";
+            claim.service.namespace = "db";
+            claim.persist();
             bindService.bindApplication(claim);
             claim.persist();
             return Response.ok().build();

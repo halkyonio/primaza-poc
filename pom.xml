@@ -179,7 +179,6 @@
 
     <modules>
         <module>app</module>
-        <!--    <module>watcher</module>-->
     </modules>
 
     <profiles>

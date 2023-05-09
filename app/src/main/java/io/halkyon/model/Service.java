@@ -47,6 +47,10 @@ public class Service extends PanacheEntityBase {
      */
     public String externalEndpoint;
     public Boolean available;
+    public Boolean installable;
+    public String helmRepo;
+    public String helmChart;
+    public String helmChartVersion;
     @CreationTimestamp
     public Date created;
     @UpdateTimestamp
@@ -98,6 +102,12 @@ public class Service extends PanacheEntityBase {
     }
 
     public static List<Service> findAvailableServices() {
+        // TODO. This code should be reviewed as currently we check if a Service
+        // part of the catalog as the property available = true
+        // instead of checking if a service is running within the cluster(s).
+        // This service must check using the cache, the available services
+        // old code -->
+        // return Service.findAll(Sort.ascending("name")).list();
         return Service.find("available=true").list();
     }
 }

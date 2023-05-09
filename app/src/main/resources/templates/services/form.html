@@ -1,77 +1,136 @@
 {@java.lang.Integer items}
 {#include base}
-  {#title}Service{/title}
-  {#body}
-     <div class="container" id="form">
-         {#if service.id == null }
-         <h1>New Service</h1>
-         <form class="form-horizontal" action="/services" hx-post="/services" hx-target="#response" method="POST" hx-swap="innerHTML">
-         {#else}
-         <h1>Update Service</h1>
-         <form class="form-horizontal" action="/services/{service.id}" hx-put="/services/{service.id}" hx-target="#response" method="PUT" hx-swap="innerHTML">
-         {/if}
-         <div class="form-group">
-            <label class="control-label col-sm-2" for="name">Service name:</label>
-            <div class="col-sm-5">
-             <input id="name" class="form-control new-service" type="text" name="name" value="{#if service.name}{service.name}{/if}" placeholder="What service do you want to register? ?">
+    {#title}Service{/title}
+    {#body}
+      <div class="container" id="form">
+        {#if service.id == null }
+        <h1>New Service</h1>
+        <form class="form-horizontal" action="/services" hx-post="/services" hx-target="#response" method="POST"
+        hx-swap="innerHTML">
+        {#else}
+        <h1>Update Service</h1>
+        <form class="form-horizontal" action="/services/{service.id}" hx-put="/services/{service.id}"
+        hx-target="#response" method="PUT" hx-swap="innerHTML">
+        {/if}
+        <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="name">Service name:</label>
+                <div class="col-sm-5">
+                    <input id="name" class="form-control new-service" type="text" name="name"
+                           value="{#if service.name}{service.name}{/if}"
+                           placeholder="What service do you want to register? ?">
+                </div>
             </div>
-         </div>
-         <div class="form-group">
-             <label class="control-label col-sm-2" for="version">Version:</label>
-             <div class="col-sm-10">
-               <input id="version" class="form-control new-service" type="text" name="version" value="{#if service.version}{service.version}{/if}" placeholder="What version service?">
-             </div>
-         </div>
-         <div class="form-group">
-             <label class="control-label col-sm-2" for="service_type">Type :</label>
-             <div class="col-sm-5">
-                 <select id="service_type" class="form-control new-service" name="type" required placeholder="Select the type ?">
-                    <option value="any" selected>Any</option>
-                    <option value="postgresql" {#if service.type == "postgresql"}selected{/if}>Postgresql</option>
-                    <option value="mysql" {#if service.type == "mysql"}selected{/if}>MySQL</option>
-                    <option value="mariadb" {#if service.type == "mariadb"}selected{/if}>mariadb</option>
-                    <option value="activemq" {#if service.type == "activemq"}selected{/if}>ActiveMQ</option>
-                    <option value="api" {#if service.type == "api"}selected{/if}>Api</option>
-                 </select>
-             </div>
-         </div>
-         <div class="form-group">
-             <label class="control-label col-sm-2" for="endpoint_input">Endpoint:</label>
-             <div class="col-sm-5">
-                <input id="endpoint_input" class="form-control new-service" type="text" name="endpoint"
-                       value="{#if service.endpoint}{service.endpoint}{/if}"
-                       onclick="clearInput('external_endpoint_input')"
-                       placeholder="protocol:port (e.g. tcp:5432)">
-             </div>
-         </div>
-           OR
-         <div class="form-group">
-             <label class="control-label col-sm-2" for="external_endpoint_input">External endpoint:</label>
-             <div class="col-sm-5">
-                 <input id="external_endpoint_input" class="form-control new-service" type="text" name="externalEndpoint"
-                        value="{#if service.externalEndpoint}{service.externalEndpoint}{/if}"
-                        onclick="clearInput('endpoint_input')"
-                        placeholder="myservice.my.org">
-             </div>
-         </div>
-         </br>
-         <div class="form-group">
-           <div class="col-sm-offset-2 col-sm-10">
-             <button id="service-button" type="submit" class="btn btn-primary">Submit</button>
-           </div>
-         </div>
-       </form>
-       <div style="height: 10px;"></div>
-       <hr>
-       <a href="/services" class="btn btn-info active" role="button" aria-pressed="true">Back</a>
-       <div class="container">
-         <div id="response"/>
-       </div>
-     </div>
-  {/body}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="version">Version:</label>
+                <div class="col-sm-5">
+                    <input id="version" class="form-control new-service" type="text" name="version"
+                           value="{#if service.version}{service.version}{/if}"
+                           placeholder="What version service?">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="service_type">Type :</label>
+                <div class="col-sm-5">
+                    <select id="service_type" class="form-control new-service" name="type" required
+                            placeholder="Select the type ?">
+                        <option value="any" selected>Any</option>
+                        <option value="postgresql" {#if service.type == "postgresql"}selected{/if}>Postgresql
+                        </option>
+                        <option value="mysql" {#if service.type == "mysql"}selected{/if}>MySQL</option>
+                        <option value="mariadb" {#if service.type == "mariadb"}selected{/if}>mariadb</option>
+                        <option value="activemq" {#if service.type == "activemq"}selected{/if}>ActiveMQ</option>
+                        <option value="api" {#if service.type == "api"}selected{/if}>Api</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="endpoint_input">Endpoint:</label>
+                <div class="col-sm-5">
+                    <input id="endpoint_input" class="form-control new-service" type="text" name="endpoint"
+                           value="{#if service.endpoint}{service.endpoint}{/if}"
+                           onclick="clearInput('external_endpoint_input')"
+                           placeholder="protocol:port (e.g. tcp:5432)">
+                </div>
+            </div>
+            OR
+            <div class="form-group">
+                <label class="control-label col-sm-4" for="external_endpoint_input">External endpoint:</label>
+                <div class="col-sm-5">
+                    <input id="external_endpoint_input" class="form-control new-service" type="text"
+                           name="externalEndpoint"
+                           value="{#if service.externalEndpoint}{service.externalEndpoint}{/if}"
+                           onclick="clearInput('endpoint_input')"
+                           placeholder="myservice.my.org">
+                </div>
+            </div>
+        </div>
+        <div class="col">
+        <div class="form-group">
+            <label class="form-check-label col-sm-5" for="is_installable">To be provisioned (yes/no)</label>
+            <div class="col-sm-5">
+                <input id="is_installable" class="form-check-input new-service" type="checkbox"
+                       name="installable" {#if service.installable}checked{/if}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-5" for="service_type">Provisioner :</label>
+            <div class="col-sm-5">
+                <select id="provisioner_type" class="form-control new-service" name="type"
+                        placeholder="Select the provisioner ?">
+                    <option value="crossplane" selected>Crossplane</option>
+                    <option value="helm">Helm</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="helmrepo_input">Helm repo:</label>
+            <div class="col-sm-5">
+                <input id="helmrepo_input" class="form-control new-service" type="text" name="helmRepo"
+                       value="{#if service.helmRepo}{service.helmRepo}{/if}"
+                       placeholder="my-helm-repo">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="helmChart_input">Chart name:</label>
+            <div class="col-sm-5">
+                <input id="helmChart_input" class="form-control new-service" type="text" name="helmChart"
+                       value="{#if service.helmChart}{service.helmChart}{/if}"
+                       placeholder="helm chart name">
+            </div>
+        </div>
+        <div class="form-group">
+        <label class="control-label col-sm-2" for="helmChartVersion_input">Chart version:</label>
+        <div class="col-sm-5">
+        <input id="helmChartVersion_input" class="form-control new-service" type="text" name="helmChartVersion"
+        value="{#if service.helmChartVersion}{service.helmChartVersion}{/if}"
+        placeholder="helm chart version">
+        </div>
+        </div>
+        </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button id="service-button" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+        <div style="height: 10px;"></div>
+        <hr>
+        <a href="/services" class="btn btn-info active" role="button" aria-pressed="true">Back</a>
+        <div class="container">
+            <div id="response"/>
+        </div>
+      </form>
+    {/body}
 {/include}
 <script>
-function clearInput(id) {
-    document.getElementById(id).value = "";
-}
+    function clearInput(id) {
+        document.getElementById(id).value = "";
+    }
 </script>

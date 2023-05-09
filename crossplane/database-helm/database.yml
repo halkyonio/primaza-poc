@@ -1,0 +1,13 @@
+apiVersion: snowdrop.dev/v1alpha1
+kind: Database
+metadata:
+  name: postgresql
+spec:
+  compositionSelector:
+    matchLabels:
+      provider: local
+      type: dev
+  parameters:
+    type: postgresql
+    version: 11.9.1
+    namespace: db
