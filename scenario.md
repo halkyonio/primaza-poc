@@ -1,3 +1,14 @@
+Table of Contents
+=================
+
+* [Installation](#installation)
+* [Running Primaza on k8s using local build](#running-primaza-on-k8s-using-local-build)
+* [Access the cluster using mvn quarkus:dev](#access-the-cluster-using-mvn-quarkusdev)
+* [Watch primaza log](#watch-primaza-log)
+* [Rollout](#rollout)
+* [Test 1 :: DB installed using Crossplane Helm Release (= auto)](#test-1--db-installed-using-crossplane-helm-release--auto)
+* [Test 2 :: DB manually installed using Bitnami Helm chart](#test-2--db-manually-installed-using-bitnami-helm-chart)
+
 ## Installation
 
 Steps to execute to create a kind cluster + vault + crossplane locally
@@ -57,9 +68,7 @@ $(pwd)/scripts/data/cluster.sh
 $(pwd)/scripts/data/services.sh
 $(pwd)/scripts/data/credentials.sh
 ```
-## Test 1
-
-DB installed using Crossplane Helm Release (= auto)
+## Test 1 :: DB installed using Crossplane Helm Release (= auto)
 
 - Check the box `installable` for postgresql DB within the Service catalog
 ```bash
@@ -72,9 +81,7 @@ helm install fruits-app halkyonio/fruits-app \
   --set db.enabled=false
 ```
 
-## TEST 2
-
-!! DB manually installed using Bitnami Helm chart
+## Test 2 :: DB manually installed using Bitnami Helm chart
 
 ```bash
 helm uninstall fruits-app -n app
