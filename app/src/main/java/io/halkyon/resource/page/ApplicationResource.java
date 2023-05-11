@@ -119,8 +119,7 @@ public class ApplicationResource {
         try {
             // TODO: Do a temporary workaround and hard code the values :-(
             claim.service.cluster = claim.application.cluster;
-            claim.service.name = "postgresql";
-            claim.service.namespace = "db";
+            claim.service.namespace = claim.application.namespace;
             claim.persist();
             bindService.bindApplication(claim);
             claim.persist();
