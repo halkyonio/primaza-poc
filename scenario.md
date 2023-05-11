@@ -2,7 +2,7 @@ Table of Contents
 =================
 
 * [Installation](#installation)
-* [Running Primaza on k8s using local build](#running-primaza-on-k8s-using-local-build)
+* [Running Primaza on k8s using local maven build](#running-primaza-on-k8s-using-local-maven-build)
 * [Access the cluster using mvn quarkus:dev](#access-the-cluster-using-mvn-quarkusdev)
 * [Watch primaza log](#watch-primaza-log)
 * [Build and rollout](#build-and-rollout)
@@ -31,7 +31,7 @@ vault kv put -mount=secret primaza/fruits username=healthy password=healthy data
 vault kv get -mount=secret primaza/fruits
 ```
 
-## Running Primaza on k8s using local build
+## Running Primaza on k8s using local maven build
 ```bash
 k create ns primaza --dry-run=client -o yaml | k apply -f -
 $(pwd)/scripts/primaza.sh build
