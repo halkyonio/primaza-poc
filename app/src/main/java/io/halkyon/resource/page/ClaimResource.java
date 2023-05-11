@@ -216,6 +216,9 @@ public class ClaimResource {
 
         // TODO: Logic to be reviewed
         if (claim.service.installable != null && claim.service.installable && claim.application != null) {
+            claim.service.cluster = claim.application.cluster;
+            claim.service.namespace = claim.application.namespace;
+            claim.persist();
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
                 bindService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
@@ -238,10 +241,6 @@ public class ClaimResource {
 
         if (claim.service != null && claim.service.credentials != null && claim.application != null) {
             try {
-                // TODO: Do a temporary workaround and hard code the values :-(
-                claim.service.cluster = claim.application.cluster;
-                claim.service.namespace = claim.application.namespace;
-                claim.persist();
                 bindService.bindApplication(claim);
             } catch (ClusterConnectException e) {
                 LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());

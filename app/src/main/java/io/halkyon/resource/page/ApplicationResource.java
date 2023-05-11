@@ -104,6 +104,9 @@ public class ApplicationResource {
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
         }
         if (claim.service.installable) {
+            claim.service.cluster = claim.application.cluster;
+            claim.service.namespace = claim.application.namespace;
+            claim.persist();
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
                 bindService.createCrossplaneHelmRelease(application.cluster, claim.service);
@@ -117,10 +120,6 @@ public class ApplicationResource {
         }
         claim.application = application;
         try {
-            // TODO: Do a temporary workaround and hard code the values :-(
-            claim.service.cluster = claim.application.cluster;
-            claim.service.namespace = claim.application.namespace;
-            claim.persist();
             bindService.bindApplication(claim);
             claim.persist();
             return Response.ok().build();
