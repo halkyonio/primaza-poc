@@ -5,7 +5,7 @@ Table of Contents
 * [Running Primaza on k8s using local build](#running-primaza-on-k8s-using-local-build)
 * [Access the cluster using mvn quarkus:dev](#access-the-cluster-using-mvn-quarkusdev)
 * [Watch primaza log](#watch-primaza-log)
-* [Rollout](#rollout)
+* [Build and rollout](#build-and-rollout)
 * [Test 1 :: DB installed using Crossplane Helm Release (= auto)](#test-1--db-installed-using-crossplane-helm-release--auto)
 * [Test 2 :: DB manually installed using Bitnami Helm chart](#test-2--db-manually-installed-using-bitnami-helm-chart)
 
@@ -57,7 +57,7 @@ POD=$(k get pods -n primaza -lapp.kubernetes.io/name=primaza-app -oname)
 k -n primaza logs $POD -f
 ```
 
-## Rollout
+## Build and rollout
 ```bash
 $(pwd)/scripts/primaza.sh build
 k scale -n primaza --replicas=0 deployment/primaza-app; k scale -n primaza --replicas=1 deployment/primaza-app
