@@ -38,6 +38,8 @@ public class Credential extends PanacheEntityBase {
     @JoinColumn(name = "service_id", nullable = false)
     public Service service;
 
+    public String type;
+
     public String vaultKvPath;
 
     public String username;

@@ -16,6 +16,10 @@ public class CredentialRequest {
     @FormParam
     public String name;
 
+    @NotBlank
+    @FormParam
+    public String type;
+
     @NotNull
     @FormParam
     public Long serviceId;
