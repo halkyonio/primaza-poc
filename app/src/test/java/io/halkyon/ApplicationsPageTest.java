@@ -43,7 +43,6 @@ import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.ApplicationNameMatcher;
-import io.halkyon.utils.ClaimNameMatcher;
 import io.halkyon.utils.ClusterNameMatcher;
 import io.halkyon.utils.SecretDataMatcher;
 import io.halkyon.utils.WebPageExtension;
@@ -202,7 +201,8 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
+                argThat(new ApplicationNameMatcher(claimName)),
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
@@ -266,7 +266,8 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
+                argThat(new ApplicationNameMatcher(claimName)),
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));
@@ -380,7 +381,8 @@ public class ApplicationsPageTest {
         assertEquals(expectedUrl, actualClaim.url);
 
         // then secret should have been generated
-        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(argThat(new ClaimNameMatcher(claimName)),
+        verify(mockKubernetesClientService, times(1)).mountSecretInApplication(
+                argThat(new ApplicationNameMatcher(claimName)),
                 argThat(new SecretDataMatcher(expectedUrl, "user1", "pass1")));
         // and application should have been rolled out.
         verify(mockKubernetesClientService, times(1)).rolloutApplication(argThat(new ApplicationNameMatcher(appName)));

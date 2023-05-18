@@ -62,7 +62,8 @@ public class KubernetesClientServiceTest {
         claim.application = app;
         app.claim = claim;
 
-        String secretName = "test2-app-test2-claim";
+        // String secretName = "test2-app-test2-claim";
+        String secretName = "test2-app-secret";
         Map<String, String> secretData = new HashMap<>();
         String url = "testbind://consul:1111";
         secretData.put("host", toBase64(getHostFromUrl(url)));
@@ -97,11 +98,11 @@ public class KubernetesClientServiceTest {
                 .andReturn(HttpURLConnection.HTTP_INTERNAL_ERROR, "{error: impossible to patch deployment}").once();
 
         // - the secret is deleted because the mounting failed.
-        mockServer.expect().delete().withPath("/api/v1/namespaces/test/secrets/test2-app-test2-claim")
+        mockServer.expect().delete().withPath("/api/v1/namespaces/test/secrets/test2-app-secret")
                 .andReturn(HTTP_INTERNAL_ERROR, "{error: unexpected response status code 500}").once();
 
         Exception exception = assertThrows(KubernetesClientException.class,
-                () -> kubernetesClientService.mountSecretInApplication(claim, secretData));
+                () -> kubernetesClientService.mountSecretInApplication(claim.application, secretData));
 
         assertTrue(exception.getMessage().contains("Failure executing: DELETE"));
 
@@ -158,7 +159,7 @@ public class KubernetesClientServiceTest {
         mockServer.expect().delete().withPath("/api/v1/namespaces/test/secrets/" + secretName)
                 .andReturn(HTTP_INTERNAL_ERROR, "{error: unexpected response status code 500}").once();
 
-        kubernetesClientService.mountSecretInApplication(claim, secretData);
+        kubernetesClientService.mountSecretInApplication(claim.application, secretData);
 
     }
 
