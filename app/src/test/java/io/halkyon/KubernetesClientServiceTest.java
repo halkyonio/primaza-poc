@@ -62,7 +62,6 @@ public class KubernetesClientServiceTest {
         claim.application = app;
         app.claim = claim;
 
-        // String secretName = "test2-app-test2-claim";
         String secretName = "test2-app-secret";
         Map<String, String> secretData = new HashMap<>();
         String url = "testbind://consul:1111";

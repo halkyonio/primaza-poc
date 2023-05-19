@@ -69,7 +69,9 @@ public class ServiceResource {
             response.withErrors(errors);
         } else {
             if (Service.count("name=?1 AND version=?2", request.name, request.version) > 0) {
-                throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
+                throw new ClientErrorException(
+                        "Service name" + request.name + " and version " + request.version + " already exists",
+                        Response.Status.CONFLICT);
             }
             Service service = new Service();
             doUpdateService(service, request);
@@ -199,8 +201,6 @@ public class ServiceResource {
     public TemplateInstance listDiscoveredServices() throws ClusterConnectException {
         List<ServiceDiscovered> servicesDiscovered = kubernetesClientService.discoverServicesInCluster();
         return Templates.Services.listDiscovered("Services available", servicesDiscovered, servicesDiscovered.size());
-        // List<Service> services = Service.findAvailableServices();
-        // return Templates.Services.listDiscoveredTable(services, services.size());
     }
 
     @GET

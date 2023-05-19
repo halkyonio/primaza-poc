@@ -42,16 +42,15 @@ public class BindApplicationService {
     @Inject
     KubernetesClientService kubernetesClientService;
 
-    public void unBindApplication(Application application) throws ClusterConnectException {
-        kubernetesClientService.unMountSecretVolumeEnvInApplication(application);
-        kubernetesClientService.deleteApplicationSecret(application);
-        removeIngressHostFromApplication(application);
-        kubernetesClientService.rolloutApplication(application);
+    public void unBindApplication(Claim claim) throws ClusterConnectException {
+        kubernetesClientService.unMountSecretVolumeEnvInApplication(claim.application);
+        kubernetesClientService.deleteApplicationSecret(claim.application);
+        removeIngressHostFromApplication(claim.application);
+        kubernetesClientService.rolloutApplication(claim.application);
         // TODO: Test should be improved to test if the service has been deployed using Crossplane
-        // TODO: following logic needs to be done somewhere else
-        // if (claim.service.installable) {
-        // deleteCrossplaneHelmRelease(claim);
-        // }
+        if (claim.service.installable) {
+            deleteCrossplaneHelmRelease(claim);
+        }
     }
 
     private void removeIngressHostFromApplication(Application application) {

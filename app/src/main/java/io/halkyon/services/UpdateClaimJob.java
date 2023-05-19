@@ -31,10 +31,13 @@ import io.quarkus.scheduler.Scheduled;
  *
  * After a number of attempts have been made to find a suitable service, the claim status will change to "error".
  */
+// TODO Review the lifecycle of claims and describe it in javadoc. Current description doesn't correspond to the
+// implemented lifecycle: this job is setting claim status to pending
 @ApplicationScoped
 public class UpdateClaimJob {
 
     public static final String ERROR_MESSAGE_NO_SERVICE_REGISTERED = "Service '%s' not registered";
+    public static final String ERROR_MESSAGE_NO_CLAIM_WITHOUT_APPLICATION = "Claim '%s' without application id.";
     public static final String ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED = "Service '%s' has no credentials";
     public static final String ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER = "Could not find a service with protocol '%s'";
 
@@ -96,6 +99,10 @@ public class UpdateClaimJob {
             } catch (ClusterConnectException e) {
                 LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
             }
+            // }
+            // TODO review this
+        } else {
+            incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CLAIM_WITHOUT_APPLICATION, claim.name));
         }
 
         claim.persist();

@@ -2,6 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
+import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -17,6 +18,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
+import io.halkyon.model.Service;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.UpdateClaimJob;
@@ -42,11 +44,14 @@ public class UpdateClaimJobTest {
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
         pauseScheduler();
-        Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
-        Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
         createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port",
                 mockKubernetesClientService, "protocol", "9999");
-        createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "protocol:9999");
+        Service serviceWithCredential = createServiceWithCredential("postgresqlClaimingServiceJobTest", "8",
+                "postgresql", "protocol:9999");
+        Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
+        createService("MySQLClaimingServiceJobTest", "7.5", "type");
+        Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
+
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created
         // with status "new" and attempts set to 1)
         // When we run the job once:
@@ -60,7 +65,7 @@ public class UpdateClaimJobTest {
 
         assertEquals(postgresqlClaim.name, actualPostgresql.name);
         assertEquals("postgresql", actualPostgresql.type);
-        assertEquals(ClaimStatus.BINDABLE.toString(), actualPostgresql.status);
+        assertEquals(ClaimStatus.PENDING.toString(), actualPostgresql.status);
         assertEquals(1, actualPostgresql.attempts);
 
         Claim actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name)
@@ -114,6 +119,8 @@ public class UpdateClaimJobTest {
     @Test
     public void testShouldClaimServiceWhenNewClaimIsCreated() {
         pauseScheduler();
+        final String claimName = "testQueryUsingServiceRequestedToGetClaims";
+        createService("oracle", "1234", "type");
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", "Oracle1").formParam("serviceRequested", "oracle-1234")
                 .formParam("description", "Description").when().post("/claims").then().statusCode(201);

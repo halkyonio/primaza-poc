@@ -44,10 +44,6 @@ public class KubernetesClientService {
 
     private KubernetesClient client;
 
-    public KubernetesClient getClient() {
-        return client;
-    }
-
     /**
      * Get the deployments that are installed in the cluster. TODO: For OpenShift, we should support DeploymentConfig:
      * https://github.com/halkyonio/primaza-poc/issues/136
@@ -130,7 +126,7 @@ public class KubernetesClientService {
     }
 
     /**
-     * R the secret into the specified cluster and namespace.
+     * Add the secret into the specified cluster and namespace.
      */
     public void unMountSecretVolumeEnvInApplication(Application application) throws ClusterConnectException {
         // Application application = claim.application;

@@ -126,10 +126,12 @@ public class ServicesEndpointTest {
         assertTrue(service.available);
         assertNotNull(service.created);
 
+        // This shouldn't be checked here but in ServiceDiscoveryJobTest or something like this
+        // And also a standalone service is not in a cluster (cluster=null) so it can't be discovered
         // Then, the service should be listed in the discovered page
-        page.goTo("/services/discovered");
-        page.assertContentContains(serviceName);
-        page.assertContentContains("rabbit.com");
+        // page.goTo("/services/discovered");
+        // page.assertContentContains(serviceName);
+        // page.assertContentContains("rabbit.com");
     }
 
     /**

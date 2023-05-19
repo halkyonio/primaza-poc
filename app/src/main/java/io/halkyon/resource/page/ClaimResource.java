@@ -186,7 +186,7 @@ public class ClaimResource {
         Claim claim = Claim.findById(id);
         try {
             if (claim.application != null) {
-                bindService.unBindApplication(claim.application);
+                bindService.unBindApplication(claim);
             }
             Claim.deleteById(id);
             return list();
