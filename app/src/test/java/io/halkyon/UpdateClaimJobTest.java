@@ -65,7 +65,7 @@ public class UpdateClaimJobTest {
 
         assertEquals(postgresqlClaim.name, actualPostgresql.name);
         assertEquals("postgresql", actualPostgresql.type);
-        assertEquals(ClaimStatus.PENDING.toString(), actualPostgresql.status);
+        assertEquals(ClaimStatus.BINDABLE.toString(), actualPostgresql.status);
         assertEquals(1, actualPostgresql.attempts);
 
         Claim actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name)

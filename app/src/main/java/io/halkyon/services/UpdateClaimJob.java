@@ -101,9 +101,10 @@ public class UpdateClaimJob {
             }
             // }
             // TODO review this
-        } else {
-            incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CLAIM_WITHOUT_APPLICATION, claim.name));
         }
+        // else {
+        // incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_CLAIM_WITHOUT_APPLICATION, claim.name));
+        // }
 
         claim.persist();
     }

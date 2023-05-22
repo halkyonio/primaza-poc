@@ -7,7 +7,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import jakarta.ws.rs.core.MediaType;
 
 import org.hamcrest.MatcherAssert;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import io.halkyon.model.Claim;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
