@@ -9,13 +9,18 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Credential;
 import io.halkyon.model.Service;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
 @QuarkusTestResource(WebPageExtension.class)
 public class CredentialsPageTest {
+
+    @InjectMock
+    KubernetesClientService mockKubernetesClientService;
 
     WebPageExtension.PageManager page;
 
