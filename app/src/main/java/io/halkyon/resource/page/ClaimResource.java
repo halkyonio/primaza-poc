@@ -215,7 +215,8 @@ public class ClaimResource {
         claimingService.updateClaim(claim);
 
         // TODO: Logic to be reviewed
-        if (claim.service.installable != null && claim.service.installable && claim.application != null) {
+        if (claim.service != null && claim.service.installable != null && claim.service.installable
+                && claim.application != null) {
             claim.service.cluster = claim.application.cluster;
             claim.service.namespace = claim.application.namespace;
             claim.persist();
@@ -234,10 +235,12 @@ public class ClaimResource {
 
         // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
         // generateUrlByClaimService(claim) will be null
-        LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
-        LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
-        LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
-        LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
+        if (claim.service != null) {
+            LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
+            LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
+            LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
+            LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
+        }
 
         if (claim.service != null && claim.service.credentials != null && claim.application != null) {
             try {
