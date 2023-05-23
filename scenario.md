@@ -1,6 +1,7 @@
 Table of Contents
 =================
 
+* [Prerequisites](#prerequisites)
 * [Installation](#installation)
 * [Running Primaza on k8s using local maven build](#running-primaza-on-k8s-using-local-maven-build)
 * [Access the cluster using mvn quarkus:dev](#access-the-cluster-using-mvn-quarkusdev)
@@ -8,6 +9,15 @@ Table of Contents
 * [Build and rollout](#build-and-rollout)
 * [Test 1 :: DB installed using Crossplane Helm Release (= auto)](#test-1--db-installed-using-crossplane-helm-release--auto)
 * [Test 2 :: DB manually installed using Bitnami Helm chart](#test-2--db-manually-installed-using-bitnami-helm-chart)
+
+## Prerequisites
+
+Add first the following helm repositories
+```bash
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo add halkyonio http://halkyonio.github.io/helm-charts
+```
+Install the vault client using the [following](https://developer.hashicorp.com/vault/docs/install) instructions
 
 ## Installation
 
