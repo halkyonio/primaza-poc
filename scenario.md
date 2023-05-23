@@ -15,6 +15,7 @@ Table of Contents
 Add first the following helm repositories
 ```bash
 helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add halkyonio http://halkyonio.github.io/helm-charts
 ```
 Install the vault client using the [following](https://developer.hashicorp.com/vault/docs/install) instructions
