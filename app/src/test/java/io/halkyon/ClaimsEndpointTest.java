@@ -82,29 +82,6 @@ public class ClaimsEndpointTest {
                 .delete("/claims/" + claim.id).then().statusCode(200);
     }
 
-    @DisabledOnIntegrationTest
-    @Test
-    public void testEditClaimFromPage() {
-        // Create data
-        Claim claim = createClaim("testEditClaimFromPage", "payment-api-1.1");
-        // Go to the claims page
-        page.goTo("/claims");
-        // Ensure our data is listed
-        page.assertContentContains(claim.name);
-        // Let's change the owner
-        page.clickById("btn-claim-edit-" + claim.id);
-        page.assertPathIs("/claims/" + claim.id);
-        page.assertContentContains("Update Claim");
-        page.assertContentContains(claim.name);
-        page.type("owner", "NEW OWNER");
-        page.clickById("claim-button");
-        // Verify the entity was properly updated:
-        page.assertContentContains("Updated successfully for id: " + claim.id);
-        // Go back to the claims list and check whether the owner is displayed
-        page.goTo("/claims");
-        page.assertContentContains("NEW OWNER");
-    }
-
     @Test
     public void testDeleteClaim() {
         String prefix = "ClaimsEndpointTest-testDeleteClaim-";

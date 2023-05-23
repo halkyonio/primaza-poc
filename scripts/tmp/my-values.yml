@@ -1,0 +1,12 @@
+server:
+  ha:
+    enabled: false
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+    - host: vault.127.0.0.1.nip.io
+      paths: []
+ui:
+  enabled: true
+  serviceType: "ClusterIP"

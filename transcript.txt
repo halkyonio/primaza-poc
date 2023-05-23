@@ -1,0 +1,950 @@
+thank you all for coming i'm pleasantly surprised to see so many people here at nine o'clock in the morning
+0:12
+on a thursday um but you're all obviously very very interested in um
+0:17
+either what i'm going to say or java in general so before we kick off uh my name is mark
+0:25
+little i'm vp of engineering at red hat i i run the
+0:30
+uh the middleware and application services engineering efforts for red hat
+0:36
+i joined red hat in 2006 when they acquired jboss some of you may remember there was a company called jboss at the
+0:43
+time over the interviewing years we've acquired other technologies like fuse slash camel
+0:49
+and three scale and quite a bit more so we have quite quite
+0:55
+a lot more than just uh the application server i'm going to talk about java
+1:00
+and this is my personal perspective on java there's lots of things we could talk about in terms of the future of java
+1:07
+way more than i could fit into a 50 minute slot with with q a um so hopefully i'll touch on a few
+1:14
+things that are interesting oh there's still yeah i did stop for a
+1:20
+second all right so um
+Back to the Future
+1:25
+hopefully you all have seen or heard of uh back to the future um this is a scene from the end of back
+1:33
+to the future where doc brown has actually come back from 2015. anybody remember 2015 as being that
+1:40
+heady day of the future where we'll all be flying around in cars and there will be no roads
+1:45
+well it's actually many years ago now well seven years ago
+1:51
+uh and it's uh still pretty incredible i think to consider that today
+1:57
+so much work is being done on java you know this is a language that essentially came out in in 95.
+2:06
+it was called oak then it got rebranded to java but you know with very few exceptions and you know c c plus plus uh are probably a
+2:14
+couple um this this language has got such a pedigree now it's being used in lots of
+2:20
+different areas over the last almost you know 25 30 years and to think that people are still using
+2:27
+it and still committed to using it and there's still so much interest in it and and innovation that's going on in the
+2:33
+language and around the language i actually think is is quite astonishing and uh and very good
+2:41
+certainly for any of you who are using java it's it's a fantastic career opportunity
+2:46
+i will put my hand up and say actually by the way java is not my favorite language it just happens to be one that has
+2:52
+defined me for the last 20 odd years if anybody is interested in what my favorite language is you can grab me
+2:57
+afterwards but it's it's not java so just some some quick statistics you
+Statistics
+3:04
+might have seen some of these you know obviously take them all with a pinch of salt um but i do find them interesting
+3:12
+hopefully to try and drive home what i was saying before about the fact that java is still very very vibrant you know
+3:18
+we've got github statistics there which they run uh very you know annually based on the
+3:24
+millions of projects that are now hosted at gearhub and then you have something
+3:29
+called the the tob index all of these are you know available online so you don't need to take my word for them
+3:35
+um you know i went back to 2021 i think for for toby but you can see that java
+3:41
+is you know in the top three these days and it's been in the top three if not the top one
+3:48
+for you know a lot of it's uh its history which again i think you know if you look
+3:54
+at some of these other languages is is pretty incredible
+Why is Java still important
+4:01
+so why is java still important well it's essentially the de facto standard
+4:06
+language for enterprise developers you know if you think about enterprises and and certainly back-end
+4:12
+systems whether it's netflix or amazon or
+4:19
+you know banking systems even in air traffic control systems
+4:25
+a lot of what they have today is built on java um it may be quite old versions of java
+4:32
+unfortunately but uh it's a lot of it is still built on java and
+4:37
+we have you know a lot of java developers in the in the in the world you know it depends on who you believe
+4:43
+you know oracle or you know other independent uh uh statistics but between
+4:48
+seven to ten million people are using java in one way or another today now
+4:54
+they may not be using it exclusively they may be using it in combination with things like javascript or c plus plus or
+5:01
+rust but they're still using java
+5:06
+and if you look at where we are today with with java and the ecosystem it's
+5:11
+incredibly diverse you only have to walk around the you know the booths um here or to go
+5:18
+to some of the the sessions and you know you'll see some of these these vendors
+5:23
+represented obviously you've got oracle and pivotal and red hat and ibm you've got microsoft now
+5:29
+microsoft is a big big proponent of java and yes those of you who've been around long enough will probably remember
+5:36
+back in the late 90s microsoft was actually into java then too uh visual j plus plus was the best java
+5:43
+development environment around about 98.99 until they had a falling out with sun
+5:48
+um amazon amazon are into into java a lot of amazon's back-end systems believe
+5:54
+it or not are actually written in java and obviously amazon have their own um java open jdk build these days
+6:02
+there in fact there's there's probably more vendors large and small
+6:08
+involved in java today than and probably at any time in the past
+6:14
+and i think this this speaks to the fact that it's a very large and resilient community we've had many many waves
+6:19
+in our industry over the years you know whether it's service oriented architecture microservices cloud
+6:26
+constrained devices you know constrained devices essentially where java came from in the originally
+6:32
+where some were were working on something to run on you know washing machines and fridges and stuff
+6:38
+java has managed to evolve and and become relevant and remain relevant in many of
+6:45
+those areas over the last 25 years but one thing i think
+6:51
+you know we often fall into i use we you know colloquially i know i do at times
+6:57
+specifically when we often talk about java and we talk about you know java versus php or
+7:03
+java versus javascript we're we're often
+7:08
+comparing we're not comparing you know like with like
+7:14
+if you've been in the java arena long enough you'll probably implicitly be thinking about more than just the
+7:21
+language we rarely compare just the language java with
+7:26
+javascript or with perl or with rust as a language we're
+7:32
+implicitly thinking about all these other things that have built up around java whether
+7:37
+it's the ide whether it's the cid ci cd systems whether it's you know um for for better or for worse
+7:44
+whether it's things like log4j all these things that make our lives as java developers so much easier
+7:52
+these are implicitly part of what we like to call java so when you think about java and where you
+7:59
+see anybody talking about oh java versus rust you know rust clearly better think about
+8:05
+okay maybe on the language level maybe there are some nice things in rust that java doesn't have but if you step back
+8:11
+and look at the productivity aspects of these languages there are
+8:17
+millions of people hours have been spent around more than just the java language
+8:23
+and there's a lot of hours spent in the java language itself and we've got to remember that this is
+8:28
+one of the things that makes java very very vibrant and even if a new language comes along that on the on the surface
+8:34
+of it the language specs are far better than java what about all these other things that we're implicitly taking for
+8:41
+granted they're going to take a long long time to be duplicated
+8:46
+um i think this this contributes to a lot of where the innovation is i'm going to touch on some of these so there's
+8:52
+innovation in the eclipse foundation there's a lot of innovation still going on in in open jdk things like the you
+8:58
+know the faster release schedule i think uh holly cummings yesterday
+9:03
+touched on this a bit in the in the 15-minute keynote and then we got
+9:08
+growl vm and substrate vm which you know hopefully some of you have heard about
+9:16
+so one of the things that's been driving innovation in java i would say for at
+9:23
+least at least the last seven or eight years is the transition to
+9:30
+to cloud and to microservices so the diagram on the left as you look
+9:37
+at it uh forgetting my left and right for a second uh is your your typical application server architecture of you
+9:44
+know the day late 90s through to you know 2010s your operating system you've got
+9:51
+your jvm then you have your application server it could be tomcat could be something based
+9:57
+on java e or j2e if you go back far enough and then you have your frameworks that sit on top things like spring
+10:03
+framework and then you build your apps this was this was essentially what we were building uh standardizing and then
+10:10
+what people were developing their applications on and it it did very very well in those environments
+10:16
+then as i said we saw cloud come along and and java
+10:21
+was okay initially in the cloud because lots of people didn't really know what what they were doing there i think
+10:27
+uh lift and shift tended to be a good thing and it and to a degree it still is today
+10:32
+but as we started to really double down on cloud development
+10:38
+and as things like microservices came along that typical java application server
+10:44
+architecture start to creak and groan a bit and people start to say oh it's a monolith you know it needs to be broken
+10:52
+down into microservices and the jvm is just so big it's you know it's a virtualized operating system why do i
+10:58
+need a virtualized operating system on top of an operating system um and
+11:03
+this is when developers uh started to look at you know other ways of building applications things
+11:09
+that could spin up a lot quicker things that had less memory footprint and could be crammed on you know small
+11:16
+cause that amazon made available now it's important though to recognize
+Optimizing for throughput
+11:23
+why we had that traditional architecture and it's still around today because it is still applicable to lots of use cases
+11:32
+we spent decades building the open jdk jvm and and you know the application
+11:40
+server technologies and the specs that the standards and the implementations of them that sit on top of it
+11:46
+looking at optimizing for throughput we we spent a lot of time making sure
+11:51
+that these things would typically be spun up and they may not be spun down
+11:57
+ignoring crashes for weeks months at a time so we needed to
+12:02
+optimize for them running continuously and this is where we started to look at things
+12:08
+like osgi and you know the wildfly has its own module system as well
+12:13
+um we are absolutely optimizing for for throughput we're not optimizing for footprint the original java developers
+12:20
+you know essentially had this mindset of spin up the jvm how much memory have you got great give it to me all i'm not
+12:25
+going to get rid of it until i go away and that gives you lots of flexibility and lots of performance in very very
+12:33
+good very common use cases back then and obviously java is very very dynamic
+12:39
+um back in the day before java came along people were starting to play tricks with you know dynamic link
+12:44
+loading on c or c plus plus libraries to try and delay the binding of your interface to implementation to the last
+12:51
+minute because you wanted to delay these design choices uh but it was hard java comes along and
+12:57
+says great here's the thing called a class loader oh have at it you can leave your bind choices
+13:03
+till the you know very last minute and your application server may have been running for five days before you
+13:09
+actually decide which implementation you're going to buy into that interface oh and by the way if you want to change it later on great we'll do that that
+13:15
+does not come for nothing though there are overheads that are involved there but we understand those trade-offs
+13:23
+now when cloud came along and kubernetes which has essentially become you know like the de facto standard for for cloud
+13:30
+uh certainly from for portable cloud that has a very different approach so
+13:36
+clearly kubernetes uses linux containers uh linux containers do not require you
+13:42
+to be uh you know immutable if you spin up a linux container you can be you can modify and
+13:48
+you know it will create a new container kubernetes doesn't work that way kubernetes assumes immutability because
+13:54
+the way that it works for load balancing and for failover it if you modify your container when
+13:59
+it's running and kube decides to take it down and spin up another instance somewhere else to make it fast make your
+14:04
+application faster and all those modifications have gone so kubernetes pushes you towards a more
+14:09
+immutability more immutable uh approach to building applications and
+14:15
+kube and cloud were starting more and more to think about short duration applications
+14:20
+yes it's it can be a lot cheaper to run your applications on the cloud rather than on backend systems but only
+14:27
+if you remember to shut them off when you're not using them there are many many people many horror stories out there of people who have
+14:35
+who have literally you know spun up their application forgot about it gone away and a month later a bill comes and
+14:41
+they've got like two million dollars they've got to spend i have actually got one person in my in my organization who
+14:46
+did that four years ago um and he managed to spend quite a lot of
+14:53
+money over a weekend that he didn't know about so um it's very very different mindset so this
+14:59
+notion of spinning up an application server and letting it run for three or four months
+15:04
+that doesn't kind of uh work in this environment and i've already touched on this a
+Serverless technologies
+15:09
+little bit but one of the things that was you know we're starting to see a lot of people using and maybe some of you using it
+15:15
+already is you know serverless technologies whether it's things like amazon lambda or you know k native for
+15:20
+instance again it's you know very event driven message comes in triggers an event the event might say
+15:28
+spin up x to do some work that work might then send another message but when x is done it goes away
+15:35
+serverless is very very important uh you know some people have talked about as the
+15:41
+evolution of micro services but if you look at what people are doing on serverless and particularly the
+15:47
+languages or frameworks that they're using and i have to admit this is probably two or three years old now
+15:54
+it's not java or it wasn't java you know 63 of people are using node.js and and
+16:00
+almost 21 are using python java is just you know all right twice as much as c
+16:05
+sharp probably twice as better as c sharp but it's still just below go okay
+Go vs Node
+16:15
+and you know essentially this is what i've just said but if you look at what people have been trying to do at that point
+16:20
+and cramming all these applications onto onto the cloud you can get a lot higher density of your
+16:28
+apps in go a lot higher in node not as high as no
+16:33
+as as go and node itself is higher than your traditional java
+16:40
+architecture so if that had stayed the same if that had not changed
+16:46
+then there you know more and more people would probably have moved to to go or moving to node
+Renaissance in Java
+16:54
+but like i said there is there is a renaissance in java at least for the last seven or eight
+Linux Container and JVM
+17:00
+years i think and there's been lots of things that we have seen collaborated on by the likes
+17:06
+of red hat alibaba microsoft amazon and others around things like making
+17:12
+the linux container more aware of jvm and and vice versa this is this is a
+17:18
+two-way street um so understanding how
+17:24
+the linux container and jvm work in terms of memory utilization and processors again many of you may not be aware of it
+17:30
+but you only have to go back three or four years to older versions of open jdk and the linux container running with a
+17:38
+jvm of that time would not be able to give the jvm
+17:43
+anything less than essentially all of the memory that it had available to it and the jvm was not able to recognize
+17:50
+the number of real processors that were running on the machine we've made lots of changes and
+17:56
+and that's a lot better these days open jdk continues to evolve you know you might hear almost every week there
+18:03
+seems to be a new garbage collector um shenandoah is is the one that's you know
+18:09
+hopefully pretty pretty familiar to some folks but uh relatively new and and um
+18:15
+very very um popular certainly with red hat people um then we've got things like checkpoint
+18:20
+restore that are happening in open jdk uh there's eclipse open j9 which is a
+18:27
+essentially to white room implementation of the java specs it
+18:32
+was done by ibm it got donated to the eclipse foundation a few years back they've been working on
+18:38
+things like jit as a service so you essentially have a single
+18:44
+instance which does all of your you know which is the jit and it farms out by code and you don't have to do that
+18:51
+on the on the other servers that are actually attached to it and then
+18:56
+compiled or as we're now starting to call it native java now you know i'll talk a little bit more about this uh
+19:02
+soon but although it might sound like this is a new thing it isn't a new thing
+19:08
+native java or compile java goes back i think probably until
+19:14
+maybe 1999 early 2000s there was some a project called gcj which was essentially
+19:20
+the gcc team or some members of it tried to work on adding java compilation
+19:29
+support to gcc and that project was gcj some of those team members then went and
+19:36
+got involved with uh java um and and open jdk um
+19:42
+you may or may not have heard of dalvik if you're using android and you've been using android for a long time you will absolutely have heard of java dalvik if
+19:49
+you haven't heard of java sorry dalvik but you have heard of the google oracle court case
+19:54
+that's all about dalvik so google essentially you know i'm no lawyer so i'm probably
+20:00
+going to paraphrase this or summarize it in a way that if i was you know i could possibly get into trouble in in
+20:07
+the us but google essentially took a version of java and they streamed it down and and they
+20:13
+optimized it for running on a smartphone and they part of part of the dalvik
+20:18
+uh operation is to compile the byte code to a native executable
+20:23
+that runs on your phone so you've got that is essentially native java then there were a number of
+20:29
+projects over the last five years or so uh avian and something called excelsior
+20:34
+jet both of those were doing doing native compilation and then we
+20:40
+have grav vm the thing about growl vm that's very different to any of the ones that came before is or at least there's
+20:46
+a number of things that are different about it and i'll touch on some of those later but probably i think the one standout thing that makes it potentially
+20:53
+more successful is it comes from oracle as well so all of these others had to worry about and if
+20:59
+there's any oracle employees in the in the room so if there are please put your fingers in your ears they had to worry about being sued by oracle
+21:06
+for infringement of one thing or another that team shouldn't because they are oracle okay
+21:12
+so it has more of a chance of of being around for a few more years
+21:18
+a lot of this stuff here well all of this stuff is is improvements at the jvm level which are incredibly important
+21:23
+however as i'm about to talk to to you improvements at the jvm level while
+21:28
+they're necessary they're not sufficient and some of this or at least they're not
+Dynamic Java
+21:33
+sufficient for one with again you know thinking about things like the cloud and kube native
+21:40
+it comes down to what i was touching on earlier about you know the the traditional 20-plus years of of
+21:46
+designing and building and architecting and building um java applications and certainly java
+21:53
+application server applications this dynamic aspect of of java this
+21:59
+even this dynamic aspect of the application servers allowing you to bind
+22:04
+do very late binding of your jms implementation for instance and then rebind it later on
+22:10
+all of that essentially can be encapsulated in in this where there's some build time
+22:16
+aspect to developing your application but a lot of the work happens at run
+22:21
+time so you know build time obviously you know before this there's there's the building you're writing your application
+22:28
+and that could be months here so that's not represented on this slide but
+22:33
+once you get to that point where you can compile you know you're you're working with maven you
+22:38
+might be working with gradle but you do a lot of that work on
+22:44
+binding at run time so you might load configuration files
+22:50
+obviously you do class path scanning and and you can be doing this continuously through the long running uh
+22:57
+life of your application and as i said open jdk or the jvm in
+23:02
+general and the the frameworks the stacks that we built on top of it have
+23:07
+been optimized for this but there's still a lot of work that's involved in this there's still a lot of infrastructure or baggage if you like to
+23:15
+make all of this work some of it's in in the jvm a lot of it is on top of the jvm
+Kubernetes Native
+23:23
+what we're finding though for kubernetes native is we're trying to flip it around
+23:29
+as i said coupe kind of pushes you towards a more immutable approach if you change the application
+23:36
+what kubernetes would require you to do is change your linux container image and stick it in kube's
+23:42
+equivalent of a repo and then kube can pull that out do not change the existing image because like i
+23:49
+said it's going to get rid of that it's ephemeral so put as much of that previous work
+23:54
+that was done at runtime at build time make those decisions at build time make this as quick as possible so that if you
+24:00
+do decide to change your jms implementation probably doesn't happen that often but if you do decide to do it you can
+24:07
+re rebuild your container image stick it in the cube repo and you know hopefully that's no more than a few minutes
+24:14
+and then very little actually happens at runtime other than the business that your application should be doing
+24:19
+that could be you know reserving a restaurant seat or you know flight booking system
+24:25
+whatever so there are a number of uh frameworks and
+24:33
+stacks these days that uh you know are said to be kubernetes native obviously the one that i would like to
+24:39
+point you all at and i think there are some slights some other presentations you can go to the red hat booth is a one called quarkus
+24:46
+uh quarkus 2.9 is now out for those of you who are really interested in it
+24:52
+but but we have spent a lot of time optimizing quarkus and the frameworks
+24:57
+and implementations that it uses some of which have been around for decades to be
+25:03
+kube native and i say i'm not going to spend a lot of time on on this but what we have managed to do is some
+25:11
+of you may have seen some of these before but essentially we've managed to take startup times down in some cases from over a minute to 400
+25:19
+milliseconds now i want to just point out there are three graphs here for for a very good reason a
+25:27
+lot of the time with kube native and certainly with with quarkus we we tend to focus too much on
+25:33
+the on the the native aspect the the java native the compiled
+25:39
+with gral however that that absolutely does help
+25:45
+but we've spent a lot of time making sure that a lot of these build time decisions as well the runtime decisions
+25:51
+that you were making that we then shift to build time they happen irrespective of whether you
+25:58
+are going to use growl or substrate they happen
+26:03
+even if you're going to just use vanilla jvm so that's why we have these three graphs here so i won't spend too much
+26:10
+time on this but in here you've got reduced memory footprint is what we're focusing on you've got your traditional
+26:15
+cloud native stack so you know that that could be that architecture that we saw earlier so it could be tomcat it could be an
+26:21
+application server you know it could be you know even spring framework or spring boot could be on that but that's your traditional the
+26:28
+memory footprint there's 136 meg because of all this stuff it's leaving to to run
+26:33
+time it still has to have there available even if you're not going to use it
+26:39
+just optimizing that and doing ahead of time decisions so at build time
+26:46
+this is the jvm this is still the jvm we get that image size down by almost 50 73
+26:52
+megabytes then if you add in the compilation that goes down to 12 megabytes
+26:58
+so i just want to point this out because you don't have to use native java
+27:04
+if you don't want to to get some of these performance improvements
+27:09
+this is then shifted that diagram that i showed you earlier so you've got node you've got so you've got go you've got
+27:16
+node and you've got your traditional cloud native stack then you've got quarkus in there
+27:21
+and quite literally we've had from a red hat point of view and you can there's some success stories that that back this up
+27:28
+but we have had big customers of of red hat who two years or so ago and we started to really
+27:35
+push quarkus come to us and say we were on the path to rewrite
+27:41
+everything in go or to rewrite a lot of it in node.js
+27:46
+and we're not going to do that now you know we are we're a six thousand person company we've got
+27:52
+you know 500 to a thousand java developers who we have spent years
+27:57
+training to be java it was going to be a monumental task for us to go from java to go
+28:05
+and now that we've seen what you can do with quarkus native quakers or not native carcass we've decided that we
+28:11
+want to stick with java because essentially this is still java you are not having to change
+28:18
+the way in which you develop too much if you want to take advantage of some of the capabilities you do have to make
+28:23
+some changes some mental changes around things like reflection for instance but generally you can just take the skills that you
+28:30
+know and you can get that improvement so i mentioned this a few times but one
+GRAV
+28:36
+of the key aspects to that native uh performance improvement and memory footprint improvement is this thing
+28:42
+called grav vm or very specifically substrate vm so growl is a huge project
+28:48
+if you haven't heard about it you should go and and look for it google it you'll it'll definitely be in your top hit
+28:55
+it does a lot of different things the one sub component if you like that we're
+29:01
+really interested in is is the native java aspect so that's what
+29:07
+what is in red here so that's you know includes things like substrate vm
+Performance
+29:14
+i think i've touched on some of this already but you know if you think about jit and versus aot
+29:21
+with hotspot you know again high memory density requirements grab all the memory that you possibly can
+29:27
+um fast startup time the jvm starts up pretty fast these days compared to what
+29:32
+it used to do so you know it's it's certainly not in the ballpark of it was a decade ago it's
+29:38
+still fast or it is faster i should say sorry you get still get the best performance
+29:44
+when you are running your applications on open jdk versus growl there are trade-offs that happen under growl
+29:51
+substrate that you we absolutely want in some environments like i said memory startup
+29:56
+memory footprint absolutely but if you are going to be running okay your application for a long time let's
+30:03
+say for for more than a few minutes uh you should still think about open jdk
+30:10
+absolutely because it has been optimized i have been optimized a lot to make those applications faster i'm not
+30:17
+suggesting you go back to the old model of leaving all of your your design time choices to run time i
+30:24
+still think you should make a lot more choices if you're thinking about kube at least at build time but open jdk offers
+30:31
+by itself some significant performance improvements for long duration applications serverless it's a
+30:37
+completely different story you really you can do serverless with open jdk
+30:42
+but you have to play some tricks and it's not necessarily as as performant and it certainly doesn't hit
+30:48
+the memory footprint obviously there's a lot of other things that come with open jdk that aren't
+30:53
+available with growl at the moment things like well so mission control and flight recorder are kind of there
+31:00
+but a lot of the monitoring tools still haven't been ported across that is work that is going on um so you and this is probably the the
+31:07
+point i would like to to make growl despite the fact that growler's got a lot of popularity at the moment
+31:14
+it's still quite quite new it's still a research project it's in oracle labs it's not actually oracle
+31:22
+the product side of of things there's a there's a lot of research and development still going on here so it
+31:28
+may not have some of these things now i guarantee you you know if it continues it will have them eventually
+Grails
+31:36
+so i think grahl actually has been a great catalyst for innovation in in the
+31:41
+space of kube native uh java um red hat has
+31:47
+just in case anybody has heard about it red hat has a version called mandrel
+31:52
+it is part of the growl ecosystem so it's not a fork but it is a fully supported version so
+31:59
+oracle um with oracle labs have essentially two versions of growl because growl community edition and
+32:04
+growl enterprise edition you get no support for growth community edition i mean it's community best
+32:11
+effort growl enterprise edition to get that you need to buy i can't remember if it's a license or a subscription but
+32:18
+essentially that you get that support from uh from oracle so mandrel from a
+32:23
+red hat point of view if we have any customers who want to use grail in production
+32:29
+there's two choices we either point them at oracle to get an oracle um enterprise edition license which we would never
+32:34
+ever do um or we recommend that they go and get mandrel which is our fully supported
+32:40
+version because our our open jdk team uh and others are have been working with
+32:45
+the oracle team for for a number of years upstream so we can support this it's
+32:50
+pretty much the same as what we do with other upstream communities where we collaborate with the likes of microsoft
+32:55
+it's no different really to what we do with openjdk um but
+33:01
+graal as i said is this one implementation that comes from oracle labs there's no standard it is effectively
+33:08
+the de facto standard at the moment but one of the things that concerns various people is it's
+33:15
+just it's not necessarily fully open source project yet but it's just from oracle yes red hat's involved with it yes there
+33:22
+are some some folks on twitter are involved in it and there are a few other uh
+33:27
+vendors who are involved in it on the edges but it's outside of things like open jdk which
+33:33
+has got a huge community of contributions like i said amazon microsoft alibaba
+33:38
+to name just a few so what was announced last year in the open jdk project was a project called
+33:46
+laden or leiden i never know how to pronounce it and essentially what laden is going to
+33:51
+do if it ever comes out is is try and provide a
+33:57
+standard within open jdk for native java
+34:02
+grawl needs to fit into that somehow and it may well be that growly is an implementation of whatever laden does
+34:09
+but it shouldn't necessarily be the only implementation so things like for instance openj9 from the eclipse foundation could provide their own
+34:15
+implementation for anybody that's interested there is another project in this space called
+34:21
+cubic and there's a url there cubic is is absolutely research uh project from
+34:28
+from red hat some of the people who've been involved with the growl efforts for a while uh trying for the last few years to do a
+34:35
+uh an independent native java uh implementation based purely on java as well so that's that's there if anybody's
+34:42
+interested to take a look and you know try it out maybe even contribute
+Eclipse Adoptium
+34:47
+so i want to move on a little bit though to something called eclipse adoptium
+34:54
+again in this con concept context of innovation in java
+35:00
+uh hopefully you'll have heard of clips adopt him if you haven't you should have heard of openjd adopt open jdk
+35:07
+that was its old name before it got moved to the eclipse foundation uh and adoptium is a great example of how
+35:13
+naming is still the hardest problem in computer science uh but it's essentially the same thing
+35:18
+okay so it's high quality open jdk binaries that are built and tested by a
+35:24
+community of vendors and individuals you've got alibaba contributing to it
+35:29
+you've got azul huawei ibm red hat all these vendors and more are part of the adoptee and working
+35:36
+group and there's actually more there who now than were involved with adopt open jdk
+35:42
+part of adoptium is also something called aquavit which i'll touch on in a minute which is
+35:47
+uh a test suite and there's a branding and certification that goes around there all this is open
+35:53
+source keep keep should keep saying that everything is open source here nothing is closed source nothing is proprietary
+36:01
+and then we have somebody called tamarin which are the official which is the name the official name for the builds that
+36:06
+come out of adopt him uh i don't know hey you can't see these
+Download Statistics
+36:12
+great so uh i just wanted to flash up some download statistics just in case you you haven't seen it
+36:19
+um if anybody can remember when adopt open jdk came out
+36:25
+the the main reason that ibm and the london java user group who
+36:31
+were the original creators of it uh formed it was that there was no central place that any
+36:37
+developer could go to to get a definitive implementation of open jdk
+36:42
+boundaries for their for their architecture you could go to red hat you could you couldn't go to microsoft at the time you
+36:48
+could go to you know maybe ubuntu or somewhere else and get a version of a binary
+36:54
+and in many cases there were binaries that were months if not years out of date there
+37:00
+were binaries that had not been patched for cves they were absolutely you know it was
+37:06
+almost a wild west um there what there was a big gap in the market here and i don't mean market from
+37:13
+a from a revenue point of view because these are all free and and they got together to create a
+37:20
+central repository where you could go like i said you could get binaries that you could trust okay
+37:27
+and adopt open jdk in five years let's call it 390 million
+37:34
+downloads of java that is predominantly open jdk builds yes there's some open j9
+37:40
+builds in here too but it's mostly open jdk for various architectures
+37:46
+adoptium uh has been up for about a year and even in that in that time you know
+37:53
+27 million downloads of various architectured versions uh of of open jdk
+37:59
+so lots and lots of people going here and i would encourage you you know if you if you need to get a binary
+38:06
+uh these aren't predominantly unsupported but if you need to get binary for your developer uh situations go go to adopt
+38:15
+em go to the eclipse foundation and get involved um
+Adoption
+38:21
+so uh yeah so i think i've probably said some of this and only 12 minutes left but the the important thing
+38:28
+is that these are all well mostly in adoption they are all based on open jdk there is no open j9 uh builds
+38:35
+in in adoptium uh yeah they were on uh adopt open jdk but they're all
+38:41
+based on the upstream version of adopt open jdk there's there's you know there's nothing proprietary in any of
+38:47
+this and they as i said earlier they they passed this
+38:52
+test suite acquit which we'll touch on in a second but every binary that you find that is
+38:59
+released and given a equivalent of a ga tag has gone through this certification
+39:04
+process and has had you know cvs applied to it these are updated on
+39:11
+on a you know daily basis whenever anything significant comes out like blog4j
+39:18
+uh did i oh okay so i didn't i must have missed the slide that i had on accurate so i
+39:23
+will say a little bit about acquivit acquivit is this test suite over a quarter of a
+39:29
+million tests that have been developed to put these binaries through it is not the
+39:35
+same as the tck if any of you are involved with openjdk or any of you know what the tck is it's
+39:41
+essentially that it's a test compatibility suite that oracle controls and anybody who
+39:48
+wants to have a distribution that is that is called java has to pass the tck so if you can
+39:55
+remember that dalvik reference a while back that never passed the tck despite the fact that google were then calling
+40:01
+it java um but the tck tests some very low level capabilities
+40:07
+a very very low level uh and and in many cases it doesn't test the things that
+40:13
+developers use and and there are areas where your jdk or your jvm i should say can
+40:20
+fail and it would still pass the ttk and
+40:25
+the tck wouldn't be updated because the idea is the tcg only tests this very sub small subset of capabilities so aquavit
+40:33
+was developed to try and address a lot of these a lot of
+40:39
+these situations where the tck isn't uh applicable like i said over a quarter of a million
+40:45
+tests are run on every single one of these uh binaries and
+40:50
+that in itself is an evolving project so um
+40:55
+any issues that that get uh seen around open jdk
+41:00
+that aren't things that would get covered by the ttk this team gets together and adds more
+41:07
+tests so aquavit is itself growing and actually i think i hope at some point
+41:13
+aquavit would become the brand that you would look for more than something that is tckad
+41:19
+because i think from a developer point of view acquit's probably going to have more rel um relevance to you in your
+41:26
+day-to-day application development life cycle so something else i wanted to mention
+Autotune
+41:32
+which is not an eclipse foundation but it is another open source project is something called uh autotune
+41:39
+or cruise autotune um and
+41:44
+i'm sure if you're in the java business whether you've been in it for a year or you've been it for two decades
+41:51
+you will have probably spent some time trying to tune your application this is not necessarily tuning it for the cloud
+41:58
+or tuning it for for kubernetes it could just be tuning it to run on your back end systems or tuning it to run on your
+42:04
+laptop tuning the jvm is in many ways a mystic art
+42:11
+it's something that could have been taught you know by one of harry potter's teachers and then when you think about tuning the
+42:18
+applications that sit on top of it it can even get even more complex uh
+42:25
+so if you you know if you look at red hat for instance or or microsoft
+42:32
+you will typically find a lot of the documentation that that comes out is about tuning
+42:38
+in this environment with this capabilities and this you know these are your or requirements
+42:44
+these are the these are the parameters that we suggest that you take and you put to the jvm when you run your
+42:50
+application a lot of time spent on this what autotune tries to do is to do this
+42:56
+for you automatically using ai machine learning yes i know oh god machine learning yes that's yeah that's never
+43:02
+going to work but autotune actually does work uh and the team behind this have been
+43:10
+have been pretty pragmatic in first of all admitting the initial
+43:16
+um tuning parameters that autotune might come up with might not be the optimal
+43:22
+ones but it monitors your application at runtime and it can continue to keep
+43:27
+tuning it and making some modifications to the performance um and like i said this is this is
+43:34
+available as an upstream project it's it's not specific to kube you can use it with kube but you can use it with any
+43:42
+open jdk application with any application that that's or framework that's sat on top um
+43:48
+whether it's spring boot or carcass or wildfly but very i think it's extremely
+43:54
+innovative and it's probably one of the real world use cases of ai machine learning that i think is
+44:00
+is going to be around for a long time and and hopefully make your lives easier
+44:06
+say a couple of things on frameworks in the eclipse foundation again uh micro profile
+44:11
+um been around since 2006 lots of activity in this from these
+44:16
+vendors here it essentially span out of java ee at the time in 2016
+44:22
+to try and focus on microservices and take this notion that well java ee is a monolith you don't need all these 45
+44:28
+specs let's start with three specs and let's rapidly innovate in this area
+44:33
+because java e never rapidly innovated you know one release every 18 months was was probably
+44:39
+way too fast um and in the six years since it's come out
+44:44
+there's way over 20 releases it's won a duke's chord there are lots of new specs that have
+44:50
+never found themselves and found their way into javery but were influenced by things that were happening elsewhere whether it's netflix oss for instance
+44:58
+um stuff that was happening in spring boot have influenced um what goes on in micro profile and there are lots of
+45:04
+implementations there and it's like i said still it's still going today and if you're interested in enterprise micro
+45:10
+services take a look at micro profile jakarta e that is the new name for java
+Java EE
+45:17
+ee uh oracle uh essentially decided to donate all of this to eclipse foundation
+45:22
+in 2018 2019 um that's kind of still in a getting up and
+45:29
+going uh mode um the aim behind your calories is in some ways similar to what micro
+45:35
+profile is trying to do to trim down and provide more cloud native uh implementations
+45:41
+um and there's an overlap in in the participants so at some point these two things they are collaborating but you
+45:47
+know what their futures are who knows but again i i put this here as it's a
+45:53
+great example of how the java community is still trying to innovate and still trying to tackle
+46:00
+these problems and and build on you know the knowledge that has helped evolve java over the
+46:06
+last 20 plus years so this is this is kind of like my
+46:11
+conclusion slide i hopefully have given you like i said my personal uh
+46:18
+um preferences on innovation that's happening in and around java things like open jdk and growl vm all
+46:25
+the work that's going on and doctium i think that yeah that that's that's really really
+46:30
+uh critical uh and then stuff that that red hat and and is doing with you know with our
+46:36
+partners or by ourselves vs code extensions for instance if
+46:42
+anybody isn't using vs code you should absolutely take a look at that um i was
+46:47
+doing a microsoft conference last week and the guy from microsoft i was talking to at the time was saying that on a
+46:53
+daily basis they get something like 1.5 million downloads of the vs code java extension which is which is
+47:00
+incredible so actually so this is my conclusion slide uh i think there's a huge
+Conclusion
+47:06
+amount of innovation happening in java today in terms of cloud native and cool native
+47:12
+i definitely think java has stepped up to try and address this problem if you're looking to modernize your
+47:18
+applications your java applications today you should obviously think about trying to make them kube native doesn't
+47:24
+mean you have to use native java and if you do go to the native java side of
+47:30
+things though there's there's a lot of opportunities now that we're seeing opening up around reactive and serverless and even you know far edge
+47:37
+constrained devices you know like where java started it's kind of getting back there now
+47:43
+um and i started with a back to the future slide so i'm going to end with the back to future slide um i think hopefully you
+47:51
+know with people like yourselves involved in one or more of these efforts that i've talked about
+47:56
+java's got a bright future thank you very much we've got time for a question or you can grab me afterwards
+48:05
+[Applause]
+48:16
+you

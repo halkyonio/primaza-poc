@@ -7,6 +7,7 @@ import static io.halkyon.utils.StringUtils.toBase64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,71 +43,53 @@ public class BindApplicationService {
     KubernetesClientService kubernetesClientService;
 
     public void unBindApplication(Claim claim) throws ClusterConnectException {
-        unMountSecretVolumeEnvInApplication(claim);
-        deleteSecretInNamespace(claim);
-        removeIngressHostFromApplication(claim);
-        rolloutApplication(claim);
+        kubernetesClientService.unMountSecretVolumeEnvInApplication(claim.application);
+        kubernetesClientService.deleteApplicationSecret(claim.application);
+        removeIngressHostFromApplication(claim.application);
+        kubernetesClientService.rolloutApplication(claim.application);
         // TODO: Test should be improved to test if the service has been deployed using Crossplane
         if (claim.service.installable) {
-            deleteCrossplaneHelmRelease(claim);
+            kubernetesClientService.deleteRelease(claim);
         }
     }
 
-    private void removeIngressHostFromApplication(Claim claim) {
-        Application app = claim.application;
-        app.ingress = "";
-        app.persist();
+    private void removeIngressHostFromApplication(Application application) {
+        application.ingress = "";
+        application.persist();
     }
 
     public void bindApplication(Claim claim) throws ClusterConnectException {
-        Credential credential = getFirstCredentialFromService(claim.service);
-        String url = generateUrlByClaimService(claim);
-        claim.credential = credential;
-        claim.url = url;
-        claim.status = ClaimStatus.BOUND.toString();
-        claim.persist();
-        if (credential != null && url != null) {
-            // scenario is supported
-            createSecretForApplication(claim, credential, url);
-            rolloutApplication(claim);
-            if (claim.status.equals(ClaimStatus.BOUND.toString())) {
-                Application app = claim.application;
-                app.ingress = getIngressHost(app);
-                app.persist();
+        Optional<Credential> optCredential = getFirstCredentialFromService(claim.service);
+        if (optCredential.isPresent()) {
+            Credential credential = optCredential.get();
+            String url = generateUrlByClaimService(claim);
+            claim.credential = credential;
+            claim.url = url;
+            claim.status = ClaimStatus.BOUND.toString();
+            claim.persist();
+            if (url != null) {
+                // scenario is supported
+                Map<String, String> secret = createSecret(claim.type, credential, url);
+                kubernetesClientService.mountSecretInApplication(claim.application, secret);
+                kubernetesClientService.rolloutApplication(claim.application);
+                if (claim.status.equals(ClaimStatus.BOUND.toString())) {
+                    kubernetesClientService.getIngressHost(claim.application);
+                    Application.persist(claim.application);
+                }
+            } else {
+                LOG.infof("Credential: %s; url: %s ", credential.vaultKvPath, url);
             }
         } else {
-            LOG.infof("Credential: %s; url: %s ", credential.vaultKvPath, url);
+            LOG.errorf("Credential not found for service %s. Impossible binding", claim.service.name);
+            claim.status = ClaimStatus.ERROR.toString();
+            claim.persist();
         }
     }
 
-    private void rolloutApplication(Claim claim) throws ClusterConnectException {
-        kubernetesClientService.rolloutApplication(claim.application);
-    }
-
-    private String getIngressHost(Application application) throws ClusterConnectException {
-        return kubernetesClientService.getIngressHost(application);
-    }
-
-    private void deleteSecretInNamespace(Claim claim) throws ClusterConnectException {
-        kubernetesClientService.deleteSecretInNamespace(claim);
-    }
-
-    private void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
-        kubernetesClientService.unMountSecretVolumeEnvInApplication(claim);
-    }
-
-    public void createCrossplaneHelmRelease(Cluster cluster, Service service) throws ClusterConnectException {
-        kubernetesClientService.createCrossplaneHelmRelease(cluster, service);
-    }
-
-    public void deleteCrossplaneHelmRelease(Claim claim) throws ClusterConnectException {
-        kubernetesClientService.deleteRelease(claim);
-    }
-
-    private void createSecretForApplication(Claim claim, Credential credential, String url)
+    private Map<String, String> createSecret(String type, Credential credential, String url)
             throws ClusterConnectException {
         Map<String, String> secretData = new HashMap<>();
-        secretData.put(TYPE_KEY, toBase64(claim.type));
+        secretData.put(TYPE_KEY, toBase64(type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
         secretData.put(PORT_KEY, toBase64(getPortFromUrl(url)));
         secretData.put(URL_KEY, toBase64(url));
@@ -148,15 +131,40 @@ public class BindApplicationService {
         secretData.put(PASSWORD_KEY, toBase64(password));
         secretData.put(DATABASE_KEY, toBase64(database));
 
-        kubernetesClientService.mountSecretInApplication(claim, secretData);
+        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
+            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
+            Set<String> vaultSet = vaultSecret.keySet();
+            for (String key : vaultSet) {
+                if (key.equals(USERNAME_KEY)) {
+                    username = vaultSecret.get(USERNAME_KEY);
+                    credential.username = username;
+                } else if (key.equals(PASSWORD_KEY)) {
+                    password = vaultSecret.get(PASSWORD_KEY);
+                    credential.password = password;
+                } else if (key.equals(DATABASE_KEY)) {
+                    database = vaultSecret.get(DATABASE_KEY);
+                } else {
+                    secretData.put(key, vaultSecret.get(key));
+                    CredentialParameter credentialParameter = new CredentialParameter();
+                    credentialParameter.paramName = key;
+                    credentialParameter.paramValue = vaultSecret.get(key);
+                    credential.params.add(credentialParameter);
+                }
+            }
+        }
+        secretData.put(USERNAME_KEY, toBase64(username));
+        secretData.put(PASSWORD_KEY, toBase64(password));
+        secretData.put(DATABASE_KEY, toBase64(database));
+
+        return secretData;
     }
 
-    private Credential getFirstCredentialFromService(Service service) {
-        if (service.credentials == null || service.credentials.isEmpty()) {
-            return null;
+    private Optional<Credential> getFirstCredentialFromService(Service service) {
+        if (service.credentials != null) {
+            return service.credentials.stream().findFirst();
         }
+        return Optional.empty();
 
-        return service.credentials.get(0);
     }
 
     private String generateUrlByClaimService(Claim claim) {
