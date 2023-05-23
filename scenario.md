@@ -103,6 +103,7 @@ helm install fruits-app halkyonio/fruits-app \
   --set app.serviceBinding.enabled=false \
   --set db.enabled=false
 
+DB_USERNAME=healthy
 DB_PASSWORD=healthy
 DB_DATABASE=fruits_database
 RELEASE_NAME=postgresql
