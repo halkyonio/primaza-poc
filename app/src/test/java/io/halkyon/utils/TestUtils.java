@@ -66,7 +66,8 @@ public final class TestUtils {
     public static Claim createClaim(String claimName, String serviceRequested) {
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", claimName).formParam("serviceRequested", serviceRequested).formParam("status", "new")
-                .formParam("description", "claim for testing purposes").when().post("/claims").then().statusCode(201);
+                .formParam("applicationId", "1").formParam("description", "claim for testing purposes").when()
+                .post("/claims").then().statusCode(201);
         return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 

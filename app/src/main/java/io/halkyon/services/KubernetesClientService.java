@@ -31,7 +31,6 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
-import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.utils.StringUtils;
 
@@ -74,10 +73,10 @@ public class KubernetesClientService {
     /**
      * Deleting the Kubernetes Secret
      */
-    public void deleteSecretInNamespace(Claim claim) throws ClusterConnectException {
-        Application application = claim.application;
+    public void deleteApplicationSecret(Application application) throws ClusterConnectException {
+        // Application application = claim.application;
         KubernetesClient client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-" + claim.name;
+        String secretName = application.name + "-secret";
         client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().build());
     }
@@ -85,10 +84,10 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
-        Application application = claim.application;
+    public void unMountSecretVolumeEnvInApplication(Application application) throws ClusterConnectException {
+        // Application application = claim.application;
         client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-" + claim.name;
+        String secretName = application.name + "-secret";
 
         // Get the Deployment resource
         Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
@@ -111,12 +110,13 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void mountSecretInApplication(Claim claim, Map<String, String> secretData) throws ClusterConnectException {
-        Application application = claim.application;
+    public void mountSecretInApplication(Application application, Map<String, String> secretData)
+            throws ClusterConnectException {
+        // Application application = claim.application;
         client = getClientForCluster(application.cluster);
 
         // create secret
-        String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
+        String secretName = (application.name + "-secret").toLowerCase(Locale.ROOT);
         client.secrets().inNamespace(application.namespace).resource(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().withData(secretData).build())
                 .create();

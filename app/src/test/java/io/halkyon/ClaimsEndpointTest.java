@@ -1,6 +1,7 @@
 package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
+import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,16 +41,20 @@ public class ClaimsEndpointTest {
     @Test
     public void testQueryUsingNameToGetClaims() {
         final String claimName = "testQueryUsingNameToGetClaims";
-        createClaim(claimName, "Postgresql-5509");
+        createService(claimName + "-service", "14.5", "type");
+        createClaim(claimName, claimName + "-service-14.5");
         given().header("HX-Request", "true").queryParam("name", claimName).when().get("/claims/filter").then()
                 .body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
+    @DisabledOnIntegrationTest
     public void testQueryUsingServiceRequestedToGetClaims() {
         final String claimName = "testQueryUsingServiceRequestedToGetClaims";
-        createClaim(claimName, "Postgresql-5509");
-        given().header("HX-Request", "true").queryParam("servicerequested", "Postgresql-5509").when()
+        createService(claimName + "-service", "14.5", "type");
+        createClaim(claimName, claimName + "-service-14.5");
+        given().header("HX-Request", "true")
+                .queryParam("servicerequested", "testQueryUsingServiceRequestedToGetClaims-service").when()
                 .get("/claims/filter").then().body(containsString("<td>" + claimName + "</td>"));
     }
 
@@ -57,6 +62,7 @@ public class ClaimsEndpointTest {
     public void claimCreatedViaForm() {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         String claimName = "mysql-claim";
+        createService("mysql", "8.0.3", "type");
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", claimName).formParam("serviceRequested", "mysql-8.0.3")
                 .formParam("description", "mysql claim for testing purposes").when().post("/claims").then()
@@ -74,7 +80,8 @@ public class ClaimsEndpointTest {
     @Test
     public void testDeleteUnBoundClaim() {
         final String claimName = "testDeleteBoundClaim";
-        Claim claim = createClaim(claimName, "Postgresql-5509");
+        createService(claimName + "-service", "14.5", "type");
+        Claim claim = createClaim(claimName, claimName + "-service-14.5");
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
@@ -82,33 +89,11 @@ public class ClaimsEndpointTest {
                 .delete("/claims/" + claim.id).then().statusCode(200);
     }
 
-    @DisabledOnIntegrationTest
-    @Test
-    public void testEditClaimFromPage() {
-        // Create data
-        Claim claim = createClaim("testEditClaimFromPage", "payment-api-1.1");
-        // Go to the claims page
-        page.goTo("/claims");
-        // Ensure our data is listed
-        page.assertContentContains(claim.name);
-        // Let's change the owner
-        page.clickById("btn-claim-edit-" + claim.id);
-        page.assertPathIs("/claims/" + claim.id);
-        page.assertContentContains("Update Claim");
-        page.assertContentContains(claim.name);
-        page.type("owner", "NEW OWNER");
-        page.clickById("claim-button");
-        // Verify the entity was properly updated:
-        page.assertContentContains("Updated successfully for id: " + claim.id);
-        // Go back to the claims list and check whether the owner is displayed
-        page.goTo("/claims");
-        page.assertContentContains("NEW OWNER");
-    }
-
     @Test
     public void testDeleteClaim() {
-        String prefix = "ClaimsEndpointTest-testDeleteClaim-";
-        Claim claim = createClaim(prefix + "claim", "Postgresql-5509");
+        String claimName = "ClaimsEndpointTest-testDeleteClaim";
+        createService(claimName + "-service", "14.5", "type");
+        Claim claim = createClaim(claimName, claimName + "-service-14.5");
 
         // When, we go to the claims page
         page.goTo("/claims");

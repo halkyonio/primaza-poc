@@ -70,7 +70,11 @@ public class ServiceDiscoveryJob {
             service.available = false;
             List<Cluster> clusters = Cluster.listAll();
             for (Cluster cluster : clusters) {
+                LOG.debugf("Checking after the service: %s, %s, %s", service.name, service.getProtocol(),
+                        service.getPort());
                 if (updateServiceIfFoundInCluster(service, cluster)) {
+                    LOG.infof("Service: %s, %s found within namespace: %s of the cluster: %s", service.name,
+                            service.getPort(), service.namespace, service.cluster);
                     updated = true;
                     break;
                 }
