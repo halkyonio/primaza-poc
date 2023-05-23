@@ -10,12 +10,12 @@ import jakarta.ws.rs.core.MediaType;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -82,7 +82,7 @@ public class ClaimsEndpointTest {
                 .delete("/claims/" + claim.id).then().statusCode(200);
     }
 
-    @DisabledOnIntegrationTest
+    @Disabled(value = "Disable it as Claim CR should stay immutable, so this test is not longer valid")
     @Test
     public void testEditClaimFromPage() {
         // Create data
