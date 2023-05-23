@@ -108,8 +108,8 @@ DB_DATABASE=fruits_database
 RELEASE_NAME=postgresql
 VERSION=11.9.13
 
-helm uninstall postgresql -n db
-kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n db
+helm uninstall postgresql -n app
+kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n app
 
 helm install $RELEASE_NAME bitnami/postgresql \
   --version $VERSION \
@@ -117,5 +117,5 @@ helm install $RELEASE_NAME bitnami/postgresql \
   --set auth.password=$DB_PASSWORD \
   --set auth.database=$DB_DATABASE \
   --create-namespace \
-  -n db
+  -n app
 ```
