@@ -269,7 +269,8 @@ public class KubernetesClientService {
             } else {
                 config = Config.autoConfigure(null);
             }
-            LOG.infof("Cluster configuration settings from %s", StringUtils.isNotEmpty(cluster.kubeConfig)?"cluster.kubeconfig" : "autoconfigure");
+            LOG.infof("Cluster configuration settings from %s",
+                    StringUtils.isNotEmpty(cluster.kubeConfig) ? "cluster.kubeconfig" : "autoconfigure");
             LOG.infof("Cluster name: %s", cluster.name);
             LOG.infof("Cluster URL: %s", cluster.url);
             LOG.infof("Config URL: %s", config.getMasterUrl());
