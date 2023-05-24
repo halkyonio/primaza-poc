@@ -1,7 +1,6 @@
 package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createClaim;
-import static io.halkyon.utils.TestUtils.createService;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import io.halkyon.model.Claim;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -41,20 +39,16 @@ public class ClaimsEndpointTest {
     @Test
     public void testQueryUsingNameToGetClaims() {
         final String claimName = "testQueryUsingNameToGetClaims";
-        createService(claimName + "-service", "14.5", "type");
-        createClaim(claimName, claimName + "-service-14.5");
+        createClaim(claimName, "Postgresql-5509");
         given().header("HX-Request", "true").queryParam("name", claimName).when().get("/claims/filter").then()
                 .body(containsString("<td>" + claimName + "</td>"));
     }
 
     @Test
-    @DisabledOnIntegrationTest
     public void testQueryUsingServiceRequestedToGetClaims() {
         final String claimName = "testQueryUsingServiceRequestedToGetClaims";
-        createService(claimName + "-service", "14.5", "type");
-        createClaim(claimName, claimName + "-service-14.5");
-        given().header("HX-Request", "true")
-                .queryParam("servicerequested", "testQueryUsingServiceRequestedToGetClaims-service").when()
+        createClaim(claimName, "Postgresql-5509");
+        given().header("HX-Request", "true").queryParam("servicerequested", "Postgresql-5509").when()
                 .get("/claims/filter").then().body(containsString("<td>" + claimName + "</td>"));
     }
 
@@ -62,7 +56,6 @@ public class ClaimsEndpointTest {
     public void claimCreatedViaForm() {
         // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         String claimName = "mysql-claim";
-        createService("mysql", "8.0.3", "type");
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", claimName).formParam("serviceRequested", "mysql-8.0.3")
                 .formParam("description", "mysql claim for testing purposes").when().post("/claims").then()
@@ -80,8 +73,7 @@ public class ClaimsEndpointTest {
     @Test
     public void testDeleteUnBoundClaim() {
         final String claimName = "testDeleteBoundClaim";
-        createService(claimName + "-service", "14.5", "type");
-        Claim claim = createClaim(claimName, claimName + "-service-14.5");
+        Claim claim = createClaim(claimName, "Postgresql-5509");
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
@@ -91,9 +83,8 @@ public class ClaimsEndpointTest {
 
     @Test
     public void testDeleteClaim() {
-        String claimName = "ClaimsEndpointTest-testDeleteClaim";
-        createService(claimName + "-service", "14.5", "type");
-        Claim claim = createClaim(claimName, claimName + "-service-14.5");
+        String prefix = "ClaimsEndpointTest-testDeleteClaim-";
+        Claim claim = createClaim(prefix + "claim", "Postgresql-5509");
 
         // When, we go to the claims page
         page.goTo("/claims");

@@ -1,0 +1,56 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: databases.snowdrop.dev
+spec:
+  group: snowdrop.dev
+  names:
+    kind: Database
+    plural: databases
+    shortNames:
+      - "db"
+      - "dbs"
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .spec.parameters.size
+          name: SIZE
+          type: string
+        - jsonPath: .spec.parameters.namespace
+          name: NAMESPACE
+          type: string
+        - jsonPath: .spec.parameters.type
+          name: TYPE
+          type: string
+        - jsonPath: .spec.parameters.version
+          name: VERSION
+          type: string
+      name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    size:
+                      type: string
+                    namespace:
+                      type: string
+                    type:
+                      type: string
+                    version:
+                      type: string
+                  required:
+                    - type
+                    - version
+                    - namespace
+              required:
+                - parameters          
+
+     
+            

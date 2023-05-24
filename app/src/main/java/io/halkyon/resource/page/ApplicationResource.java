@@ -23,6 +23,7 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.services.BindApplicationService;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.FilterableQueryBuilder;
 import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
@@ -32,6 +33,9 @@ public class ApplicationResource {
 
     @Inject
     BindApplicationService bindService;
+
+    @Inject
+    KubernetesClientService kubernetesClientService;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -102,6 +106,18 @@ public class ApplicationResource {
         }
         if (claim.service == null) {
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
+        }
+        if (claim.service.installable) {
+            claim.service.cluster = claim.application.cluster;
+            claim.service.namespace = claim.application.namespace;
+            claim.persist();
+            try {
+                System.out.println("Service is installable using crossplane. Let's do it :-)");
+                kubernetesClientService.createCrossplaneHelmRelease(application.cluster, claim.service);
+            } catch (ClusterConnectException ex) {
+                throw new InternalServerErrorException(
+                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+            }
         }
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));

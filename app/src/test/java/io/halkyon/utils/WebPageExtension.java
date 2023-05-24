@@ -2,6 +2,7 @@ package io.halkyon.utils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
+import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.javascript.SilentJavaScriptErrorListener;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
@@ -95,8 +97,15 @@ public class WebPageExtension implements QuarkusTestResourceLifecycleManager {
         }
 
         public void type(String elementId, String value) {
-            HtmlInput input = (HtmlInput) currentPage.getElementById(elementId);
-            input.setValue(value);
+            DomElement element = currentPage.getElementById(elementId);
+            if (element instanceof HtmlInput) {
+                ((HtmlInput) element).setValue(value);
+            } else if (element instanceof HtmlTextArea) {
+                ((HtmlTextArea) element).setText(value);
+            } else {
+                fail(String.format("Can't set value or text in the HTML element with ID '%s'. Unexpected type: '%d'",
+                        elementId, element.getClass().getName()));
+            }
         }
 
         public void select(String elementId, String option) {

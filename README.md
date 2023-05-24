@@ -17,6 +17,9 @@ Table of Contents
     * [Running the application locally](#running-the-application-locally)
     * [Using Primaza on a k8s cluster](#using-primaza-on-a-k8s-cluster)
   * [Demo time](#demo-time)
+  * [Use cases](#use-cases)
+    * [Service discovered](#service-discovered)
+    * [Service deployed using Crossplane](#service-deployed-using-crossplane)
 
 # Introduction
 
@@ -104,25 +107,18 @@ but will also run different containers:  database (h2) & vault secret engine if 
 
 You can discover the [quarkus dev services](https://quarkus.io/guides/dev-services) and injected config by pressing on the key `c` within your terminal.
 
-If you plan to play with a quarkus demo application and bind it to a service, then install a kind cluster locally
-```bash
-VM_IP=<IP_OR_HOSTNAME_OF_THE_MACHINE/VM> // e.g. VM_IP=127.0.0.1
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest kind 0 ${VM_IP}
-```
-and next follow then the instructions of the [Demo time](#demo-time) section :-)
+Next follow then the instructions of the [Demo time](#demo-time) section :-)
 
 ### Using Primaza on a k8s cluster
 
 In order to use Primaza on kubernetes, it is needed first to setup a cluster (kind, minikube, etc) and to install an ingress controller.
-To simplify this process, you can use the following bash script able to set up such environment using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and [helm](https://helm.sh/docs/helm/helm_install/).
-
+You can use the following script able to install using kind a kubernetes cluster locally:
 ```bash
-VM_IP=<IP_OR_HOSTNAME_OF_THE_MACHINE/VM>
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh" | bash -s y latest kind 0 ${VM_IP}
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install
 ```
-**Remark**: The kubernetes's version can be changed if you replace `latest` with one of the version supported by kind `1.23 .. 1.25`
+> **Remark**: To see all the options proposed by the script, use the command `curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s -h`
 
-Install vault using the following script `./scripts/vault.sh`. We recommend to use this script as it is needed to perform different steps
+If the cluster is up and running, install vault using the following script `./scripts/vault.sh`. We recommend to use this script as it is needed to perform different steps
 post vault installation such as: 
 - unseal, 
 - store root token within the local folder `.vault/cluster-keys.json`, 
@@ -133,7 +129,13 @@ post vault installation such as:
 > **Note**: If creation of the vault's pod is taking more than 60s as the container image must be downloaded, then the process will stop.
 In this case, remove the helm chart `./scripts/vault.sh remove` and repeat the operation.
 
-> **Tip**: Notice the messages displayed within the console as they told you how to get the root token and where they are stored, where to access the keys, etc !
+> **Tip**: Notice the messages displayed within the terminal as they told you how to get the root token and where they are stored, where to access the keys, etc !
+
+We can now install Crossplane and its Helm provider
+```bash
+./scripts/crossplane.sh
+```
+> **Tip**: Script usage is available using the `-h` parameter
 
 Create the primaza namespace
 ```bash
@@ -151,7 +153,7 @@ helm install \
   primaza-app \
   primaza-app \
   -n primaza \
-  --set app.image=quay.io/halkyonio/primaza-app:latest \
+  --set app.image=<CONTAINER_REGISTRY>/<ORG>/primaza-app:latest \
   --set app.host=primaza.${VM_IP}.nip.io \
   --set app.envs.vault.url=${VAULT_URL}
 ```
@@ -160,12 +162,15 @@ helm install \
 If you prefer to install everything all-in-one, use our bash scripts on a `kind` k8s cluster:
 ```bash
 VM_IP=<VM_IP>
-VAULT_URL=http://vault-internal.vault:8200
+export VAULT_URL=http://vault-internal.vault:8200
+export PRIMAZA_IMAGE_NAME=kind-registry:5000/local/primaza-app
 $(pwd)/scripts/vault.sh
-$(pwd)/scripts/primaza.sh
+$(pwd)/scripts/crossplane.sh
+$(pwd)/scripts/primaza.sh build
+$(pwd)/scripts/primaza.sh localdeploy
 ```
 
-> **Note**: Before to execute the `./primaza.sh` script, check the latest image pushed on quay.io as set the version to the one you want to test using the variable `export GIT_SHA_COMMIT=` !
+> **Note**: If you prefer to use the helm chart pushed on [Halkyon repository](https://github.com/halkyonio/helm-charts), don't use the parameters `build` and `localdeploy`
 
 And now, you can demo it ;-)
 
@@ -188,29 +193,14 @@ To play with Primaza, you can use the following scenario:
 
 Everything is in place to claim a Service using the following commands:
 
-- Install the `fruits` postgresql DB that the Quarkus Fruits application will access
-  ```bash
-  DB_USERNAME=healthy
-  DB_PASSWORD=healthy
-  DB_DATABASE=fruits_database
-  RELEASE_NAME=postgresql
-  VERSION=11.9.13
-  helm uninstall postgresql -n db
-  kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n db
-  
-  helm install $RELEASE_NAME bitnami/postgresql \
-    --version $VERSION \
-    --set auth.username=$DB_USERNAME \
-    --set auth.password=$DB_PASSWORD \
-    --set auth.database=$DB_DATABASE \
-    --create-namespace \
-    -n db
-  ```
 - Deploy the Quarkus Fruits application within the namespace `app`
   ```bash
-  kubectl create ns app
-  kubectl delete -f $(pwd)/scripts/data/atomic-fruits.yml
-  kubectl apply -f $(pwd)/scripts/data/atomic-fruits.yml
+  helm install fruits-app halkyonio/fruits-app \
+    -n app --create-namespace \
+    --set app.image=quay.io/halkyonio/atomic-fruits:latest \
+    --set app.host=atomic-fruits.<VM_IP>.nip.io \
+    --set app.serviceBinding.enabled=false \
+    --set db.enabled=false
   ```
 - Create an entry within the secret store engine at the path `primaza/fruits`. This path will be used to configure the credentials to access the `fruits_database`.
   ```bash
@@ -222,8 +212,8 @@ Everything is in place to claim a Service using the following commands:
   export VAULT_TOKEN=root
   export VAULT_ADDR=http://localhost:<VAULT_PORT>
   
-  // Next create a key
-  vault kv put -mount=secret primaza/fruits healthy=healthy
+  // Next create the key that we need to access the Postgresql fruits db
+  vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database
   vault kv get -mount=secret primaza/fruits
   ```
   
@@ -237,7 +227,7 @@ Everything is in place to claim a Service using the following commands:
   
   // To be executed when steps are done manually or when using quarkus:dev
   export KIND_URL=$(kubectl config view -o json | jq -r --arg ctx kind-kind '.clusters[] | select(.name == $ctx) | .cluster.server')
-  $(pwd)/scripts/data/cluster.sh 
+  $(pwd)/scripts/data/cluster.sh
   
   // Common steps
   $(pwd)/scripts/data/services.sh
@@ -254,3 +244,53 @@ Everything is in place to claim a Service using the following commands:
 - Click on the URL to access the application's screen
 - Alternatively `curl` or `httpie` the URL (`http http://atomic-fruits.127.0.0.1.nip.io/fruits`)
 - Enjoy :-)
+
+## Use cases
+
+This section describes different use cases that you can play manually top of a k8s cluster where:
+- Primaza, vault and crossplane have been deployed
+- Service catalog, cluster and credentials records has been populated (use for that purpose the scripts of: ./scripts/data/*.sh)
+- Vault path has been created: `vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database`
+- Deploy the Atomic Fruits helm chart
+```bash
+VM_IP=127.0.0.1
+helm uninstall fruits-app -n app
+helm install fruits-app halkyonio/fruits-app \
+  -n app --create-namespace \
+  --set app.image=quay.io/halkyonio/atomic-fruits:latest \
+  --set app.host=atomic-fruits.$VM_IP.nip.io \
+  --set app.serviceBinding.enabled=false \
+  --set db.enabled=false
+```
+
+### Service discovered
+
+- Install a Helm chart (or a YAML static file) of a service part of the catalog (e.g. postgresql)
+```bash
+DB_PASSWORD=healthy
+DB_DATABASE=fruits_database
+RELEASE_NAME=postgresql
+VERSION=11.9.13
+
+helm uninstall postgresql -n db
+kubectl delete pvc -lapp.kubernetes.io/name=$RELEASE_NAME -n db
+
+helm install $RELEASE_NAME bitnami/postgresql \
+  --version $VERSION \
+  --set auth.username=$DB_USERNAME \
+  --set auth.password=$DB_PASSWORD \
+  --set auth.database=$DB_DATABASE \
+  --create-namespace \
+  -n db
+```
+- Open the primaza `applications` screen and next to the line of the `fruits` application, click on the claim button
+- Create a new claim
+- Wait a few moments till the status is `bound` and open the ingress URL
+
+### Service deployed using Crossplane
+
+- Open the primaza `services catalog` screen and click on the `installable` checkbox of the service `postgresql`
+- If not yet done, specify the Helm repo `https://charts.bitnami.com/bitnami`, chart name `postgresql` and version `11.9.13` to be deployed
+- Next, open the primaza `applications` screen and next to the line of the `fruits` application, click on the claim button
+- Create a new claim
+- Wait a few moments till the status is `bound` and open the ingress URL

@@ -224,12 +224,15 @@
         <configuration>
           <extraAnnotations>true</extraAnnotations>
           <urls>
+            <!-- Primaza CRDs -->
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_clusterenvironments.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_registeredservices.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_servicebindings.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_servicecatalogs.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclaims.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclasses.yaml</url>
+            <!-- Crossplane Helm release able to deploy a helm chart -->
+            <url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/master/package/crds/helm.crossplane.io_releases.yaml</url>
           </urls>
         </configuration>
       </plugin>

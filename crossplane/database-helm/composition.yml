@@ -1,0 +1,93 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: db.local.snowdrop.dev
+  labels:
+    type: dev
+    provider: local
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: snowdrop.dev/v1alpha1
+    kind: Database
+  resources:
+    - name: postgresql-helm-release
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          annotations:
+            crossplane.io/external-name: # patched
+        spec:
+          rollbackLimit: 3
+          forProvider:
+            namespace: # patched
+            chart:
+              repository: https://charts.bitnami.com/bitnami
+              name: # patched
+              version: # patched
+          providerConfigRef:
+            name: helm-provider
+      patches:
+        - fromFieldPath: spec.parameters.namespace
+          toFieldPath: spec.forProvider.namespace
+        - fromFieldPath: spec.parameters.version
+          toFieldPath: spec.forProvider.chart.version
+        - fromFieldPath: spec.parameters.type
+          toFieldPath: spec.forProvider.chart.name
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Required
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-postgresql"
+      readinessChecks:
+        - type: MatchString
+          fieldPath: status.atProvider.state
+          matchString: deployed
+    - name: secret
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: "db-secret"
+                namespace: #patched
+              data:
+                database: fruits_database
+                username: healthy
+                password: healthy
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+        - fromFieldPath: spec.parameters.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+        - fromFieldPath: spec.forProvider.data.database
+          toFieldPath: spec.forProvider.data.database
+          transforms:
+          - type: string
+            string:
+              type: Convert
+              convert: ToBase64
+        - fromFieldPath: spec.forProvider.data.username
+          toFieldPath: spec.forProvider.data.username
+          transforms:
+            - type: string
+              string:
+                type: Convert
+                convert: ToBase64
+        - fromFieldPath: spec.forProvider.data.password
+          toFieldPath: spec.forProvider.data.password
+          transforms:
+            - type: string
+              string:
+                type: Convert
+                convert: ToBase64

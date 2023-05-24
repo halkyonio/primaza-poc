@@ -24,7 +24,7 @@ SERVICE_ID=${SERVICE_ID:-1}
 p "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
-  "name=fruits_database-vault-creds&serviceId=$SERVICE_ID&vaultKvPath=primaza/fruits&params=database:fruits_database"
+  "name=fruits_database-vault-creds&serviceId=$SERVICE_ID&vaultKvPath=primaza/fruits"
 )
 
 for i in "${arr[@]}"

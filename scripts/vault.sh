@@ -12,6 +12,7 @@ KV_APP_NAME=${KV_APP_NAME:-primaza}
 KV1_PREFIX=${KV1_PREFIX:-kv1}
 KV2_PREFIX=${KV2_PREFIX:-secret}
 
+VAULT_NAMESPACE=${VAULT_NAMESPACE:-vault}
 VAULT_USER=${VAULT_USER:-bob}
 VAULT_PASSWORD=${VAULT_PASSWORD:-sinclair}
 VAULT_POLICY_NAME=kv-${KV_APP_NAME}-policy
@@ -42,7 +43,7 @@ function usage() {
 #########################
 function vaultExec() {
   COMMAND=${1}
-  kubectl exec vault-0 -n vault -- sh -c "${COMMAND}" 2> /dev/null
+  kubectl exec vault-0 -n ${VAULT_NAMESPACE} -- sh -c "${COMMAND}" 2> /dev/null
 }
 
 function install() {
@@ -64,7 +65,12 @@ ui:
   enabled: true
   serviceType: "ClusterIP"
 EOF
-  helm install vault hashicorp/vault --create-namespace -n vault -f ${TMP_DIR}/my-values.yml
+  helm install vault hashicorp/vault --create-namespace -n ${VAULT_NAMESPACE} -f ${TMP_DIR}/my-values.yml
+
+  while [[ $(kubectl get pod/vault-0 -n vault -ojson | jq -r 'if .status.phase == "Running" then "true" else "false" end') != "true" ]]; do
+     echo "Still waiting for vault pod to be ready"
+     sleep 5
+  done
 }
 
 #########################
@@ -72,9 +78,9 @@ EOF
 #########################
 function remove() {
   log BLUE "Removing helm vault & pvc"
-  helm uninstall vault -n vault || true
-  kubectl delete -n vault pvc -lapp.kubernetes.io/name=vault
-  kubectl delete -n vault secret tokens || true
+  helm uninstall vault -n ${VAULT_NAMESPACE} || true
+  kubectl delete -n ${VAULT_NAMESPACE} pvc -lapp.kubernetes.io/name=vault
+  kubectl delete -n ${VAULT_NAMESPACE} secret tokens || true
   rm -rf ${TMP_DIR} || true
 }
 
@@ -85,7 +91,7 @@ function login() {
 }
 
 function rootToken() {
-  log "YELLOW" "Vault root token: $(kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d)"
+  log "YELLOW" "Vault root token: $(kubectl get secret -n ${VAULT_NAMESPACE} tokens -ojson | jq -r '.data.root_token' | base64 -d)"
 }
 
 function loginAsUser() {
@@ -132,7 +138,7 @@ function enableUserPasswordAuth() {
 
 function createTokensKubernetesSecret() {
   log BLUE "Creating a kubernetes secret storing the Vault Root Token"
-  kubectl create secret generic -n vault tokens --from-literal=root_token=$(jq -r '.root_token' ${TMP_DIR}/cluster-keys.json)
+  kubectl create secret generic -n ${VAULT_NAMESPACE} tokens --from-literal=root_token=$(jq -r '.root_token' ${TMP_DIR}/cluster-keys.json)
 }
 
 function createUserPolicy() {
@@ -183,7 +189,7 @@ path "sys/policies/acl/*" {
   "capabilities"=["read","list"]
 }
 EOF
-  kubectl -n vault cp ${POLICY_FILE} vault-0:/tmp/spi_policy.hcl
+  kubectl -n ${VAULT_NAMESPACE} cp ${POLICY_FILE} vault-0:/tmp/spi_policy.hcl
   vaultExec "vault policy write $VAULT_POLICY_NAME /tmp/spi_policy.hcl"
 }
 
@@ -220,8 +226,6 @@ case $1 in
 esac
 
 install
-# DO NOT WORK -> kubectl rollout status statefulset/vault -n vault
-sleep 60
 unseal
 login
 #enableKV1SecretEngine
@@ -243,4 +247,4 @@ vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
 log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
 
-log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n vault tokens -ojson | jq -r '.data.root_token' | base64 -d\""
+log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n ${VAULT_NAMESPACE} tokens -ojson | jq -r '.data.root_token' | base64 -d\""

@@ -28,6 +28,8 @@ PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
 PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GIT_SHA_COMMIT}}
 
+NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault}
+
 # Parameters to play the demo
 export TYPE_SPEED=400
 NO_WAIT=true
@@ -35,12 +37,20 @@ NO_WAIT=true
 p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
 p "Ingress host is: ${INGRESS_HOST}"
 
-function install_kind() {
-  pe "curl -s -L https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind-reg-ingress.sh | bash -s y latest primaza 0 ${VM_IP}"
-  pe "k wait -n ingress \
-    --for=condition=ready pod \
-    --selector=app.kubernetes.io/component=controller \
-    --timeout=120s"
+#########################
+## Help / Usage
+#########################
+function primazaUsage() {
+  fmt ""
+  fmt "Usage: $0 [option]"
+  fmt ""
+  fmt "\tWhere option is:"
+  fmt "\t-h            \tPrints help"
+  fmt "\tremove        \tUninstall Primaza helm chart and additional kubernetes resources"
+  fmt "\tbuild         \tBuild the Primaza quarkus application"
+  fmt "\tdeploy        \tDeploy the primaza helm chart using Halkyon Helm repo"
+  fmt "\tlocaldeploy   \tDeploy the primaza helm chart using local build application"
+  fmt ""
 }
 
 function build() {
@@ -56,7 +66,7 @@ function build() {
      -Dgit.sha.commit=${GIT_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
-  pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
+  #pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
   popd
 }
 
@@ -97,7 +107,6 @@ function deploy() {
     pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,primaza,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault,local-path-storage,kube-node-lease}
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
@@ -110,13 +119,20 @@ function deploy() {
 }
 
 function localDeploy() {
+    ENVARGS=""
+    if [[ -n "${VAULT_URL}" ]]; then ENVARGS+="--set app.envs.vault.url=${VAULT_URL}"; fi
+    if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
+    if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
+
     pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
     pe "k config set-context --current --namespace=${NAMESPACE}"
     pe "helm install --devel primaza-app \
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
-      --set app.image=localhost:5000/${REGISTRY_GROUP}/primaza-app:${IMAGE_VERSION} 2>&1 1>/dev/null"
+      --set app.image=${PRIMAZA_IMAGE_NAME} \
+      ${ENVARGS} \
+      2>&1 1>/dev/null"
 
     pe "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
@@ -134,7 +150,7 @@ function localDeploy() {
     pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=default,kube-system,ingress,pipelines-as-code,tekton-pipelines,tekton-pipelines-resolvers,vault -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -H 'HX-Request: true' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
         p "Cluster failed to be saved in Primaza: $RESULT"
@@ -150,11 +166,12 @@ function remove() {
 }
 
 case $1 in
-    install_kind) "$@"; exit;;
+    -h)           primazaUsage; exit;;
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
-    localDeploy) "$@"; exit;;
+    localdeploy)  localDeploy; exit;;
     remove)       "$@"; exit;;
+    *)            primazaUsage; exit;;
 esac
 
 remove

@@ -51,6 +51,10 @@ public class BindApplicationService {
         kubernetesClientService.deleteApplicationSecret(claim.application);
         removeIngressHostFromApplication(claim.application);
         kubernetesClientService.rolloutApplication(claim.application);
+        // TODO: Test should be improved to test if the service has been deployed using Crossplane
+        if (claim.service.installable) {
+            kubernetesClientService.deleteRelease(claim);
+        }
     }
 
     private void removeIngressHostFromApplication(Application application) {
