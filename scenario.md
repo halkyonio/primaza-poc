@@ -25,7 +25,7 @@ Install the vault client using the [following](https://developer.hashicorp.com/v
 Steps to execute to create a kind cluster + vault + crossplane locally
 
 ```bash
-export VM_IP=127.0.0.1
+export VM_IP=127.0.0.1 or export VM_IP=$(ifconfig eth0 | grep 'inet ' | cut -d: -f2 | awk '{ print $2}')
 export VAULT_URL=http://vault-internal.vault:8200
 export PRIMAZA_URL=primaza.$VM_IP.nip.io
 export PRIMAZA_IMAGE_NAME=kind-registry:5000/local/primaza-app
