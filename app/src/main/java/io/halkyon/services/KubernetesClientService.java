@@ -286,15 +286,15 @@ public class KubernetesClientService {
             return client;
         } catch (Exception ex) {
             LOG.error("Error trying to get client for cluster: '" + cluster.name + "'. Caused by: " + ex.getMessage());
-            if (ex.getCause() != null) {
-                cluster.errorMessage = ex.getCause().getMessage();
-            } else {
-                cluster.errorMessage = ex.getMessage();
-            }
             Cluster errorCluster = Cluster.findByName(cluster.name);
             errorCluster.status = ClusterStatus.ERROR;
             errorCluster.persist();
-            throw new ClusterConnectException(cluster, ex);
+            if (ex.getCause() != null) {
+                errorCluster.errorMessage = ex.getCause().getMessage();
+            } else {
+                errorCluster.errorMessage = ex.getMessage();
+            }
+            throw new ClusterConnectException(errorCluster, ex);
         }
     }
 
