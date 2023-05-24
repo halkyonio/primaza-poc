@@ -1,7 +1,0 @@
-GET /version HTTP/1.1 and responded: HTTP/1.1 200 OK
-POST /api/v1/namespaces/test/secrets HTTP/1.1 and responded: HTTP/1.1 200 OK
-GET /apis/apps/v1/namespaces/test/deployments/test2-app HTTP/1.1 and responded: HTTP/1.1 200 OK
-POST /apis/apps/v1/namespaces/test/deployments HTTP/1.1 and responded: HTTP/1.1 500 Server Error
-POST /apis/apps/v1/namespaces/test/deployments HTTP/1.1 and responded: HTTP/1.1 404 Client Error
-DELETE /api/v1/namespaces/test/secrets/test2-app-test2-claim HTTP/1.1 and responded: HTTP/1.1 500 Server Error
-DELETE /api/v1/namespaces/test/secrets/test2-app-test2-claim HTTP/1.1 and responded: HTTP/1.1 404 Client Error

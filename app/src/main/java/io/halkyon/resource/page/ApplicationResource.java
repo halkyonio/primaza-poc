@@ -23,6 +23,7 @@ import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
 import io.halkyon.services.BindApplicationService;
+import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.FilterableQueryBuilder;
 import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
@@ -32,6 +33,9 @@ public class ApplicationResource {
 
     @Inject
     BindApplicationService bindService;
+
+    @Inject
+    KubernetesClientService kubernetesClientService;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -109,7 +113,7 @@ public class ApplicationResource {
             claim.persist();
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
-                bindService.createCrossplaneHelmRelease(application.cluster, claim.service);
+                kubernetesClientService.createCrossplaneHelmRelease(application.cluster, claim.service);
             } catch (ClusterConnectException ex) {
                 throw new InternalServerErrorException(
                         "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());

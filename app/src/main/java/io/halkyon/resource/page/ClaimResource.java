@@ -222,7 +222,7 @@ public class ClaimResource {
             claim.persist();
             try {
                 System.out.println("Service is installable using crossplane. Let's do it :-)");
-                bindService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
+                kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
                 if (kubernetesClientService.getServiceInCluster(claim.application.cluster, claim.service.getProtocol(),
                         claim.service.getPort()).isPresent()) {
                     claim.service.cluster = claim.application.cluster;
