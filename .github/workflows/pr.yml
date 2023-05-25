@@ -183,7 +183,7 @@ jobs:
           echo "Logs of the deployment:"
           kubectl logs deploy/rest-heroes --all-containers=true -n $KUBERNETES_NAMESPACE
           echo "Print secret: "
-          kubectl get secret rest-heroes-hero-secret -o yaml -n $KUBERNETES_NAMESPACE
+          kubectl get secret rest-heroes-secret -o yaml -n $KUBERNETES_NAMESPACE
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=rest-heroes -n $KUBERNETES_NAMESPACE -o name)
           echo "Describe pod:"
           kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
