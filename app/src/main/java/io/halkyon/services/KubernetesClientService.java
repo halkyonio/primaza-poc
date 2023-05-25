@@ -2,7 +2,12 @@ package io.halkyon.services;
 
 import static io.halkyon.utils.StringUtils.equalsIgnoreCase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -58,24 +63,28 @@ public class KubernetesClientService {
      */
     public List<ServiceDiscovered> discoverServicesInCluster() throws ClusterConnectException {
         List<io.halkyon.model.Service> serviceCatalog = io.halkyon.model.Service.findAll(Sort.ascending("name")).list();
-        List<ServiceDiscovered> servicesDiscovered = new ArrayList<ServiceDiscovered>();
+        List<ServiceDiscovered> servicesDiscovered = new ArrayList<>();
 
         for (Cluster cluster : Cluster.listAll()) {
-            List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
-            for (Service service : kubernetesServices) {
-                for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
-                    boolean found = service.getSpec().getPorts().stream()
-                            .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
-                                    && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
-                    if (found) {
-                        ServiceDiscovered serviceDiscovered = new ServiceDiscovered();
-                        serviceDiscovered.clusterName = cluster.name;
-                        serviceDiscovered.namespace = service.getMetadata().getNamespace();
-                        serviceDiscovered.kubernetesSvcName = service.getMetadata().getName();
-                        serviceDiscovered.serviceIdentity = serviceIdentity;
-                        servicesDiscovered.add(serviceDiscovered);
+            try {
+                List<Service> kubernetesServices = filterByCluster(getClientForCluster(cluster).services(), cluster);
+                for (Service service : kubernetesServices) {
+                    for (io.halkyon.model.Service serviceIdentity : serviceCatalog) {
+                        boolean found = service.getSpec().getPorts().stream()
+                                .anyMatch(p -> equalsIgnoreCase(p.getProtocol(), serviceIdentity.getProtocol())
+                                        && String.valueOf(p.getPort()).equals(serviceIdentity.getPort()));
+                        if (found) {
+                            ServiceDiscovered serviceDiscovered = new ServiceDiscovered();
+                            serviceDiscovered.clusterName = cluster.name;
+                            serviceDiscovered.namespace = service.getMetadata().getNamespace();
+                            serviceDiscovered.kubernetesSvcName = service.getMetadata().getName();
+                            serviceDiscovered.serviceIdentity = serviceIdentity;
+                            servicesDiscovered.add(serviceDiscovered);
+                        }
                     }
                 }
+            } catch (ClusterConnectException exception) {
+                LOG.warnf("Error calling the cluster '%s', it will be skipped", cluster.name, exception);
             }
         }
         return servicesDiscovered;
@@ -103,10 +112,10 @@ public class KubernetesClientService {
     /**
      * Deleting the Kubernetes Secret
      */
-    public void deleteSecretInNamespace(Claim claim) throws ClusterConnectException {
-        Application application = claim.application;
+    public void deleteApplicationSecret(Application application) throws ClusterConnectException {
+        // Application application = claim.application;
         KubernetesClient client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-" + claim.name;
+        String secretName = application.name + "-secret";
         client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().build());
     }
@@ -128,10 +137,10 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void unMountSecretVolumeEnvInApplication(Claim claim) throws ClusterConnectException {
-        Application application = claim.application;
+    public void unMountSecretVolumeEnvInApplication(Application application) throws ClusterConnectException {
+        // Application application = claim.application;
         client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-" + claim.name;
+        String secretName = application.name + "-secret";
 
         // Get the Deployment resource
         Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
@@ -154,12 +163,13 @@ public class KubernetesClientService {
     /**
      * Add the secret into the specified cluster and namespace.
      */
-    public void mountSecretInApplication(Claim claim, Map<String, String> secretData) throws ClusterConnectException {
-        Application application = claim.application;
+    public void mountSecretInApplication(Application application, Map<String, String> secretData)
+            throws ClusterConnectException {
+        // Application application = claim.application;
         client = getClientForCluster(application.cluster);
 
         // create secret
-        String secretName = (application.name + "-" + claim.name).toLowerCase(Locale.ROOT);
+        String secretName = (application.name + "-secret").toLowerCase(Locale.ROOT);
         client.secrets().inNamespace(application.namespace).resource(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().withData(secretData).build())
                 .create();
@@ -263,7 +273,11 @@ public class KubernetesClientService {
             } else {
                 config = Config.autoConfigure(null);
             }
-
+            LOG.infof("Cluster configuration settings from %s",
+                    StringUtils.isNotEmpty(cluster.kubeConfig) ? "cluster.kubeconfig" : "autoconfigure");
+            LOG.infof("Cluster name: %s", cluster.name);
+            LOG.infof("Cluster URL: %s", cluster.url);
+            LOG.infof("Config URL: %s", config.getMasterUrl());
             config.setMasterUrl(cluster.url);
             if (StringUtils.isNotEmpty(cluster.token)) {
                 config.setOauthToken(cluster.token);
@@ -279,15 +293,16 @@ public class KubernetesClientService {
 
             return client;
         } catch (Exception ex) {
-            cluster.status = ClusterStatus.ERROR;
+            LOG.error("Error trying to get client for cluster: '" + cluster.name + "'. Caused by: " + ex.getMessage());
+            Cluster errorCluster = Cluster.findByName(cluster.name);
+            errorCluster.status = ClusterStatus.ERROR;
             if (ex.getCause() != null) {
-                cluster.errorMessage = ex.getCause().getMessage();
+                errorCluster.errorMessage = ex.getCause().getMessage();
             } else {
-                cluster.errorMessage = ex.getMessage();
+                errorCluster.errorMessage = ex.getMessage();
             }
-
-            cluster.persist();
-            throw new ClusterConnectException(cluster, ex);
+            errorCluster.persist();
+            throw new ClusterConnectException(errorCluster, ex);
         }
     }
 

@@ -1,6 +1,5 @@
 package io.halkyon.model;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -62,8 +61,8 @@ public class Claim extends PanacheEntityBase {
 
     public static List<Claim> listAvailable() {
         // TODO: To be reviewed to support to display claims when status is pending or bindable
-        // return find("status=:status", Collections.singletonMap("status", ClaimStatus.BINDABLE.toString())).list();
-        return find("status in :statuses", Collections.singletonMap("statuses",
-                Arrays.asList(ClaimStatus.PENDING.toString(), ClaimStatus.BINDABLE.toString()))).list();
+        // find("status in :statuses", Collections.singletonMap("statuses",
+        // Arrays.asList(ClaimStatus.PENDING.toString(), ClaimStatus.BINDABLE.toString()))).list();
+        return find("status=:status", Collections.singletonMap("status", ClaimStatus.BINDABLE.toString())).list();
     }
 }

@@ -46,7 +46,7 @@ public class Service extends PanacheEntityBase {
      * the Ingress resource from the Kubernetes Service.
      */
     public String externalEndpoint;
-    public Boolean available;
+    public Boolean available = false;
     public Boolean installable;
     public String helmRepo;
     public String helmChart;

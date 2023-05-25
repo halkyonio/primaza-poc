@@ -3,7 +3,12 @@ package io.halkyon;
 import java.util.List;
 import java.util.Map;
 
-import io.halkyon.model.*;
+import io.halkyon.model.Application;
+import io.halkyon.model.Claim;
+import io.halkyon.model.Cluster;
+import io.halkyon.model.Credential;
+import io.halkyon.model.Service;
+import io.halkyon.model.ServiceDiscovered;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
