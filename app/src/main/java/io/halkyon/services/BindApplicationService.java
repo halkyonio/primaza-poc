@@ -129,32 +129,9 @@ public class BindApplicationService {
         }
         secretData.put(USERNAME_KEY, toBase64(username));
         secretData.put(PASSWORD_KEY, toBase64(password));
-        secretData.put(DATABASE_KEY, toBase64(database));
-
-        if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
-            Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
-            Set<String> vaultSet = vaultSecret.keySet();
-            for (String key : vaultSet) {
-                if (key.equals(USERNAME_KEY)) {
-                    username = vaultSecret.get(USERNAME_KEY);
-                    credential.username = username;
-                } else if (key.equals(PASSWORD_KEY)) {
-                    password = vaultSecret.get(PASSWORD_KEY);
-                    credential.password = password;
-                } else if (key.equals(DATABASE_KEY)) {
-                    database = vaultSecret.get(DATABASE_KEY);
-                } else {
-                    secretData.put(key, vaultSecret.get(key));
-                    CredentialParameter credentialParameter = new CredentialParameter();
-                    credentialParameter.paramName = key;
-                    credentialParameter.paramValue = vaultSecret.get(key);
-                    credential.params.add(credentialParameter);
-                }
-            }
+        if (StringUtils.isNotEmpty(database)) {
+            secretData.put(DATABASE_KEY, toBase64(database));
         }
-        secretData.put(USERNAME_KEY, toBase64(username));
-        secretData.put(PASSWORD_KEY, toBase64(password));
-        secretData.put(DATABASE_KEY, toBase64(database));
 
         return secretData;
     }
