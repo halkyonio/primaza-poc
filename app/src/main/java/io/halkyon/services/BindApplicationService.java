@@ -44,7 +44,9 @@ public class BindApplicationService {
 
     public void unBindApplication(Claim claim) throws ClusterConnectException {
         kubernetesClientService.unMountSecretVolumeEnvInApplication(claim.application);
-        kubernetesClientService.deleteApplicationSecret(claim.application);
+        String secretName = KubernetesClientService.getSecretName(claim.application);
+        kubernetesClientService.deleteApplicationSecret(secretName, claim.application.cluster,
+                claim.application.namespace);
         removeIngressHostFromApplication(claim.application);
         kubernetesClientService.rolloutApplication(claim.application);
         // TODO: Test should be improved to test if the service has been deployed using Crossplane

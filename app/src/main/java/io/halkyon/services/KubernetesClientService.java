@@ -112,12 +112,11 @@ public class KubernetesClientService {
     /**
      * Deleting the Kubernetes Secret
      */
-    public void deleteApplicationSecret(Application application) throws ClusterConnectException {
-        // Application application = claim.application;
-        KubernetesClient client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-secret";
-        client.secrets().inNamespace(application.namespace).delete(new SecretBuilder().withNewMetadata()
-                .withName(secretName).withNamespace(application.namespace).endMetadata().build());
+    public void deleteApplicationSecret(String secretName, Cluster cluster, String namespace)
+            throws ClusterConnectException {
+        KubernetesClient client = getClientForCluster(cluster);
+        client.secrets().inNamespace(namespace).resource(new SecretBuilder().withNewMetadata().withName(secretName)
+                .withNamespace(namespace).endMetadata().build()).delete();
     }
 
     /**
@@ -138,9 +137,8 @@ public class KubernetesClientService {
      * Add the secret into the specified cluster and namespace.
      */
     public void unMountSecretVolumeEnvInApplication(Application application) throws ClusterConnectException {
-        // Application application = claim.application;
         client = getClientForCluster(application.cluster);
-        String secretName = application.name + "-secret";
+        String secretName = getSecretName(application);
 
         // Get the Deployment resource
         Deployment deployment = client.apps().deployments().inNamespace(application.namespace)
@@ -157,7 +155,7 @@ public class KubernetesClientService {
         logIfDebugEnabled(newDeployment);
 
         // Update deployment
-        client.apps().deployments().resource(newDeployment).createOrReplace();
+        client.apps().deployments().resource(newDeployment).serverSideApply();
     }
 
     /**
@@ -169,7 +167,7 @@ public class KubernetesClientService {
         client = getClientForCluster(application.cluster);
 
         // create secret
-        String secretName = (application.name + "-secret").toLowerCase(Locale.ROOT);
+        String secretName = getSecretName(application);
         client.secrets().inNamespace(application.namespace).resource(new SecretBuilder().withNewMetadata()
                 .withName(secretName).withNamespace(application.namespace).endMetadata().withData(secretData).build())
                 .create();
@@ -209,6 +207,10 @@ public class KubernetesClientService {
         } catch (Exception e) {
             client.secrets().inNamespace(application.namespace).withName(secretName).delete();
         }
+    }
+
+    public static String getSecretName(Application application) {
+        return (application.name + "-secret").toLowerCase(Locale.ROOT);
     }
 
     /**
