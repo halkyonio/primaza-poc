@@ -38,10 +38,10 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ClaimService;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
-import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.ApplicationNameMatcher;
 import io.halkyon.utils.ClusterNameMatcher;
 import io.halkyon.utils.SecretDataMatcher;
@@ -65,7 +65,7 @@ public class ApplicationsPageTest {
     ApplicationDiscoveryJob applicationDiscoveryJob;
 
     @Inject
-    UpdateClaimJob claimingServiceJob;
+    ClaimService claimingServiceJob;
 
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
@@ -166,8 +166,8 @@ public class ApplicationsPageTest {
         createCredential(credentialName, service.id, "user1", "pass1", null);
         createCluster(clusterName, "host:port");
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.execute(); // this action will link the claim with the above service
+        Claim claim = createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -231,8 +231,8 @@ public class ApplicationsPageTest {
         createCluster(clusterNameOfService, "host:port");
         createCluster(clusterNameOfApplication, "host:port");
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.execute(); // this action will link the claim with the above service
+        Claim claim = createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -345,8 +345,8 @@ public class ApplicationsPageTest {
         assertEquals("{database=database1, password=pass1, username=user1}", secrets);
 
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.execute(); // this action will link the claim with the above service
+        Claim claim = createClaim(claimName, serviceName + "-version");
+        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page

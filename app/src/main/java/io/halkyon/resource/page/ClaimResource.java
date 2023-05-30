@@ -17,7 +17,6 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -35,9 +34,8 @@ import io.halkyon.model.Claim;
 import io.halkyon.model.Service;
 import io.halkyon.resource.requests.ClaimRequest;
 import io.halkyon.services.BindApplicationService;
+import io.halkyon.services.ClaimService;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.KubernetesClientService;
-import io.halkyon.services.UpdateClaimJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
 import io.halkyon.utils.StringUtils;
@@ -49,14 +47,11 @@ public class ClaimResource {
     private static final Logger LOG = Logger.getLogger(ClaimResource.class);
 
     private final Validator validator;
-    private final UpdateClaimJob claimingService;
+    private final ClaimService claimingService;
     private final BindApplicationService bindService;
 
     @Inject
-    KubernetesClientService kubernetesClientService;
-
-    @Inject
-    public ClaimResource(Validator validator, UpdateClaimJob claimingService, BindApplicationService bindService) {
+    public ClaimResource(Validator validator, ClaimService claimingService, BindApplicationService bindService) {
         this.validator = validator;
         this.claimingService = claimingService;
         this.bindService = bindService;
@@ -130,9 +125,8 @@ public class ClaimResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            Claim claim = new Claim();
-
-            doUpdateClaim(claim, claimRequest);
+            Claim claim = initializeClaim(claimRequest);
+            claimingService.doClaim(claim);
 
             response.withSuccessMessage(claim.id);
         }
@@ -154,31 +148,6 @@ public class ClaimResource {
         return Templates.Claims.form("Claim " + id + " form", claim, Service.listAll(), Collections.emptyMap());
     }
 
-    @PUT
-    @Path("/{id:[0-9]+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.TEXT_HTML)
-    @Transactional
-    public Object edit(@PathParam("id") Long id, @Form ClaimRequest claimRequest) {
-        Claim claim = Claim.findById(id);
-        if (claim == null) {
-            throw new NotFoundException(String.format("Claim not found for id: %d%n", id));
-        }
-
-        Set<ConstraintViolation<ClaimRequest>> errors = validator.validate(claimRequest);
-        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claims/" + claim.id);
-
-        if (errors.size() > 0) {
-            response.withErrors(errors);
-        } else {
-            doUpdateClaim(claim, claimRequest);
-            response.withUpdateSuccessMessage(claim.id);
-        }
-
-        // Return as HTML the template rendering the item for HTMX
-        return response.build();
-    }
-
     @DELETE
     @Path("/{id}")
     @Transactional
@@ -196,7 +165,8 @@ public class ClaimResource {
         }
     }
 
-    private void doUpdateClaim(Claim claim, ClaimRequest request) {
+    private Claim initializeClaim(ClaimRequest request) {
+        Claim claim = new Claim();
         claim.name = request.name;
         claim.owner = request.owner;
         claim.description = request.description;
@@ -211,44 +181,8 @@ public class ClaimResource {
         if (request.applicationId != null) {
             claim.application = Application.findById(request.applicationId);
         }
+        return claim;
 
-        claimingService.updateClaim(claim);
-
-        // TODO: Logic to be reviewed
-        if (claim.service != null && claim.service.installable != null && claim.service.installable
-                && claim.application != null) {
-            claim.service.cluster = claim.application.cluster;
-            claim.service.namespace = claim.application.namespace;
-            claim.persist();
-            try {
-                System.out.println("Service is installable using crossplane. Let's do it :-)");
-                kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
-                if (kubernetesClientService.getServiceInCluster(claim.application.cluster, claim.service.getProtocol(),
-                        claim.service.getPort()).isPresent()) {
-                    claim.service.cluster = claim.application.cluster;
-                }
-            } catch (ClusterConnectException ex) {
-                throw new InternalServerErrorException(
-                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
-            }
-        }
-
-        // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
-        // generateUrlByClaimService(claim) will be null
-        if (claim.service != null) {
-            LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
-            LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
-            LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
-            LOG.infof("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
-        }
-
-        if (claim.service != null && claim.service.credentials != null && claim.application != null) {
-            try {
-                bindService.bindApplication(claim);
-            } catch (ClusterConnectException e) {
-                LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
-            }
-        }
     }
 
 }
