@@ -17,21 +17,21 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
+import io.halkyon.services.ClaimService;
 import io.halkyon.services.ClaimStatus;
 import io.halkyon.services.KubernetesClientService;
-import io.halkyon.services.UpdateClaimJob;
 import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-public class UpdateClaimJobTest {
+public class ClaimServiceTest {
 
     @InjectMock
     KubernetesClientService mockKubernetesClientService;
 
     @Inject
-    UpdateClaimJob job;
+    ClaimService claimService;
 
     @ConfigProperty(name = "primaza.update-claim-job.max-attempts")
     int maxAttempts;
@@ -54,7 +54,7 @@ public class UpdateClaimJobTest {
         // - the claim "PostgresSQL" should change from "NEW" to "BINDABLE", attempts still to 1
         // - the claim "MySQL" should change from "new" to "pending", as no service is running for MySQL claim, should
         // increase the attempts to 2
-        job.execute();
+        claimService.execute();
         Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
@@ -77,7 +77,7 @@ public class UpdateClaimJobTest {
         // - the claim "mysql-demo" should increase the attempts to 3 and status is still Pending.
         // We iterate from the number of attempts until the max attempts just for checking the "PENDING" status.
         for (int attempt = 2; attempt < maxAttempts; attempt++) {
-            job.execute();
+            claimService.execute();
             actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
                     .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
@@ -98,15 +98,16 @@ public class UpdateClaimJobTest {
         // Then:
         // - the claim "mysql-demo" should change the status to ERROR.
 
-        job.execute();
+        claimService.execute();
 
         actualMysql = given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + mySqlClaim.name).then()
                 .statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
         assertEquals(ClaimStatus.ERROR.toString(), actualMysql.status);
-        assertTrue(actualMysql.errorMessage.startsWith(
-                String.format(UpdateClaimJob.ERROR_MESSAGE_NO_SERVICE_REGISTERED, actualMysql.serviceRequested)),
+        assertTrue(
+                actualMysql.errorMessage.startsWith(
+                        String.format(ClaimService.ERROR_MESSAGE_NO_SERVICE_REGISTERED, actualMysql.serviceRequested)),
                 "Unexpected error message " + actualMysql.errorMessage);
         assertEquals(maxAttempts, actualMysql.attempts);
     }

@@ -8,6 +8,7 @@ import java.util.Collections;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.InternalServerErrorException;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -32,19 +33,22 @@ import io.quarkus.scheduler.Scheduled;
  * After a number of attempts have been made to find a suitable service, the claim status will change to "error".
  */
 @ApplicationScoped
-public class UpdateClaimJob {
+public class ClaimService {
 
     public static final String ERROR_MESSAGE_NO_SERVICE_REGISTERED = "Service '%s' not registered";
     public static final String ERROR_MESSAGE_NO_CREDENTIALS_REGISTERED = "Service '%s' has no credentials";
     public static final String ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER = "Could not find a service with protocol '%s'";
 
-    private static final Logger LOG = Logger.getLogger(UpdateClaimJob.class);
+    private static final Logger LOG = Logger.getLogger(ClaimService.class);
 
     @ConfigProperty(name = "primaza.update-claim-job.max-attempts")
     int maxAttempts;
 
     @Inject
     BindApplicationService bindApplicationService;
+
+    @Inject
+    KubernetesClientService kubernetesClientService;
 
     /**
      * This method will be executed at every `${primaza.update-claim-job.poll-every}`. It will loop over the new and
@@ -56,18 +60,17 @@ public class UpdateClaimJob {
         Claim.find("status in :statuses",
                 Collections.singletonMap("statuses",
                         Arrays.asList(ClaimStatus.NEW.toString(), ClaimStatus.PENDING.toString())))
-                .list().forEach(e -> updateClaim((Claim) e));
+                .list().forEach(e -> setClaimStatusAndAttempts((Claim) e));
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void updateClaim(Claim claim) {
+    public void setClaimStatusAndAttempts(Claim claim) {
         if (claim.service == null) {
             Service service = findService(claim.serviceRequested);
             if (service != null) {
                 claim.type = service.type;
                 claim.service = service;
             } else {
-                // claim.status = ClaimStatus.PENDING.toString();
                 incrementAttempts(claim, String.format(ERROR_MESSAGE_NO_SERVICE_REGISTERED, claim.serviceRequested));
                 claim.persist();
                 return;
@@ -89,16 +92,52 @@ public class UpdateClaimJob {
                         String.format(ERROR_MESSAGE_NO_SERVICE_FOUND_IN_CLUSTER, claim.service.endpoint));
             }
         }
+        claim.persist();
+    }
 
-        if (ClaimStatus.BINDABLE.toString().equals(claim.status) && claim.application != null) {
-            try {
-                bindApplicationService.bindApplication(claim);
-            } catch (ClusterConnectException e) {
-                LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
+    @Transactional
+    public void doClaim(Claim claim) {
+
+        if (!ClaimStatus.BINDABLE.toString().equals(claim.status)) {
+            setClaimStatusAndAttempts(claim);
+        } else {
+            // TODO: Logic to be reviewed
+            if (claim.service != null && claim.service.installable != null && claim.service.installable
+                    && claim.application != null) {
+                claim.service.cluster = claim.application.cluster;
+                claim.service.namespace = claim.application.namespace;
+                claim.persist();
+                try {
+                    System.out.println("Service is installable using crossplane. Let's do it :-)");
+                    kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
+                    if (kubernetesClientService.getServiceInCluster(claim.application.cluster,
+                            claim.service.getProtocol(), claim.service.getPort()).isPresent()) {
+                        claim.service.cluster = claim.application.cluster;
+                    }
+                } catch (ClusterConnectException ex) {
+                    throw new InternalServerErrorException("Can't deploy the service with the cluster "
+                            + ex.getCluster() + ". Cause: " + ex.getMessage());
+                }
+            }
+
+            // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
+            // generateUrlByClaimService(claim) will be null
+            if (claim.service != null) {
+                LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
+                LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
+                LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
+                LOG.infof("Service protocol: %s",
+                        claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
+            }
+
+            if (claim.service != null && claim.service.credentials != null && claim.application != null) {
+                try {
+                    bindApplicationService.bindApplication(claim);
+                } catch (ClusterConnectException e) {
+                    LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
+                }
             }
         }
-
-        claim.persist();
     }
 
     private void incrementAttempts(Claim claim, String errorMessage) {
