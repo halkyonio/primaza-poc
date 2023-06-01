@@ -158,7 +158,7 @@ public class ApplicationsPageTest extends BaseTest {
         createCluster(clusterName, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
+        claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -223,7 +223,7 @@ public class ApplicationsPageTest extends BaseTest {
         createCluster(clusterNameOfApplication, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
+        claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -337,7 +337,7 @@ public class ApplicationsPageTest extends BaseTest {
 
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
-        claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
+        claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page

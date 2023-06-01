@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 
 import org.mockito.Mockito;
@@ -69,6 +70,20 @@ public final class TestUtils {
         return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
+    }
+
+    @Transactional
+    public static Application createApplication(String applicationName) {
+        Application app = new Application();
+        app.name = applicationName;
+        app.namespace = applicationName + "-test-ns";
+        app.image = "localhost:5000/amunozhe/atomic-fruits:1.0.0";
+
+        Cluster cluster = new Cluster();
+        cluster.name = applicationName + "-cluster";
+        app.cluster = cluster;
+        app.persist();
+        return app;
     }
 
     public static Credential createCredential(String credentialName, long serviceId, String username, String password,
