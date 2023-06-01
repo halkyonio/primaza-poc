@@ -28,6 +28,7 @@ public class ClustersEndpointTest {
     KubernetesClientService mockKubernetesClientService;
 
     @Test
+    // @Disabled
     public void testAddClusterViaHtmxForm() {
         // A htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
         given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
@@ -64,6 +65,7 @@ public class ClustersEndpointTest {
      */
     @DisabledOnIntegrationTest
     @Test
+    // @Disabled
     public void testDeleteClusterInPage() {
         // First, we create a cluster with a service
         String prefix = "ClustersEndpointTest-testDeleteClusterInPage-";

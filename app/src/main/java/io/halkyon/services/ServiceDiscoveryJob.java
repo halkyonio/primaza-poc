@@ -45,7 +45,7 @@ public class ServiceDiscoveryJob {
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void checkCluster(Cluster cluster) {
+    public void discoverServices(Cluster cluster) {
         List<Service> services = Service.listAll();
         boolean updated = false;
         for (Service service : services) {

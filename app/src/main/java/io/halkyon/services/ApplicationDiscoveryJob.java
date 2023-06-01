@@ -34,12 +34,12 @@ public class ApplicationDiscoveryJob {
     public void execute() {
         List<Cluster> clusters = Cluster.listAll();
         for (Cluster cluster : clusters) {
-            syncApplicationsInCluster(cluster);
+            discoverApplications(cluster);
         }
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public void syncApplicationsInCluster(Cluster cluster) {
+    public void discoverApplications(Cluster cluster) {
         try {
             Set<String> deploymentsSeen = new HashSet<>();
             // save or update applications in cluster
