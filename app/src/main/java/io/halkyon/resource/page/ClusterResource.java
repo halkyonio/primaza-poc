@@ -26,13 +26,10 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import io.halkyon.Templates;
-import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Cluster;
 import io.halkyon.resource.requests.ClusterRequest;
-import io.halkyon.services.ApplicationDiscoveryJob;
+import io.halkyon.services.ClusterService;
 import io.halkyon.services.ClusterStatus;
-import io.halkyon.services.KubernetesClientService;
-import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
 import io.halkyon.utils.StringUtils;
@@ -45,12 +42,9 @@ public class ClusterResource {
 
     @Inject
     Validator validator;
+
     @Inject
-    KubernetesClientService kubernetesClientService;
-    @Inject
-    ServiceDiscoveryJob serviceDiscoveryJob;
-    @Inject
-    ApplicationDiscoveryJob applicationDiscoveryJob;
+    ClusterService clusterService;
 
     @GET
     @Path("/new")
@@ -92,7 +86,6 @@ public class ClusterResource {
     }
 
     @POST
-    @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response add(@MultipartForm ClusterRequest clusterRequest) throws IOException {
@@ -102,11 +95,10 @@ public class ClusterResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            Cluster cluster = new Cluster();
-            doUpdateCluster(cluster, clusterRequest);
+            Cluster cluster = initializeCluster(clusterRequest);
+            clusterService.doSave(cluster);
             response.withSuccessMessage(cluster.id);
-            serviceDiscoveryJob.checkCluster(cluster);
-            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
+
         }
 
         // Return as HTML the template rendering the item for HTMX
@@ -127,25 +119,18 @@ public class ClusterResource {
 
     @PUT
     @Path("/{id:[0-9]+}")
-    @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response edit(@PathParam("id") Long id, @MultipartForm ClusterRequest clusterRequest) throws IOException {
-        Cluster cluster = Cluster.findById(id);
-        if (cluster == null) {
-            throw new NotFoundException(String.format("Cluster not found for id: %d%n", id));
-        }
-
         Set<ConstraintViolation<ClusterRequest>> errors = validator.validate(clusterRequest);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/clusters/" + id);
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            doUpdateCluster(cluster, clusterRequest);
-            serviceDiscoveryJob.checkCluster(cluster);
-            applicationDiscoveryJob.syncApplicationsInCluster(cluster);
-
+            Cluster cluster = initializeCluster(clusterRequest);
+            cluster.id = id;
+            clusterService.doSave(cluster);
             response.withUpdateSuccessMessage(cluster.id);
         }
 
@@ -172,7 +157,8 @@ public class ClusterResource {
         return cluster;
     }
 
-    private void doUpdateCluster(Cluster cluster, ClusterRequest clusterRequest) {
+    private Cluster initializeCluster(ClusterRequest clusterRequest) {
+        Cluster cluster = new Cluster();
         cluster.name = clusterRequest.name;
         cluster.url = clusterRequest.url;
         cluster.namespace = clusterRequest.namespace;
@@ -186,13 +172,7 @@ public class ClusterResource {
                 throw new RuntimeException(e);
             }
         }
+        return cluster;
 
-        try {
-            kubernetesClientService.getClientForCluster(cluster);
-            cluster.status = ClusterStatus.OK;
-            cluster.persist();
-        } catch (ClusterConnectException e) {
-            LOG.error("Could not connect with the cluster '" + e.getCluster().name + "'. Caused by: " + e.getMessage());
-        }
     }
 }
