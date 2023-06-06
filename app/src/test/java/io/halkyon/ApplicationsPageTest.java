@@ -6,21 +6,16 @@ import static io.halkyon.utils.TestUtils.createCredential;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.findApplicationByName;
 import static io.restassured.RestAssured.given;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -29,10 +24,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
-import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
 import io.halkyon.model.Claim;
@@ -41,26 +33,14 @@ import io.halkyon.model.Service;
 import io.halkyon.services.ApplicationDiscoveryJob;
 import io.halkyon.services.ClaimService;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
 import io.halkyon.utils.ApplicationNameMatcher;
-import io.halkyon.utils.ClusterNameMatcher;
 import io.halkyon.utils.SecretDataMatcher;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.scheduler.Scheduler;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkus.vault.VaultKVSecretEngine;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class ApplicationsPageTest {
-
-    WebPageExtension.PageManager page;
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
+public class ApplicationsPageTest extends BaseTest {
 
     @Inject
     ApplicationDiscoveryJob applicationDiscoveryJob;
@@ -70,9 +50,6 @@ public class ApplicationsPageTest {
 
     @Inject
     ServiceDiscoveryJob serviceDiscoveryJob;
-
-    @Inject
-    Scheduler scheduler;
 
     @Inject
     VaultKVSecretEngine kvSecretEngine;
@@ -417,51 +394,5 @@ public class ApplicationsPageTest {
         });
         // and cluster should have only one application
         assertEquals(1, Cluster.findByName(cluster.name).applications.size());
-    }
-
-    private void configureMockApplicationWithEmptyFor(Cluster cluster) throws ClusterConnectException {
-        Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(cluster.name))))
-                .thenReturn(Collections.emptyList());
-    }
-
-    private void configureMockApplicationFor(String clusterName, String appName, String appImage, String appNamespace)
-            throws ClusterConnectException {
-        Mockito.when(mockKubernetesClientService.getDeploymentsInCluster(argThat(new ClusterNameMatcher(clusterName))))
-                .thenReturn(Arrays
-                        .asList(new DeploymentBuilder().withNewMetadata().withName(appName).withNamespace(appNamespace)
-                                .endMetadata().withNewSpec().withNewTemplate().withNewSpec().addNewContainer()
-                                .withImage(appImage).endContainer().endSpec().endTemplate().endSpec().build()));
-        Mockito.when(mockKubernetesClientService.getIngressHost(argThat(new ApplicationNameMatcher(appName))))
-                .thenReturn("");
-    }
-
-    private void configureMockApplicationIngressFor(String appName, String appIngress) throws ClusterConnectException {
-        Mockito.when(mockKubernetesClientService.getIngressHost(argThat(new ApplicationNameMatcher(appName))))
-                .thenReturn(appIngress);
-    }
-
-    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
-            String serviceNamespace) throws ClusterConnectException {
-        configureMockServiceFor(clusterName, protocol, servicePort,
-                new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata());
-    }
-
-    private void configureMockServiceWithIngressFor(String clusterName, String protocol, String servicePort,
-            String serviceNamespace, String serviceExternalIp) throws ClusterConnectException {
-        configureMockServiceFor(clusterName, protocol, servicePort,
-                new ServiceBuilder().withNewMetadata().withNamespace(serviceNamespace).endMetadata().withNewStatus()
-                        .withNewLoadBalancer().addNewIngress().withIp(serviceExternalIp).endIngress().endLoadBalancer()
-                        .endStatus());
-    }
-
-    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
-            ServiceBuilder serviceBuilder) throws ClusterConnectException {
-        Mockito.when(mockKubernetesClientService.getServiceInCluster(argThat(new ClusterNameMatcher(clusterName)),
-                eq(protocol), eq(servicePort))).thenReturn(Optional.of(serviceBuilder.build()));
-    }
-
-    private void pauseScheduler() {
-        scheduler.pause();
-        await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
     }
 }

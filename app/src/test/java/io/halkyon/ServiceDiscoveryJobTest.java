@@ -2,10 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createService;
-import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
 import static io.restassured.RestAssured.given;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,28 +15,14 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
-import io.halkyon.services.KubernetesClientService;
 import io.halkyon.services.ServiceDiscoveryJob;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.scheduler.Scheduler;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class ServiceDiscoveryJobTest {
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
+public class ServiceDiscoveryJobTest extends BaseTest {
 
     @Inject
     ServiceDiscoveryJob job;
-
-    @Inject
-    Scheduler scheduler;
-
-    WebPageExtension.PageManager page;
 
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
@@ -67,8 +50,6 @@ public class ServiceDiscoveryJobTest {
         assertTrue(service.available);
         assertNotNull(service.cluster);
         assertEquals(cluster.name, service.cluster.name);
-        // TODO this should be asserted in a the KuberentesClientServiceTest
-        // thenServiceIsInTheAvailableServicePage(service);
     }
 
     @Test
@@ -85,8 +66,6 @@ public class ServiceDiscoveryJobTest {
         assertTrue(service.available);
         assertNotNull(service.cluster);
         assertEquals(cluster.name, service.cluster.name);
-        // TODO this should be asserted in a the KuberentesClientServiceTest
-        // thenServiceIsInTheAvailableServicePage(service);
     }
 
     @Test
@@ -102,25 +81,5 @@ public class ServiceDiscoveryJobTest {
         assertTrue(service.available);
         assertNotNull(service.cluster);
         assertEquals("dummy-cluster-3", service.cluster.name);
-        // TODO this should be asserted in a the KuberentesClientServiceTest
-        // thenServiceIsInTheAvailableServicePage(service);
-    }
-
-    private void thenServiceIsInTheAvailableServicePage(Service expectedService) {
-        page.goTo("/services/discovered");
-        page.assertContentContains(expectedService.name);
-        page.assertContentContains(expectedService.getProtocol() + "://" + expectedService.name + "."
-                + expectedService.namespace + ":" + expectedService.getPort());
-    }
-
-    private void configureMockServiceFor(String clusterName, String protocol, String servicePort,
-            String serviceNamespace) {
-        mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, protocol, servicePort,
-                serviceNamespace);
-    }
-
-    private void pauseScheduler() {
-        scheduler.pause();
-        await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
     }
 }

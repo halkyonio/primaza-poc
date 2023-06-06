@@ -2,15 +2,10 @@ package io.halkyon;
 
 import org.junit.jupiter.api.Test;
 
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class HomeResourceTest {
-
-    WebPageExtension.PageManager page;
+public class HomeResourceTest extends BaseTest {
 
     @Test
     public void testShouldRedirectToHome() {
