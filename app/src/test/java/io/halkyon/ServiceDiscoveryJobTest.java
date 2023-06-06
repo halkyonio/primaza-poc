@@ -96,7 +96,7 @@ public class ServiceDiscoveryJobTest {
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
         given().contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", "dummy-cluster-3")
                 .multiPart("environment", "TEST").multiPart("excludedNamespaces", "kube-system,ingress")
-                .multiPart("url", "master:port").when().post("/clusters").then().statusCode(201);
+                .multiPart("url", "master:9999").when().post("/clusters").then().statusCode(201);
         service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then()
                 .statusCode(200).extract().as(Service.class);
         assertTrue(service.available);
