@@ -55,7 +55,7 @@ public class ClaimService {
      * pending claims and try to link the service if the criteria matches.
      */
     @Transactional
-    @Scheduled(every = "${primaza.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${primaza.update-claim-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP, skipExecutionIf = Scheduled.ApplicationNotRunning.class)
     public void execute() {
         Claim.find("status in :statuses",
                 Collections.singletonMap("statuses",

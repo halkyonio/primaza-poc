@@ -9,7 +9,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -68,9 +67,7 @@ public class ServiceResource {
             response.withErrors(errors);
         } else {
             if (Service.count("name=?1 AND version=?2", request.name, request.version) > 0) {
-                throw new ClientErrorException(
-                        "Service name" + request.name + " and version " + request.version + " already exists",
-                        Response.Status.CONFLICT);
+                return responseServiceConflict(request);
             }
             Service service = new Service();
             doUpdateService(service, request);
@@ -111,7 +108,7 @@ public class ServiceResource {
             response.withErrors(errors);
         } else {
             if (Service.count("id != ?1 AND name=?2 AND version=?3", id, request.name, request.version) > 0) {
-                throw new ClientErrorException("Service name and version already exists", Response.Status.CONFLICT);
+                return responseServiceConflict(request);
             }
 
             doUpdateService(service, request);
@@ -233,5 +230,10 @@ public class ServiceResource {
         }
 
         service.persist();
+    }
+
+    private Response responseServiceConflict(@Form ServiceRequest request) {
+        return Response.status(Response.Status.CONFLICT)
+                .entity("Service name" + request.name + " and version " + request.version + " already exists").build();
     }
 }

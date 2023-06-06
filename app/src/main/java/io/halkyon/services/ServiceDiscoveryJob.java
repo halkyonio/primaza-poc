@@ -34,7 +34,7 @@ public class ServiceDiscoveryJob {
      * resource.
      */
     @Transactional
-    @Scheduled(every = "${primaza.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${primaza.discovery-service-job.poll-every}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP, skipExecutionIf = Scheduled.ApplicationNotRunning.class)
     public void execute() {
         List<Service> services = Service.listAll();
         for (Service service : services) {
@@ -73,7 +73,7 @@ public class ServiceDiscoveryJob {
                 LOG.debugf("Checking after the service: %s, %s, %s", service.name, service.getProtocol(),
                         service.getPort());
                 if (updateServiceIfFoundInCluster(service, cluster)) {
-                    LOG.infof("Service: %s, %s found within namespace: %s of the cluster: %s", service.name,
+                    LOG.debugf("Service: %s, %s found within namespace: %s of the cluster: %s", service.name,
                             service.getPort(), service.namespace, service.cluster.name);
                     updated = true;
                     break;
