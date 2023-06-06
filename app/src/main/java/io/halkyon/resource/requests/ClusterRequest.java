@@ -3,6 +3,7 @@ package io.halkyon.resource.requests;
 import java.io.InputStream;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.jaxrs.FormParam;
@@ -18,6 +19,7 @@ public class ClusterRequest {
     public String name;
 
     @NotBlank(message = "URL must not be empty")
+    @Pattern(regexp = "^(https://|http://)?[\\w\\.]+(:[\\d]+)?$", message = "URL is not correct. It must be a valid hostname and port number.")
     @FormParam
     public String url;
 
