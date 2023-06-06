@@ -74,7 +74,7 @@ public class ServiceDiscoveryJob {
                         service.getPort());
                 if (updateServiceIfFoundInCluster(service, cluster)) {
                     LOG.infof("Service: %s, %s found within namespace: %s of the cluster: %s", service.name,
-                            service.getPort(), service.namespace, service.cluster);
+                            service.getPort(), service.namespace, service.cluster.name);
                     updated = true;
                     break;
                 }

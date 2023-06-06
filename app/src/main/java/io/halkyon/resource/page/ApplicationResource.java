@@ -112,7 +112,6 @@ public class ApplicationResource {
             claim.service.namespace = claim.application.namespace;
             claim.persist();
             try {
-                System.out.println("Service is installable using crossplane. Let's do it :-)");
                 kubernetesClientService.createCrossplaneHelmRelease(application.cluster, claim.service);
             } catch (ClusterConnectException ex) {
                 throw new InternalServerErrorException(
