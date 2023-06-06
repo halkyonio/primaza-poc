@@ -39,7 +39,7 @@ public class ClustersEndpointTest {
     public void testEditClusterFromPage() {
         // Create data
         String prefix = "ClustersEndpointTest-testEditClusterFromPage-";
-        Cluster cluster = createCluster(prefix + "cluster", "master:port");
+        Cluster cluster = createCluster(prefix + "cluster", "master:9999");
         // Go to the clusters page
         page.goTo("/clusters");
         // Ensure our data is listed
@@ -62,7 +62,7 @@ public class ClustersEndpointTest {
     public void testDeleteClusterInPage() {
         // First, we create a cluster with a service
         String prefix = "ClustersEndpointTest-testDeleteClusterInPage-";
-        Cluster cluster = createCluster(prefix + "cluster", "master:port");
+        Cluster cluster = createCluster(prefix + "cluster", "master:9999");
         mockServiceIsAvailableInCluster(mockKubernetesClientService, cluster.name, "testDeleteClusterInPage", "1111",
                 "ns1");
         createService(prefix + "service", "Api", "any", "testDeleteClusterInPage:1111");
