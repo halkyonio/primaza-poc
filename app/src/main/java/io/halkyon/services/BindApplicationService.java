@@ -78,8 +78,6 @@ public class BindApplicationService {
                     kubernetesClientService.getIngressHost(claim.application);
                     Application.persist(claim.application);
                 }
-            } else {
-                LOG.infof("Credential: %s; url: %s ", credential.vaultKvPath, url);
             }
         } else {
             LOG.errorf("Credential not found for service %s. Impossible binding", claim.service.name);
@@ -88,8 +86,7 @@ public class BindApplicationService {
         }
     }
 
-    private Map<String, String> createSecret(String type, Credential credential, String url)
-            throws ClusterConnectException {
+    private Map<String, String> createSecret(String type, Credential credential, String url) {
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
@@ -149,29 +146,29 @@ public class BindApplicationService {
     private String generateUrlByClaimService(Claim claim) {
         Application application = claim.application;
         Service service = claim.service;
-        LOG.infof("Application cluster name: %s", application.cluster.name == null ? "" : application.cluster.name);
-        LOG.infof("Application namespace: %s", application.name == null ? "" : application.namespace);
+        LOG.debugf("Application cluster name: %s", application.cluster.name == null ? "" : application.cluster.name);
+        LOG.debugf("Application namespace: %s", application.name == null ? "" : application.namespace);
 
-        LOG.infof("Service cluster: %s", service.cluster == null ? "" : service.cluster);
-        LOG.infof("Service name: %s", service.name == null ? "" : service.name);
-        LOG.infof("Service namespace: %s", service.namespace == null ? "" : service.namespace);
-        LOG.infof("Service port: %s", service.getPort() == null ? "" : service.getPort());
-        LOG.infof("Service protocol: %s", service.getProtocol() == null ? "" : service.getProtocol());
+        LOG.debugf("Service cluster: %s", service.cluster == null ? "" : service.cluster);
+        LOG.debugf("Service name: %s", service.name == null ? "" : service.name);
+        LOG.debugf("Service namespace: %s", service.namespace == null ? "" : service.namespace);
+        LOG.debugf("Service port: %s", service.getPort() == null ? "" : service.getPort());
+        LOG.debugf("Service protocol: %s", service.getProtocol() == null ? "" : service.getProtocol());
 
         if (Objects.equals(application.cluster, service.cluster)
                 && Objects.equals(application.namespace, service.namespace)) {
-            LOG.info("Rule 1: app + service within same ns, cluster");
+            LOG.debugf("Rule 1: app + service within same ns, cluster");
             // rule 1: app + service within same ns, cluster
             // -> app can access the service using: protocol://service_name:port
             return String.format("%s://%s:%s", service.getProtocol(), service.name, service.getPort());
         } else if (Objects.equals(application.cluster, service.cluster)) {
-            LOG.info("Rule 2: app + service in different ns, same cluster");
+            LOG.debugf("Rule 2: app + service in different ns, same cluster");
             // rule 2: app + service in different ns, same cluster
             // -> app can access the service using: protocol://service_name.namespace:port
             return String.format("%s://%s.%s:%s", service.getProtocol(), service.name, service.namespace,
                     service.getPort());
         } else if (StringUtils.isNotEmpty(service.externalEndpoint)) {
-            LOG.info("Rule 2: rule 3 and 4: app + service running in another cluster using external IP");
+            LOG.debugf("Rule 3 and 4: app + service running in another cluster using external IP");
             // rule 3 and 4: app + service running in another cluster using external IP
             // -> app can access the service using: protocol://service-external-ip:port
             return String.format("%s://%s:%s", service.getProtocol(), service.externalEndpoint, service.getPort());

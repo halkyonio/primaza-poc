@@ -108,7 +108,6 @@ public class ClaimService {
                 claim.service.namespace = claim.application.namespace;
                 claim.persist();
                 try {
-                    System.out.println("Service is installable using crossplane. Let's do it :-)");
                     kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
                     if (kubernetesClientService.getServiceInCluster(claim.application.cluster,
                             claim.service.getProtocol(), claim.service.getPort()).isPresent()) {
@@ -123,10 +122,10 @@ public class ClaimService {
             // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
             // generateUrlByClaimService(claim) will be null
             if (claim.service != null) {
-                LOG.infof("Service name: %s", claim.service.name == null ? "" : claim.service.name);
-                LOG.infof("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
-                LOG.infof("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
-                LOG.infof("Service protocol: %s",
+                LOG.debugf("Service name: %s", claim.service.name == null ? "" : claim.service.name);
+                LOG.debugf("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
+                LOG.debugf("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
+                LOG.debugf("Service protocol: %s",
                         claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
             }
 
