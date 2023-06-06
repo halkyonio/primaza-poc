@@ -108,6 +108,8 @@ public class ClaimServiceTest extends BaseTest {
     @Test
     public void testShouldClaimAndBindWhenServiceIsPresent() {
         createApplication("Postgresql-ClaimAndBindWhenServiceIsPresent-app");
+        createClusterWithServiceAvailable("testShouldClaimAndBindWhenServiceIsPresent", "protocol:9999",
+                mockKubernetesClientService, "protocol", "9999");
         createServiceWithCredential("postgresqlClaimAndBindWhenServiceIsPresentTest", "8", "postgresql",
                 "protocol:9999");
         Claim postgresqlClaim = createClaim("Postgresql-ClaimAndBindWhenServiceIsPresentTestTest",

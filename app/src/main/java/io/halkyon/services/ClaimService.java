@@ -75,7 +75,8 @@ public class ClaimService {
                 claim.persist();
                 return;
             }
-        } else {
+        }
+        if (claim.service != null) {
             boolean serviceAvailable = claim.service.available;
             boolean hasCredentials = claim.service.credentials.size() > 0;
             if (claim.type == null) {
