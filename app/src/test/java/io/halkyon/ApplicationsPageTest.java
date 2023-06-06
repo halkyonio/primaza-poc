@@ -77,11 +77,20 @@ public class ApplicationsPageTest {
     VaultKVSecretEngine kvSecretEngine;
 
     @Test
+    public void shouldRejectClustersWithInvalidUrl() {
+        String prefix = "ApplicationsPageTest.shouldRejectClustersWithInvalidUrl.";
+        String clusterName = prefix + "cluster";
+        given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", clusterName)
+                .multiPart("environment", "PROD").multiPart("excludedNamespaces", "kube-system,ingress")
+                .multiPart("url", "host:port").when().post("/clusters").then().statusCode(400);
+    }
+
+    @Test
     public void testDiscoverApplications() throws ClusterConnectException {
         String prefix = "ApplicationsPageTest.testDiscoverApplications.";
         pauseScheduler();
         // create data
-        Cluster cluster = createCluster(prefix + "cluster", "host:port");
+        Cluster cluster = createCluster(prefix + "cluster", "host:9999");
         configureMockApplicationFor(cluster.name, prefix + "app", "image1", "ns1");
         // test the job
         applicationDiscoveryJob.execute();
@@ -111,7 +120,7 @@ public class ApplicationsPageTest {
         pauseScheduler();
         // create data
         String namespaceToExclude = prefix + "ns";
-        Cluster cluster = createCluster(prefix + "cluster", "host:port");
+        Cluster cluster = createCluster(prefix + "cluster", "host:9999");
         configureMockApplicationFor(cluster.name, prefix + "app", "image1", namespaceToExclude);
         // test the job
         applicationDiscoveryJob.execute();
@@ -164,7 +173,7 @@ public class ApplicationsPageTest {
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
         createCredential(credentialName, service.id, "user1", "pass1", null);
-        createCluster(clusterName, "host:port");
+        createCluster(clusterName, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
         claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
@@ -228,8 +237,8 @@ public class ApplicationsPageTest {
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
         createCredential(credentialName, service.id, "user1", "pass1", null);
-        createCluster(clusterNameOfService, "host:port");
-        createCluster(clusterNameOfApplication, "host:port");
+        createCluster(clusterNameOfService, "host:9999");
+        createCluster(clusterNameOfApplication, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
         claimingServiceJob.doClaim(claim); // this action will link the claim with the above service
@@ -284,7 +293,7 @@ public class ApplicationsPageTest {
         // mock data
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
-        createCluster(clusterName, "host:port");
+        createCluster(clusterName, "host:9999");
         // test the job to find applications
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -333,7 +342,7 @@ public class ApplicationsPageTest {
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
         createCredential(credentialName, service.id, null, null, "myapps/app");
-        createCluster(clusterName, "host:port");
+        createCluster(clusterName, "host:9999");
 
         Map<String, String> newsecrets = new HashMap<>();
         newsecrets.put("username", username);

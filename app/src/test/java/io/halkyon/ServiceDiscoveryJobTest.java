@@ -58,7 +58,7 @@ public class ServiceDiscoveryJobTest {
         job.execute();
         given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then().statusCode(200)
                 .body("available", is(false));
-        Cluster cluster = createCluster("dummy-cluster-1", "master:port");
+        Cluster cluster = createCluster("dummy-cluster-1", "master:9999");
         configureMockServiceFor(cluster.name, "host", "1111", "ns1");
 
         job.execute();
@@ -75,7 +75,7 @@ public class ServiceDiscoveryJobTest {
     public void testShouldDiscoveryServiceWhenNewServiceIsCreated() {
         pauseScheduler();
         String serviceName = "ServiceDiscoveryJobTest2";
-        Cluster cluster = createCluster("dummy-cluster-2", "master:port");
+        Cluster cluster = createCluster("dummy-cluster-2", "master:9999");
         configureMockServiceFor(cluster.name, "host", "2222", "ns1");
         given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .formParam("name", serviceName).formParam("version", "any").formParam("type", "Api")
@@ -96,7 +96,7 @@ public class ServiceDiscoveryJobTest {
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
         given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("name", "dummy-cluster-3").multiPart("environment", "TEST")
-                .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "master:port").when()
+                .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "master:9999").when()
                 .post("/clusters").then().statusCode(201);
         service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then()
                 .statusCode(200).extract().as(Service.class);

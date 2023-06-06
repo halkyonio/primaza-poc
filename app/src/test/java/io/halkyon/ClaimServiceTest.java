@@ -44,7 +44,7 @@ public class ClaimServiceTest {
         pauseScheduler();
         Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
         Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
-        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:port",
+        createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:9999",
                 mockKubernetesClientService, "protocol", "9999");
         createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "protocol:9999");
         // Given 2 claims for which only one of them (postgresql) have a matching available service (Claims are created

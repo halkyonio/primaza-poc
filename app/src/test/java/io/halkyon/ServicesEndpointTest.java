@@ -137,7 +137,7 @@ public class ServicesEndpointTest {
         // First, we create a cluster with a service
         String prefix = "ServicesEndpointTest-testDeleteServiceWithClusterInPage-";
         String clusterName = prefix + "cluster";
-        createCluster(clusterName, "master:port");
+        createCluster(clusterName, "master:9999");
         mockServiceIsAvailableInCluster(mockKubernetesClientService, clusterName, "testDeleteClusterInPage", "1111",
                 "ns1");
         Service service = createService(prefix + "service", "Api", "any", "testDeleteClusterInPage:1111");
