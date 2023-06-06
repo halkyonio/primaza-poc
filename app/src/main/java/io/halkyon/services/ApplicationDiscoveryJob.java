@@ -30,7 +30,7 @@ public class ApplicationDiscoveryJob {
     KubernetesClientService kubernetesClientService;
 
     @Transactional
-    @Scheduled(every = "${primaza.discovery-application-job.poll-every:5s}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "${primaza.discovery-application-job.poll-every:5s}", concurrentExecution = Scheduled.ConcurrentExecution.SKIP, skipExecutionIf = Scheduled.ApplicationNotRunning.class)
     public void execute() {
         List<Cluster> clusters = Cluster.listAll();
         for (Cluster cluster : clusters) {
