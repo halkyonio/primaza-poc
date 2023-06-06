@@ -10,23 +10,12 @@ import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Cluster;
-import io.halkyon.services.KubernetesClientService;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class ClustersEndpointTest {
-
-    WebPageExtension.PageManager page;
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
+public class ClustersEndpointTest extends BaseTest {
 
     @Test
-    // @Disabled
     public void testAddClusterViaHtmxForm() {
         given().contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", "ocp4.11-node-2")
                 .multiPart("environment", "TEST").multiPart("excludedNamespaces", "kube-system,ingress")

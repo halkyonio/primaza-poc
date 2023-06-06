@@ -13,8 +13,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Claim;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -22,10 +20,7 @@ import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class ClaimsEndpointTest {
-
-    WebPageExtension.PageManager page;
+public class ClaimsEndpointTest extends BaseTest {
 
     @Test
     public void testQueryClaimBody() {

@@ -13,20 +13,10 @@ import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Service;
-import io.halkyon.services.KubernetesClientService;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class ServicesEndpointTest {
-
-    WebPageExtension.PageManager page;
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
+public class ServicesEndpointTest extends BaseTest {
 
     @Test
     public void serviceIsFoundByName() {

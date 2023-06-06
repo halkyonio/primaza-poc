@@ -9,15 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Credential;
 import io.halkyon.model.Service;
-import io.halkyon.utils.WebPageExtension;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-@QuarkusTestResource(WebPageExtension.class)
-public class CredentialsPageTest {
-
-    WebPageExtension.PageManager page;
+public class CredentialsPageTest extends BaseTest {
 
     @Test
     public void testCreateNewCredential() {

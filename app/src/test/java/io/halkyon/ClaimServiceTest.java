@@ -4,10 +4,9 @@ import static io.halkyon.utils.TestUtils.createClaim;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
 import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.inject.Inject;
@@ -19,25 +18,16 @@ import org.junit.jupiter.api.Test;
 import io.halkyon.model.Claim;
 import io.halkyon.services.ClaimService;
 import io.halkyon.services.ClaimStatus;
-import io.halkyon.services.KubernetesClientService;
-import io.quarkus.scheduler.Scheduler;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-public class ClaimServiceTest {
-
-    @InjectMock
-    KubernetesClientService mockKubernetesClientService;
+public class ClaimServiceTest extends BaseTest {
 
     @Inject
     ClaimService claimService;
 
     @ConfigProperty(name = "primaza.update-claim-job.max-attempts")
     int maxAttempts;
-
-    @Inject
-    Scheduler scheduler;
 
     @Test
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
@@ -67,7 +57,7 @@ public class ClaimServiceTest {
                 .then().statusCode(200).extract().as(Claim.class);
 
         assertEquals(mySqlClaim.name, actualMysql.name);
-        assertEquals(null, actualMysql.type);
+        assertNull(actualMysql.type);
         assertEquals(ClaimStatus.PENDING.toString(), actualMysql.status);
         assertEquals(2, actualMysql.attempts);
 
@@ -120,10 +110,5 @@ public class ClaimServiceTest {
                 .post("/claims").then().statusCode(201);
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/Oracle1").then().statusCode(200)
                 .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
-    }
-
-    private void pauseScheduler() {
-        scheduler.pause();
-        await().atMost(30, SECONDS).until(() -> !scheduler.isRunning());
     }
 }
