@@ -77,9 +77,9 @@ public class ServiceDiscoveryJobTest {
         String serviceName = "ServiceDiscoveryJobTest2";
         Cluster cluster = createCluster("dummy-cluster-2", "master:9999");
         configureMockServiceFor(cluster.name, "host", "2222", "ns1");
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", serviceName).formParam("version", "any").formParam("type", "Api")
-                .formParam("endpoint", "host:2222").when().post("/services").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", serviceName)
+                .formParam("version", "any").formParam("type", "Api").formParam("endpoint", "host:2222").when()
+                .post("/services").then().statusCode(201);
         Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then()
                 .statusCode(200).extract().as(Service.class);
         assertTrue(service.available);
@@ -94,10 +94,9 @@ public class ServiceDiscoveryJobTest {
         pauseScheduler();
         Service service = createService("ServiceDiscoveryJobTest3", "Api", "any", "host:3333");
         configureMockServiceFor("dummy-cluster-3", "host", "3333", "ns1");
-        given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA)
-                .multiPart("name", "dummy-cluster-3").multiPart("environment", "TEST")
-                .multiPart("excludedNamespaces", "kube-system,ingress").multiPart("url", "master:9999").when()
-                .post("/clusters").then().statusCode(201);
+        given().contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", "dummy-cluster-3")
+                .multiPart("environment", "TEST").multiPart("excludedNamespaces", "kube-system,ingress")
+                .multiPart("url", "master:port").when().post("/clusters").then().statusCode(201);
         service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + service.name).then()
                 .statusCode(200).extract().as(Service.class);
         assertTrue(service.available);

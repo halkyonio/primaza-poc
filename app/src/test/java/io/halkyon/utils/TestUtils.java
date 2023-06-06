@@ -31,7 +31,7 @@ public final class TestUtils {
     }
 
     public static Cluster createCluster(String clusterName, String url) {
-        given().header("HX-Request", true).contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", clusterName)
+        given().contentType(MediaType.MULTIPART_FORM_DATA).multiPart("name", clusterName)
                 .multiPart("environment", "PROD").multiPart("excludedNamespaces", "kube-system,ingress")
                 .multiPart("url", url).when().post("/clusters").then().statusCode(201);
 
@@ -52,19 +52,18 @@ public final class TestUtils {
 
     public static Service createService(String serviceName, String serviceVersion, String serviceType,
             String endpoint) {
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", serviceName).formParam("version", serviceVersion).formParam("type", serviceType)
-                .formParam("endpoint", endpoint).when().post("/services").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", serviceName)
+                .formParam("version", serviceVersion).formParam("type", serviceType).formParam("endpoint", endpoint)
+                .when().post("/services").then().statusCode(201);
 
-        Service service = given().contentType(MediaType.APPLICATION_JSON)
+        return given().contentType(MediaType.APPLICATION_JSON)
                 .get("/services/name/" + serviceName + "/version/" + serviceVersion).then().statusCode(200).extract()
                 .as(Service.class);
-        return service;
     }
 
     public static Claim createClaim(String claimName, String serviceRequested) {
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", claimName).formParam("serviceRequested", serviceRequested).formParam("status", "new")
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", claimName)
+                .formParam("serviceRequested", serviceRequested).formParam("status", "new")
                 .formParam("applicationId", "1").formParam("description", "claim for testing purposes").when()
                 .post("/claims").then().statusCode(201);
         return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)

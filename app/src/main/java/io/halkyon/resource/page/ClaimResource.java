@@ -13,7 +13,6 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -118,7 +117,7 @@ public class ClaimResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response add(@Form ClaimRequest claimRequest, @HeaderParam("HX-Request") boolean hxRequest) {
+    public Response add(@Form ClaimRequest claimRequest) {
         Set<ConstraintViolation<ClaimRequest>> errors = validator.validate(claimRequest);
         AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/claims");
 
