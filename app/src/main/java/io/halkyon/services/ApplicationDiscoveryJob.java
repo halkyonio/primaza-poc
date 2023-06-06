@@ -56,6 +56,7 @@ public class ApplicationDiscoveryJob {
                     application.name = name;
                     application.namespace = namespace;
                     application.cluster = cluster;
+                    application.ingress = kubernetesClientService.getIngressHost(application);
                 }
 
                 if (!Objects.equals(application.image, image)) {

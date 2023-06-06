@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import jakarta.inject.Inject;
@@ -88,10 +89,12 @@ public class ApplicationsPageTest {
     @Test
     public void testDiscoverApplications() throws ClusterConnectException {
         String prefix = "ApplicationsPageTest.testDiscoverApplications.";
+        String expectedAppIngressHost = "ingress-app-host";
         pauseScheduler();
         // create data
         Cluster cluster = createCluster(prefix + "cluster", "host:9999");
         configureMockApplicationFor(cluster.name, prefix + "app", "image1", "ns1");
+        configureMockApplicationIngressFor(prefix + "app", expectedAppIngressHost);
         // test the job
         applicationDiscoveryJob.execute();
         // now the deployment should be listed in the page
@@ -100,7 +103,9 @@ public class ApplicationsPageTest {
         // test the same application is not created again
         applicationDiscoveryJob.execute();
         // the mocked application is ignored and cluster should still have only one application
-        assertEquals(1, Cluster.findByName(cluster.name).applications.size());
+        Set<Application> appsInCluster = Cluster.findByName(cluster.name).applications;
+        assertEquals(1, appsInCluster.size());
+        assertEquals(expectedAppIngressHost, appsInCluster.iterator().next().ingress);
 
         // test that uninstalled deployments are deleted in database
         configureMockApplicationWithEmptyFor(cluster);
@@ -426,6 +431,13 @@ public class ApplicationsPageTest {
                         .asList(new DeploymentBuilder().withNewMetadata().withName(appName).withNamespace(appNamespace)
                                 .endMetadata().withNewSpec().withNewTemplate().withNewSpec().addNewContainer()
                                 .withImage(appImage).endContainer().endSpec().endTemplate().endSpec().build()));
+        Mockito.when(mockKubernetesClientService.getIngressHost(argThat(new ApplicationNameMatcher(appName))))
+                .thenReturn("");
+    }
+
+    private void configureMockApplicationIngressFor(String appName, String appIngress) throws ClusterConnectException {
+        Mockito.when(mockKubernetesClientService.getIngressHost(argThat(new ApplicationNameMatcher(appName))))
+                .thenReturn(appIngress);
     }
 
     private void configureMockServiceFor(String clusterName, String protocol, String servicePort,

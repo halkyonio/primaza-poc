@@ -34,8 +34,6 @@ public class BindApplicationService {
 
     public static final String DATABASE_KEY = "database";
 
-    public static final String VAULT_KV_PATH_KEY = "vault-path";
-
     @Inject
     VaultKVSecretEngine kvSecretEngine;
 
@@ -47,17 +45,11 @@ public class BindApplicationService {
         String secretName = KubernetesClientService.getSecretName(claim.application);
         kubernetesClientService.deleteApplicationSecret(secretName, claim.application.cluster,
                 claim.application.namespace);
-        removeIngressHostFromApplication(claim.application);
         kubernetesClientService.rolloutApplication(claim.application);
         // TODO: Test should be improved to test if the service has been deployed using Crossplane
         if (claim.service.installable) {
             kubernetesClientService.deleteRelease(claim);
         }
-    }
-
-    private void removeIngressHostFromApplication(Application application) {
-        application.ingress = "";
-        application.persist();
     }
 
     public void bindApplication(Claim claim) throws ClusterConnectException {
@@ -74,10 +66,6 @@ public class BindApplicationService {
                 Map<String, String> secret = createSecret(claim.type, credential, url);
                 kubernetesClientService.mountSecretInApplication(claim.application, secret);
                 kubernetesClientService.rolloutApplication(claim.application);
-                if (claim.status.equals(ClaimStatus.BOUND.toString())) {
-                    kubernetesClientService.getIngressHost(claim.application);
-                    Application.persist(claim.application);
-                }
             }
         } else {
             LOG.errorf("Credential not found for service %s. Impossible binding", claim.service.name);
