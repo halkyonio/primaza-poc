@@ -25,6 +25,7 @@ import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -225,13 +226,13 @@ public class KubernetesClientService {
      */
     public String getIngressHost(Application application) throws ClusterConnectException {
         KubernetesClient client = getClientForCluster(application.cluster);
-        try {
-            String host = client.network().v1().ingresses().inNamespace(application.namespace)
-                    .withName(application.name).get().getSpec().getRules().get(0).getHost();
-            return "http://" + host;
-        } catch (NullPointerException e) {
-            return "No host found";
+        Ingress ingress = client.network().v1().ingresses().inNamespace(application.namespace)
+                .withName(application.name).get();
+        if (ingress != null) {
+            return ingress.getSpec().getRules().get(0).getHost();
         }
+
+        return null;
     }
 
     /**
