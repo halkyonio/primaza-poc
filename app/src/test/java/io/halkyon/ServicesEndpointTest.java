@@ -30,12 +30,10 @@ public class ServicesEndpointTest {
 
     @Test
     public void serviceIsFoundByName() {
-        // An htmx request will contain a HX-Request header and Content-Type: application/x-www-form-urlencoded
-
         String rabbitMQ4 = "RabbitMQ4";
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", rabbitMQ4).formParam("version", "3.11.2").formParam("type", "Broker")
-                .formParam("endpoint", "tcp:5672").when().post("/services").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", rabbitMQ4)
+                .formParam("version", "3.11.2").formParam("type", "Broker").formParam("endpoint", "tcp:5672").when()
+                .post("/services").then().statusCode(201);
 
         Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + rabbitMQ4).then()
                 .statusCode(200).extract().as(Service.class);
@@ -50,8 +48,8 @@ public class ServicesEndpointTest {
         String prefix = "ServicesEndpointTest-testCannotAddServiceWithSameNameAndVersion-";
         Service service = createService(prefix + "service", "1", "type");
 
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", service.name).formParam("version", service.version).formParam("type", service.type)
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", service.name)
+                .formParam("version", service.version).formParam("type", service.type)
                 .formParam("endpoint", service.endpoint).when().post("/services").then().statusCode(409);
     }
 
@@ -61,8 +59,8 @@ public class ServicesEndpointTest {
         Service service1 = createService(prefix + "service", "1", "type");
         Service service2 = createService(prefix + "service", "2", "type");
 
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", service2.name).formParam("version", "1") // conflicts with version of service1!
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", service2.name)
+                .formParam("version", "1") // conflicts with version of service1!
                 .formParam("type", service2.type).formParam("endpoint", service2.endpoint).when()
                 .put("/services/" + service2.id).then().statusCode(409);
     }
@@ -112,10 +110,9 @@ public class ServicesEndpointTest {
     public void createStandaloneService() {
         String prefix = "ServicesEndpointTest-createStandaloneService-";
         String serviceName = prefix + "service";
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", serviceName).formParam("version", "3.11.2").formParam("type", "Broker")
-                .formParam("endpoint", "tcp:5672").formParam("externalEndpoint", "rabbit.com").when().post("/services")
-                .then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", serviceName)
+                .formParam("version", "3.11.2").formParam("type", "Broker").formParam("endpoint", "tcp:5672")
+                .formParam("externalEndpoint", "rabbit.com").when().post("/services").then().statusCode(201);
 
         Service service = given().contentType(MediaType.APPLICATION_JSON).get("/services/name/" + serviceName).then()
                 .statusCode(200).extract().as(Service.class);

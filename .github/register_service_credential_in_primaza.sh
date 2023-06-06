@@ -14,7 +14,7 @@ SERVICE_ID=$(echo "$SERVICE" | jq -r '.id')
 
 BODY="name=$CREDENTIAL_NAME&serviceId=$SERVICE_ID&username=$USERNAME&password=$PASSWORD&params=database:$DATABASE_NAME"
 echo "Sending service credential with body: $BODY"
-RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' -d '$BODY' -s -i localhost:8080/credentials")
+RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d '$BODY' -s -i localhost:8080/credentials")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
   echo "Credential failed to be saved in Primaza: $RESULT"

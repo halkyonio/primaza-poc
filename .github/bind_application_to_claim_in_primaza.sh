@@ -14,7 +14,7 @@ CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES
 CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
 echo "Claim ID to be bound $CLAIM_ID"
 
-RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -H 'HX-Request: true' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
+RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
   echo "Application failed to be bound in Primaza: $RESULT"

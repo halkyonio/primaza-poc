@@ -115,9 +115,9 @@ public class ClaimServiceTest {
     @Test
     public void testShouldClaimServiceWhenNewClaimIsCreated() {
         pauseScheduler();
-        given().header("HX-Request", true).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .formParam("name", "Oracle1").formParam("serviceRequested", "oracle-1234")
-                .formParam("description", "Description").when().post("/claims").then().statusCode(201);
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", "Oracle1")
+                .formParam("serviceRequested", "oracle-1234").formParam("description", "Description").when()
+                .post("/claims").then().statusCode(201);
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/Oracle1").then().statusCode(200)
                 .body("status", is(ClaimStatus.PENDING.toString())).body("attempts", is(1));
     }
