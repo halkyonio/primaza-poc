@@ -16,7 +16,6 @@ import io.halkyon.model.Service;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
@@ -68,7 +67,6 @@ public class ServicesEndpointTest {
                 .put("/services/" + service2.id).then().statusCode(409);
     }
 
-    @DisabledOnIntegrationTest
     @Test
     public void testEditServiceFromPage() {
         // Create data
@@ -134,10 +132,6 @@ public class ServicesEndpointTest {
         // page.assertContentContains("rabbit.com");
     }
 
-    /**
-     * `@InjectMock` does not work when running tests in prod mode.
-     */
-    @DisabledOnIntegrationTest
     @Test
     public void testDeleteServiceWithClusterInPage() {
         // First, we create a cluster with a service

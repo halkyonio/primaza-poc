@@ -4,7 +4,6 @@ import static io.halkyon.utils.TestUtils.createCluster;
 import static io.halkyon.utils.TestUtils.createService;
 import static io.halkyon.utils.TestUtils.mockServiceIsAvailableInCluster;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.core.IsNot.not;
 
 import jakarta.ws.rs.core.MediaType;
 
@@ -14,7 +13,6 @@ import io.halkyon.model.Cluster;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.WebPageExtension;
 import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
@@ -60,12 +58,7 @@ public class ClustersEndpointTest {
         page.assertContentContains(cluster.name + "-new");
     }
 
-    /**
-     * `@InjectMock` does not work when running tests in prod mode.
-     */
-    @DisabledOnIntegrationTest
     @Test
-    // @Disabled
     public void testDeleteClusterInPage() {
         // First, we create a cluster with a service
         String prefix = "ClustersEndpointTest-testDeleteClusterInPage-";
