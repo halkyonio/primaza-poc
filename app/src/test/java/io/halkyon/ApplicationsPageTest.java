@@ -157,7 +157,7 @@ public class ApplicationsPageTest extends BaseTest {
         createCredential(credentialName, service.id, "user1", "pass1", null);
         createCluster(clusterName, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        Claim claim = createClaim(claimName, serviceName + "-version");
+        Claim claim = createClaim(claimName, serviceName + "-version", 1L);
         claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
@@ -222,7 +222,7 @@ public class ApplicationsPageTest extends BaseTest {
         createCluster(clusterNameOfService, "host:9999");
         createCluster(clusterNameOfApplication, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        Claim claim = createClaim(claimName, serviceName + "-version");
+        Claim claim = createClaim(claimName, serviceName + "-version", 1L);
         claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();
@@ -336,7 +336,7 @@ public class ApplicationsPageTest extends BaseTest {
         assertEquals("{database=database1, password=pass1, username=user1}", secrets);
 
         serviceDiscoveryJob.execute(); // this action will change the service to available
-        Claim claim = createClaim(claimName, serviceName + "-version");
+        Claim claim = createClaim(claimName, serviceName + "-version", 1L);
         claimingServiceJob.execute(); // this action will link the claim with the above service
         // test the job to find applications
         applicationDiscoveryJob.execute();

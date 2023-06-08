@@ -1,6 +1,7 @@
 package io.halkyon.utils;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -62,25 +63,25 @@ public final class TestUtils {
                 .as(Service.class);
     }
 
-    public static Claim createClaim(String claimName, String serviceRequested) {
+    public static Claim createClaim(String claimName, String serviceRequested, Long applicationToBindId) {
         given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", claimName)
                 .formParam("serviceRequested", serviceRequested).formParam("status", "new")
-                .formParam("applicationId", "1").formParam("description", "claim for testing purposes").when()
-                .post("/claims").then().statusCode(201);
+                .formParam("applicationId", applicationToBindId.toString())
+                .formParam("description", "claim for testing purposes").when().post("/claims").then().statusCode(201);
         return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
     }
 
     @Transactional
-    public static Application createApplication(String applicationName) {
+    public static Application createApplication(String applicationName, String clusterName) {
         Application app = new Application();
         app.name = applicationName;
         app.namespace = applicationName + "-test-ns";
-        app.image = "localhost:5000/amunozhe/atomic-fruits:1.0.0";
+        app.image = "localhost:5000/application";
 
-        Cluster cluster = new Cluster();
-        cluster.name = applicationName + "-cluster";
+        Cluster cluster = Cluster.findByName(clusterName);
+        assertNotNull(cluster);
         app.cluster = cluster;
         app.persist();
         return app;
