@@ -76,7 +76,6 @@ public class ClaimService {
                 return;
             }
         }
-
         if (claim.service != null) {
             boolean serviceAvailable = claim.service.available;
             boolean hasCredentials = claim.service.credentials.size() > 0;
@@ -100,41 +99,37 @@ public class ClaimService {
 
         if (!ClaimStatus.BINDABLE.toString().equals(claim.status)) {
             setClaimStatusAndAttempts(claim);
-        } else {
-            // TODO: Logic to be reviewed
-            if (claim.service != null && claim.service.installable != null && claim.service.installable
-                    && claim.application != null) {
-                claim.service.cluster = claim.application.cluster;
-                claim.service.namespace = claim.application.namespace;
-                claim.persist();
-                try {
-                    kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
-                    if (kubernetesClientService.getServiceInCluster(claim.application.cluster,
-                            claim.service.getProtocol(), claim.service.getPort()).isPresent()) {
-                        claim.service.cluster = claim.application.cluster;
-                    }
-                } catch (ClusterConnectException ex) {
-                    throw new InternalServerErrorException("Can't deploy the service with the cluster "
-                            + ex.getCluster() + ". Cause: " + ex.getMessage());
+        }
+        // TODO: Logic to be reviewed
+        if (claim.service != null && claim.service.installable != null && claim.service.installable
+                && claim.application != null) {
+            claim.service.cluster = claim.application.cluster;
+            claim.service.namespace = claim.application.namespace;
+            claim.persist();
+            try {
+                kubernetesClientService.createCrossplaneHelmRelease(claim.application.cluster, claim.service);
+                if (kubernetesClientService.getServiceInCluster(claim.application.cluster, claim.service.getProtocol(),
+                        claim.service.getPort()).isPresent()) {
+                    claim.service.cluster = claim.application.cluster;
                 }
+            } catch (ClusterConnectException ex) {
+                throw new InternalServerErrorException(
+                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
             }
+        }
 
-            // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
-            // generateUrlByClaimService(claim) will be null
-            if (claim.service != null) {
-                LOG.debugf("Service name: %s", claim.service.name == null ? "" : claim.service.name);
-                LOG.debugf("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
-                LOG.debugf("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
-                LOG.debugf("Service protocol: %s",
-                        claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
-            }
-
-            if (claim.service != null && claim.service.credentials != null && claim.application != null) {
-                try {
-                    bindApplicationService.bindApplication(claim);
-                } catch (ClusterConnectException e) {
-                    LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
-                }
+        // TODO: We must find the new service created (= name & namespace + port), otherwise the url returned by
+        if (claim.service != null) {
+            LOG.debugf("Service name: %s", claim.service.name == null ? "" : claim.service.name);
+            LOG.debugf("Service namespace: %s", claim.service.namespace == null ? "" : claim.service.namespace);
+            LOG.debugf("Service port: %s", claim.service.getPort() == null ? "" : claim.service.getPort());
+            LOG.debugf("Service protocol: %s", claim.service.getProtocol() == null ? "" : claim.service.getProtocol());
+        }
+        if (claim.service != null && claim.service.credentials != null && claim.application != null) {
+            try {
+                bindApplicationService.bindApplication(claim);
+            } catch (ClusterConnectException e) {
+                LOG.error("Could bind application because there was connection errors. Cause: " + e.getMessage());
             }
         }
     }
