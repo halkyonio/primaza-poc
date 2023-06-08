@@ -63,7 +63,17 @@ public final class TestUtils {
                 .as(Service.class);
     }
 
-    public static Claim createClaim(String claimName, String serviceRequested, Long applicationToBindId) {
+    public static Claim createClaim(String claimName, String serviceRequested) {
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", claimName)
+                .formParam("serviceRequested", serviceRequested).formParam("status", "new")
+                .formParam("description", "claim for testing purposes").when().post("/claims").then().statusCode(201);
+        return given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
+                .extract().as(Claim.class);
+
+    }
+
+    public static Claim createClaimWithApplication(String claimName, String serviceRequested,
+            Long applicationToBindId) {
         given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", claimName)
                 .formParam("serviceRequested", serviceRequested).formParam("status", "new")
                 .formParam("applicationId", applicationToBindId.toString())
