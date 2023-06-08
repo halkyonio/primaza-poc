@@ -33,7 +33,7 @@ public class ClaimsEndpointTest extends BaseTest {
     @Test
     public void testQueryUsingNameToGetClaims() {
         final String claimName = "testQueryUsingNameToGetClaims";
-        createClaim(claimName, "Postgresql-5509", 1L);
+        createClaim(claimName, "Postgresql-5509");
         given().queryParam("name", claimName).when().get("/claims/filter").then()
                 .body(containsString("<td>" + claimName + "</td>"));
     }
@@ -41,7 +41,7 @@ public class ClaimsEndpointTest extends BaseTest {
     @Test
     public void testQueryUsingServiceRequestedToGetClaims() {
         final String claimName = "testQueryUsingServiceRequestedToGetClaims";
-        createClaim(claimName, "Postgresql-5509", 1L);
+        createClaim(claimName, "Postgresql-5509");
         given().queryParam("servicerequested", "Postgresql-5509").when().get("/claims/filter").then()
                 .body(containsString("<td>" + claimName + "</td>"));
     }
@@ -66,7 +66,7 @@ public class ClaimsEndpointTest extends BaseTest {
     @Test
     public void testDeleteUnBoundClaim() {
         final String claimName = "testDeleteBoundClaim";
-        Claim claim = createClaim(claimName, "Postgresql-5509", 1L);
+        Claim claim = createClaim(claimName, "Postgresql-5509");
         given().contentType(MediaType.APPLICATION_JSON).get("/claims/name/" + claimName).then().statusCode(200)
                 .extract().as(Claim.class);
 
@@ -77,7 +77,7 @@ public class ClaimsEndpointTest extends BaseTest {
     @Test
     public void testDeleteClaim() {
         String prefix = "ClaimsEndpointTest-testDeleteClaim-";
-        Claim claim = createClaim(prefix + "claim", "Postgresql-5509", 1L);
+        Claim claim = createClaim(prefix + "claim", "Postgresql-5509");
 
         // When, we go to the claims page
         page.goTo("/claims");

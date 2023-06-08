@@ -2,6 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.TestUtils.createApplication;
 import static io.halkyon.utils.TestUtils.createClaim;
+import static io.halkyon.utils.TestUtils.createClaimWithApplication;
 import static io.halkyon.utils.TestUtils.createClusterWithServiceAvailable;
 import static io.halkyon.utils.TestUtils.createServiceWithCredential;
 import static io.restassured.RestAssured.given;
@@ -14,7 +15,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.model.Application;
@@ -33,12 +33,10 @@ public class ClaimServiceTest extends BaseTest {
     int maxAttempts;
 
     @Test
-    @Disabled
     public void testJobShouldMarkClaimAsErrorAfterMaxAttemptsExceeded() {
         pauseScheduler();
-        Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8",
-                1L);
-        Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5", 1L);
+        Claim postgresqlClaim = createClaim("Postgresql-ClaimingServiceJobTest", "postgresqlClaimingServiceJobTest-8");
+        Claim mySqlClaim = createClaim("MySQL-ClaimingServiceJobTest", "MySQLClaimingServiceJobTest-7.5");
         createClusterWithServiceAvailable("testJobShouldMarkClaimAsErrorCluster", "host:9999",
                 mockKubernetesClientService, "protocol", "9999");
         createServiceWithCredential("postgresqlClaimingServiceJobTest", "8", "postgresql", "protocol:9999");
@@ -117,7 +115,7 @@ public class ClaimServiceTest extends BaseTest {
                 "protocol:9999");
 
         Application application = createApplication("Postgresql-ClaimAndBindWhenServiceIsPresent-app", clusterName);
-        Claim postgresqlClaim = createClaim("Postgresql-ClaimAndBindWhenServiceIsPresentTestTest",
+        Claim postgresqlClaim = createClaimWithApplication("Postgresql-ClaimAndBindWhenServiceIsPresentTestTest",
                 "postgresqlClaimAndBindWhenServiceIsPresentTest-8", application.id);
         Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
@@ -131,7 +129,7 @@ public class ClaimServiceTest extends BaseTest {
     @Test
     public void testShouldClaimToErrorWhenMaxAttempts() {
         Claim postgresqlClaim = createClaim("Postgresql-ShouldClaimToErrorWhenMaxAttemptsTest",
-                "ShouldClaimToErrorWhenMaxAttemptsTest-8", 1L);
+                "ShouldClaimToErrorWhenMaxAttemptsTest-8");
         Claim actualPostgresql = given().contentType(MediaType.APPLICATION_JSON)
                 .get("/claims/name/" + postgresqlClaim.name).then().statusCode(200).extract().as(Claim.class);
 
