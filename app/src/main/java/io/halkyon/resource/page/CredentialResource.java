@@ -28,6 +28,7 @@ import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 import io.halkyon.resource.requests.CredentialRequest;
+import io.halkyon.services.CredentialService;
 import io.halkyon.utils.AcceptedResponseBuilder;
 import io.halkyon.utils.FilterableQueryBuilder;
 import io.halkyon.utils.StringUtils;
@@ -38,6 +39,9 @@ public class CredentialResource {
 
     @Inject
     Validator validator;
+
+    @Inject
+    CredentialService credentialService;
 
     @GET
     @Path("/new")
@@ -56,8 +60,8 @@ public class CredentialResource {
         if (!errors.isEmpty()) {
             response.withErrors(errors);
         } else {
-            Credential credential = new Credential();
-            doUpdateCredential(credential, request);
+            Credential credential = initializeCredential(request);
+            credentialService.doSave(credential);
             response.withSuccessMessage(credential.id);
         }
 
@@ -89,21 +93,17 @@ public class CredentialResource {
     @Path("/{id:[0-9]+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    @Transactional
     public Object edit(@PathParam("id") Long id, @Form CredentialRequest request) {
-        Credential credential = Credential.findById(id);
-        if (credential == null) {
-            throw new NotFoundException(String.format("Credential not found for id: %d%n", id));
-        }
-
         Set<ConstraintViolation<CredentialRequest>> errors = validator.validate(request);
-        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/credentials/" + credential.id);
+        AcceptedResponseBuilder response = AcceptedResponseBuilder.withLocation("/credentials/" + id);
 
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            doUpdateCredential(credential, request);
-            response.withUpdateSuccessMessage(credential.id);
+            Credential edited = initializeCredential(request);
+            edited.id = id;
+            credentialService.doSave(edited);
+            response.withUpdateSuccessMessage(id);
         }
 
         // Return as HTML the template rendering the item for HTMX
@@ -155,7 +155,8 @@ public class CredentialResource {
         return credential;
     }
 
-    private void doUpdateCredential(Credential credential, CredentialRequest request) {
+    private Credential initializeCredential(CredentialRequest request) {
+        Credential credential = new Credential();
         credential.name = request.name;
         credential.username = request.username;
         credential.password = request.password;
@@ -174,7 +175,6 @@ public class CredentialResource {
                 }
             }
         }
-
-        credential.persist();
+        return credential;
     }
 }
