@@ -1,5 +1,7 @@
 package io.halkyon.services;
 
+import io.halkyon.model.Service;
+import io.halkyon.resource.requests.CredentialRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -48,6 +50,29 @@ public class CredentialService {
         }
 
         return old;
+    }
+
+    public Credential initializeCredential(CredentialRequest request) {
+        Credential credential = new Credential();
+        credential.name = request.name;
+        credential.username = request.username;
+        credential.password = request.password;
+        credential.vaultKvPath = request.vaultKvPath;
+        credential.service = Service.findById(request.serviceId);
+        credential.params.clear();
+        if (request.params != null) {
+            for (String param : request.params) {
+                String[] nameValue = param.split(":");
+                if (nameValue.length == 2) {
+                    CredentialParameter paramEntity = new CredentialParameter();
+                    paramEntity.credential = credential;
+                    paramEntity.paramName = nameValue[0];
+                    paramEntity.paramValue = nameValue[1];
+                    credential.params.add(paramEntity);
+                }
+            }
+        }
+        return credential;
     }
 
 }

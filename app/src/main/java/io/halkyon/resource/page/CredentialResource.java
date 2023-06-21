@@ -60,7 +60,7 @@ public class CredentialResource {
         if (!errors.isEmpty()) {
             response.withErrors(errors);
         } else {
-            Credential credential = initializeCredential(request);
+            Credential credential = credentialService.initializeCredential(request);
             credentialService.doSave(credential);
             response.withSuccessMessage(credential.id);
         }
@@ -100,7 +100,7 @@ public class CredentialResource {
         if (errors.size() > 0) {
             response.withErrors(errors);
         } else {
-            Credential edited = initializeCredential(request);
+            Credential edited = credentialService.initializeCredential(request);
             edited.id = id;
             credentialService.doSave(edited);
             response.withUpdateSuccessMessage(id);
@@ -155,26 +155,5 @@ public class CredentialResource {
         return credential;
     }
 
-    private Credential initializeCredential(CredentialRequest request) {
-        Credential credential = new Credential();
-        credential.name = request.name;
-        credential.username = request.username;
-        credential.password = request.password;
-        credential.vaultKvPath = request.vaultKvPath;
-        credential.service = Service.findById(request.serviceId);
-        credential.params.clear();
-        if (request.params != null) {
-            for (String param : request.params) {
-                String[] nameValue = param.split(":");
-                if (nameValue.length == 2) {
-                    CredentialParameter paramEntity = new CredentialParameter();
-                    paramEntity.credential = credential;
-                    paramEntity.paramName = nameValue[0];
-                    paramEntity.paramValue = nameValue[1];
-                    credential.params.add(paramEntity);
-                }
-            }
-        }
-        return credential;
-    }
+
 }
