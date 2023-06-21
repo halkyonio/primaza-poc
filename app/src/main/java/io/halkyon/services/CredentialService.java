@@ -1,7 +1,5 @@
 package io.halkyon.services;
 
-import io.halkyon.model.Service;
-import io.halkyon.resource.requests.CredentialRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -10,6 +8,8 @@ import org.jboss.logging.Logger;
 
 import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
+import io.halkyon.model.Service;
+import io.halkyon.resource.requests.CredentialRequest;
 
 @ApplicationScoped
 public class CredentialService {

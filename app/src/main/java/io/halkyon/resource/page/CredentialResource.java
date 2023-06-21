@@ -25,7 +25,6 @@ import org.jboss.resteasy.annotations.Form;
 
 import io.halkyon.Templates;
 import io.halkyon.model.Credential;
-import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 import io.halkyon.resource.requests.CredentialRequest;
 import io.halkyon.services.CredentialService;
@@ -154,6 +153,5 @@ public class CredentialResource {
         }
         return credential;
     }
-
 
 }
