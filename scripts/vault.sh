@@ -46,8 +46,10 @@ function vaultExec() {
   kubectl exec vault-0 -n ${VAULT_NAMESPACE} -- sh -c "${COMMAND}" 2> /dev/null
 }
 
-function install() {
-  log BLUE "Installing Vault Helm"
+function deploy() {
+  log BLUE "Installing Vault repository and Helm chart"
+  cmdExec "helm repo add hashicorp https://helm.releases.hashicorp.com"
+
   cat <<EOF > ${TMP_DIR}/my-values.yml
 server:
   image:
@@ -65,7 +67,7 @@ ui:
   enabled: true
   serviceType: "ClusterIP"
 EOF
-  helm install vault hashicorp/vault --create-namespace -n ${VAULT_NAMESPACE} -f ${TMP_DIR}/my-values.yml
+  cmdExec "helm install vault hashicorp/vault --create-namespace -n ${VAULT_NAMESPACE} -f ${TMP_DIR}/my-values.yml"
 
   while [[ $(kubectl get pod/vault-0 -n vault -ojson | jq -r 'if .status.phase == "Running" then "true" else "false" end') != "true" ]]; do
      echo "Still waiting for vault pod to be ready"
@@ -214,6 +216,25 @@ function putHelloKey() {
   vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 }
 
+function putKey() {
+    if [ -v 1 ]; then
+      # primaza
+      KV_APP_NAME=$1
+    fi
+    if [ -v 2 ]; then
+      # fruits
+      KV_KEY=$2
+    fi
+    if [ -v 3 ]; then
+      # username=healthy password=healthy database=fruits_database
+      KV_ENTRIES=$3
+    fi
+
+    loginAsUser
+    log BLUE "Executing: vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/${KV_KEY} ${KV_ENTRIES}"
+    vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/${KV_KEY} ${KV_ENTRIES}"
+}
+
 function logRootToken() {
   log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
   log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
@@ -222,21 +243,23 @@ function logRootToken() {
 
 case $1 in
     -h) usage; exit;;
-    install) "$@"; exit;;
+    deploy) "$@"; exit;;
     remove) "$@"; exit;;
     unseal) "$@"; exit;;
     enableKV1SecretEngine) "$@"; exit;;
     enableKV2SecretEngine) "$@"; exit;;
     enableK8sSecretEngine) "$@"; exit;;
     login) "$@"; exit;;
+    logRootToken) logRootToken; exit;;
     rootToken) "$@"; exit;;
     enableUserPasswordAuth) "$@"; exit;;
     createUserPolicy) "$@"; exit;;
     registerUser) "$@"; exit;;
     loginAsUser) "$@"; exit;;
+    putKey) "$@"; exit;;
     vaultExec) "$@"; exit;;
     *)
-      install
+      deploy
       unseal
       login
       enableKV2SecretEngine

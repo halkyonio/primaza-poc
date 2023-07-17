@@ -5,38 +5,86 @@
 # ./scripts/data/cluster.sh
 #
 # To use a different context
-# CONTEXT_TO_USE=my-ctx ./scripts/data/cluster.sh
+# KUBE_CONTEXT=my-ctx ./scripts/data/cluster.sh
 #
 # To create the cluster record on a Primaza server which is not localhost:8080
 # PRIMAZA_URL=myprimaza:8080 ./scripts/data/cluster.sh
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/../common.sh
-source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
 export TYPE_SPEED=400
 NO_WAIT=true
 
-# Script parameters
-NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault}
-PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
-CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind-kind}
-KIND_URL=${KIND_URL:-$(pwd)/scripts/data/cluster.sh }
+# Default parameter values
+DEFAULT_PRIMAZA_URL="localhost:8080"
+DEFAULT_NS_TO_EXCLUDE="default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault"
+DEFAULT_KUBE_CONTEXT="kind"
+DEFAULT_KIND_URL="https://kubernetes.default.svc"
+DEFAULT_ENVIRONMENT="DEV"
 
-p "Primaza server: ${PRIMAZA_URL}"
-p "Kubernetes API server: ${KIND_URL}"
+# Function to parse named parameters
+parse_parameters() {
+  for arg in "$@"; do
+    case $arg in
+      url=*)
+        PRIMAZA_URL="${arg#*=}"
+        ;;
+      ns_to_exclude=*)
+        NS_TO_EXCLUDE="${arg#*=}"
+        ;;
+      kube_context=*)
+        KUBE_CONTEXT="${arg#*=}"
+        ;;
+      kind_url=*)
+        KIND_URL="${arg#*=}"
+        ;;
+      environment=*)
+        ENVIRONMENT="${arg#*=}"
+        ;;
+      *)
+        # Handle any other unrecognized parameters
+        echo "Unrecognized parameter: $arg"
+        exit 1
+        ;;
+    esac
+  done
+}
 
-CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
-p "Creating a Primaza DEV cluster for local kind usage ..."
-p "curl -X POST -H 'Content-Type: multipart/form-data' ${PRIMAZA_URL}/clusters -s -i -F excludedNamespaces=${NS_TO_BE_EXCLUDED} -F name=${CONTEXT_TO_USE} -F environment=DEV -F url=${KIND_URL} -F kubeConfig=\"NOT_SHOW\" -o /dev/null"
+# Parse the named parameters with defaults
+parse_parameters "$@"
 
-curl -X POST -H 'Content-Type: multipart/form-data' \
-  -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
-  -F name=${CONTEXT_TO_USE}\
+PRIMAZA_URL=${PRIMAZA_URL:-$DEFAULT_PRIMAZA_URL}
+NS_TO_EXCLUDE=${NS_TO_EXCLUDE:-$DEFAULT_NS_TO_EXCLUDE}
+KUBE_CONTEXT=${KUBE_CONTEXT:-$DEFAULT_KUBE_CONTEXT}
+KIND_URL=${KIND_URL:-$DEFAULT_KIND_URL}
+ENVIRONMENT=${ENVIRONMENT:-$DEFAULT_ENVIRONMENT}
+
+note "Getting the kube config using context name: $KUBE_CONTEXT"
+CFG=$(kind get kubeconfig --name ${KUBE_CONTEXT})
+
+note "curl -s -k -o response.txt -w '%{http_code}'\
+        -X POST -H 'Content-Type: multipart/form-data' \
+        -F excludedNamespaces=${NS_TO_EXCLUDE}\
+        -F name=${KUBE_CONTEXT}\
+        -F environment=DEV\
+        -F url=${KIND_URL}\
+        -F kubeConfig=${CFG}\
+        -i ${PRIMAZA_URL}/clusters" >&2
+
+RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
+  -X POST -H 'Content-Type: multipart/form-data' \
+  -F excludedNamespaces=${NS_TO_EXCLUDE}\
+  -F name=${KUBE_CONTEXT}\
   -F environment=DEV\
   -F url=${KIND_URL}\
   -F kubeConfig="${CFG}"\
-  -s -i ${PRIMAZA_URL}/clusters
+  -i ${PRIMAZA_URL}/clusters)
+
+log_http_response "Cluster failed to be saved in Primaza: %s" "Cluster installed in Primaza: %s" "$RESPONSE"
+
+#POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
+#k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
+#k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
