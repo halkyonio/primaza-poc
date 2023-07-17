@@ -4,7 +4,7 @@
     <a href="https://github.com/halkyonio/primaza-poc/pulse" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/halkyonio/primaza-poc"/></a>
     <a href="https://github.com/halkyonio/primaza-poc/actions/workflows/push.yml" alt="Build Status">
-        <img src="https://github.com/halkyonio/primaza-poc/actions/workflows/push.yaml/badge.svg"></a>
+        <img src="https://github.com/halkyonio/primaza-poc/actions/workflows/push.yml/badge.svg"></a>
 </p>
 
 Table of Contents
