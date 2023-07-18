@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Checkout, jdk installation and maven build
-    uses: ./.github/workflows/common.yml@main
+    uses: ./.github/workflows/common.yml
 
   verify-in-kubernetes:
     name: Verify in Kubernetes
