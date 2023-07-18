@@ -7,21 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: build with jdk 17
-
+    name: Checkout, jdk installation and maven build
     steps:
-      - uses: actions/checkout@v3
-        name: checkout
-
-      - uses: actions/setup-java@v3
-        name: set up jdk 17
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
-
-      - name: build with maven
-        run: mvn clean install -Pvalidate-format
+      - uses: ./.github/workflows/jdk-maven-build.yml
 
   verify-in-kubernetes:
     name: Verify in Kubernetes
