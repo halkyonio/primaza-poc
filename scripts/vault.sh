@@ -208,6 +208,18 @@ function registerUser() {
   vaultExec "vault write auth/userpass/users/${VAULT_USER} password=${VAULT_PASSWORD} policies=${VAULT_POLICY_NAME}"
 }
 
+function putHelloKey() {
+  loginAsUser
+  log BLUE "Executing: vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
+  vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
+}
+
+function logRootToken() {
+  log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
+  log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
+  log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n ${VAULT_NAMESPACE} tokens -ojson | jq -r '.data.root_token' | base64 -d\""
+}
+
 case $1 in
     -h) usage; exit;;
     install) "$@"; exit;;
@@ -223,28 +235,16 @@ case $1 in
     registerUser) "$@"; exit;;
     loginAsUser) "$@"; exit;;
     vaultExec) "$@"; exit;;
+    *)
+      install
+      unseal
+      login
+      enableKV2SecretEngine
+      enableK8sSecretEngine
+      enableUserPasswordAuth
+      createTokensKubernetesSecret
+      createUserPolicy
+      registerUser
+      logRootToken
+      exit;;
 esac
-
-install
-unseal
-login
-#enableKV1SecretEngine
-enableKV2SecretEngine
-enableK8sSecretEngine
-enableUserPasswordAuth
-createTokensKubernetesSecret
-createUserPolicy
-registerUser
-loginAsUser
-
-# As we don't install KV v1, we will not create a key
-# log BLUE "Put the key hello = world at the mounted path: ${KV1_PREFIX}/${KV_APP_NAME}"
-#vaultExec "vault kv put ${KV1_PREFIX}/${KV_APP_NAME}/hello target=world"
-
-log BLUE "Executing: vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
-vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
-
-log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
-log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
-
-log YELLOW "Vault Root Token can be found from the kubernetes secret: \"kubectl get secret -n ${VAULT_NAMESPACE} tokens -ojson | jq -r '.data.root_token' | base64 -d\""
