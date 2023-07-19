@@ -10,7 +10,8 @@ jobs:
     strategy:
       matrix:
         java-version: [ 17 ]
-    uses: ./.github/workflows/checkout-maven-build.yml
+    steps:
+      - uses: ./.github/workflows/checkout-maven-build.yml
     with:
       java-version: ${{ matrix.java-version }}
       repository: ${{ github.event.pull_request.head.repo.full_name }}
