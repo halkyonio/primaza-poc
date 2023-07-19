@@ -14,7 +14,7 @@ NAMESPACE=primaza
 PROJECT_DIR=app
 
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
-GIT_SHA_COMMIT=${GIT_SHA_COMMIT:-$(git rev-parse --short HEAD)}
+GITHUB_SHA_COMMIT=${GITHUB_SHA_COMMIT:-$(git rev-parse --short HEAD)}
 
 # Parameters to be used when we build and push to a local container registry
 REGISTRY_GROUP=local
@@ -26,7 +26,7 @@ INGRESS_HOST=primaza.${VM_IP}.nip.io
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
 PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
-PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GIT_SHA_COMMIT}}
+PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GITHUB_SHA_COMMIT}}
 
 NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault}
 
@@ -54,7 +54,7 @@ function primazaUsage() {
 }
 
 function build() {
-  pushd ${PROJECT_DIR}
+  #pushd ${PROJECT_DIR}
   pe "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
@@ -63,11 +63,11 @@ function build() {
      -Dquarkus.container-image.insecure=true \
      -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
      -Dlog.level=INFO \
-     -Dgit.sha.commit=${GIT_SHA_COMMIT} \
+     -Dgit.sha.commit=${GITHUB_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
   #pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
-  popd
+  #popd
 }
 
 function deploy() {
@@ -86,7 +86,7 @@ function deploy() {
       -n ${NAMESPACE} \
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       --set app.host=${INGRESS_HOST} \
-      --set app.envs.git.sha.commit=${GIT_SHA_COMMIT} \
+      --set app.envs.git.sha.commit=${GITHUB_SHA_COMMIT} \
       --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO} \
       ${ENVARGS} \
       2>&1 1>/dev/null"
