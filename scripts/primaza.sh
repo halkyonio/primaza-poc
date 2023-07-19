@@ -55,7 +55,7 @@ function primazaUsage() {
 
 function build() {
   #pushd ${PROJECT_DIR}
-  pe "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
+  mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
      -Dquarkus.container-image.group=${REGISTRY_GROUP} \
@@ -64,7 +64,7 @@ function build() {
      -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
      -Dlog.level=INFO \
      -Dgit.sha.commit=${GITHUB_SHA_COMMIT} \
-     -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
+     -Dgithub.repo=${PRIMAZA_GITHUB_REPO}
 
   #pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
   #popd
