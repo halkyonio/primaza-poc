@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'scripts/**' # Ignores bash scripts
+      - '**/*.md' # Ignores all .md files
 
 jobs:
   build:
