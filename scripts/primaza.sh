@@ -55,6 +55,7 @@ function primazaUsage() {
 
 function build() {
   #pushd ${PROJECT_DIR}
+  #
   mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
