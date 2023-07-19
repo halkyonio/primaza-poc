@@ -5,7 +5,8 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'scripts/**' # Ignores bash scripts
-      - '**/*.md' # Ignores all .md files
+      - '*.md'          # Ignores .md files at the root of the repository
+      - '**/*.md'       # Ignores .md files within subdirectories
 
 jobs:
   build:
