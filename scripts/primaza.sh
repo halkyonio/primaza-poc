@@ -171,8 +171,8 @@ case $1 in
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; exit;;
     remove)       "$@"; exit;;
-    *)            primazaUsage; exit;;
+    *)
+      build
+      localdeploy
+      exit;;
 esac
-
-remove
-deploy
