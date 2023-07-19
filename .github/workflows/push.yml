@@ -8,8 +8,8 @@ on:
 jobs:
   build:
     name: Checkout, jdk installation and maven build
-    uses: ./.github/workflows/common.yml#build_job
-    #steps: *build_job
+    steps:
+      - uses: ./.github/workflows/common.yml#build_job
 
   verify-in-kubernetes:
     name: Verify in Kubernetes
