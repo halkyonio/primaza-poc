@@ -1,4 +1,4 @@
-name: Checkout, jdk installation and maven build
+name: Common steps workflow
 
 on:
   workflow_call:
@@ -11,7 +11,6 @@ jobs:
         java: [
           { 'version': '17', 'opts': '' }
         ]
-    name: build with jdk ${{matrix.java.version}}
 
     steps:
       - uses: actions/checkout@v3
