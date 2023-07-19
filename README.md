@@ -27,9 +27,9 @@ Modern runtime applications designed to be `Cloud Native` must also been able to
 running on physical or virtual machines.
 
 To access a system, it is needed to configure different resources (e.g. Datasource) and to declare different parameters (e.g jdbc url, username, password, database name) using
-`application.properties` able to configure the connection with by example a SQL database.
+by example for Spring Boot or Quarkus runtimes such a configuration config file: `application.properties` able to configure the connection with a SQL database.
 
-To avoid to hard code such parameters, we use mostly a kubernetes secret and pass the needed information as a list of key/value pairs
+To avoid to hard code such parameters, we use mostly a kubernetes secret and pass the needed information as a list of key/value pairs.
 
 ```text
 type: postgresql
