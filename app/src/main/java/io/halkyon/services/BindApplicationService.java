@@ -75,6 +75,7 @@ public class BindApplicationService {
     }
 
     private Map<String, String> createSecret(String type, Credential credential, String url) {
+        LOG.debugf("Creating secret of type %s, for credential %s and url %s", type, credential.name, url);
         Map<String, String> secretData = new HashMap<>();
         secretData.put(TYPE_KEY, toBase64(type));
         secretData.put(HOST_KEY, toBase64(getHostFromUrl(url)));
@@ -94,6 +95,7 @@ public class BindApplicationService {
         }
 
         if (StringUtils.isNotEmpty(credential.vaultKvPath)) {
+            LOG.debugf("Reading vault secret from %S", credential.vaultKvPath);
             Map<String, String> vaultSecret = kvSecretEngine.readSecret(credential.vaultKvPath);
             Set<String> vaultSet = vaultSecret.keySet();
             for (String key : vaultSet) {

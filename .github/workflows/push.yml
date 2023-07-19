@@ -70,7 +70,7 @@ jobs:
 
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
-        run: .github/print_PRIMAZA_logs.sh
+        run: .github/print_primaza_logs.sh
 
   verify-e2e-example-in-kubernetes:
     name: Verify Super Hero workshop in Kubernetes
@@ -182,7 +182,7 @@ jobs:
 
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
-        run: .github/print_PRIMAZA_logs.sh
+        run: .github/print_primaza_logs.sh
 
       - name: (Only if it failed) Log Rest Heroes traces at failures
         if: failure()
