@@ -1,8 +1,5 @@
 name: Common steps workflow
 
-on:
-  workflow_call:
-
 jobs:
   build_job:
     runs-on: ubuntu-latest
