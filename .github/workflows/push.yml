@@ -11,7 +11,7 @@ jobs:
     name: Checkout, jdk installation and maven build
     #steps:
     #  - uses: ./.github/workflows/common.yml
-    uses: ./.github/workflows/common.yml
+    uses: ./.github/workflows/common.yml#build_job
     #steps: *build_job
 
   verify-in-kubernetes:
