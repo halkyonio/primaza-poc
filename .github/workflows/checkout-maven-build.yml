@@ -1,0 +1,33 @@
+name: Common steps workflow
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: string
+        required: true
+      branch:
+        type: string
+        default: 'main'
+      repository:
+        type: string
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
+          repository: ${{ inputs.repository }}
+
+      - uses: actions/setup-java@v3
+        name: set up jdk ${{matrix.java.version}}
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+
+      - name: build with maven
+        run: mvn clean install -Pvalidate-format
