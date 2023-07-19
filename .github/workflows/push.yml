@@ -7,10 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     name: Checkout, jdk installation and maven build
-    #steps:
-    #  - uses: ./.github/workflows/common.yml
     uses: ./.github/workflows/common.yml#build_job
     #steps: *build_job
 
