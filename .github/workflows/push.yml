@@ -1,7 +1,7 @@
 name: Primaza Push Build
 
 on:
-  #workflow_dispatch:
+  workflow_dispatch:
   push:
     branches: [ main ]
 
@@ -10,8 +10,7 @@ jobs:
     strategy:
       matrix:
         java-version: [ 17 ]
-    steps:
-      - uses: ./.github/workflows/checkout-maven-build.yml
+    uses: ./.github/workflows/checkout-maven-build.yml
     with:
       java-version: ${{ matrix.java-version }}
       repository: ${{ github.event.pull_request.head.repo.full_name }}
