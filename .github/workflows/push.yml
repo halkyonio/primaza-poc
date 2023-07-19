@@ -9,7 +9,7 @@ jobs:
   build:
     name: Checkout, jdk installation and maven build
     steps:
-      - uses: ./.github/workflows/common.yml#build_job
+      - uses: ./.github/actions/checkout_install-jdk_compile
 
   verify-in-kubernetes:
     name: Verify in Kubernetes
