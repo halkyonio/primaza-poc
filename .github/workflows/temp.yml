@@ -9,6 +9,9 @@ on:
       - '*.md'          # Ignores .md files at the root of the repository
       - '**/*.md'       # Ignores .md files within subdirectories
 
+env:
+  CONTEXT: "no-tty"
+
 jobs:
   setup-k8s-platform:
     runs-on: ubuntu-latest
@@ -18,7 +21,6 @@ jobs:
     env:
       PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       GITHUB_SHA_COMMIT: ${{ github.sha }}
-      CONTEXT: "no-tty"
     steps:
       - uses: actions/checkout@v3
       #- name: Set up JDK 17
@@ -35,5 +37,4 @@ jobs:
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh
-          
           #bash ./scripts/primaza.sh localdeploy
