@@ -147,7 +147,7 @@ function localDeploy() {
     note "Primaza application is alive :-)"
 }
 
-function loadData() {
+function loaddata() {
    note "Creating the cluster's record"
    #RESPONSE=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
    RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
@@ -179,11 +179,11 @@ case $1 in
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; exit;;
-    loadData)     loadData; exit;;
+    loaddata)     loaddata; exit;;
     remove)       "$@"; exit;;
     *)
       build
       localdeploy
-      loadData
+      loaddata
       exit;;
 esac
