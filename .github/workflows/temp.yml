@@ -37,6 +37,9 @@ jobs:
           script: |
             echo "Installing pv tool"
             sudo apt-get install pv
+            SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
+            source ${SCRIPTS_DIR}/common.sh
+            source ${SCRIPTS_DIR}/play-demo.sh
             pe "mvn -version"
             #bash ./scripts/primaza.sh build
             #bash ./scripts/primaza.sh localdeploy
