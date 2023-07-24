@@ -34,7 +34,7 @@ jobs:
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           CONTEXT="no-tty"
-          CMD="ls -la"
+          CMD="mvn -v"
           function execCmd() {
             if [ "$CONTEXT" = "no-tty" ]; then
               echo "Command to be executed: $1"
