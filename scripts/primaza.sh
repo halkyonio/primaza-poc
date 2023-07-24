@@ -154,14 +154,12 @@ function loaddata() {
 
    # Extract the HTTP status code and response code from the response
    http_status_code="${RESPONSE%%:*}"
-   response_code="${RESPONSE##*:}"
 
    # Check if the HTTP status code indicates an error (e.g., 500)
-   if [ "$http_status_code" -eq 200 ]; then
-     note "Local k8s cluster registered: $response_code"
+   if [ "$http_status_code" -eq 201 ]; then
+     note "Local k8s cluster registered !"
    else
      note "Curl request failed with HTTP Status Code: $http_status_code"
-     note "Error Message: $response_code"
 
      k describe $POD_NAME -n ${NAMESPACE}
      k logs $POD_NAME -n ${NAMESPACE}

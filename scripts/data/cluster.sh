@@ -25,22 +25,25 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
 KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
 
-note "Primaza server: ${PRIMAZA_URL}"
-note "Kubernetes API server: ${KIND_URL}"
-
-note "Get the kubeconf and creating a primaza's cluster record"
-
 #cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
 #cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 #CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 CFG=$(kind get kubeconfig --name ${CONTEXT_TO_USE})
 
-note "Creating a Primaza DEV cluster for local kind usage ..."
+warn "curl -sS -o /dev/null -w '%{http_code}'\
+        -X POST -H 'Content-Type: multipart/form-data' \
+        -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
+        -F name=${CONTEXT_TO_USE}\
+        -F environment=DEV\
+        -F url=${KIND_URL}\
+        -F kubeConfig=${CFG}\
+        -i ${PRIMAZA_URL}/clusters" >&2
 
-cmdExec "curl -v -X POST -H 'Content-Type: multipart/form-data' \
+curl -sS -o /dev/null -w '%{http_code}'\
+  -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\
-  -F kubeConfig=\"${CFG}\"\
-  -s -i ${PRIMAZA_URL}/clusters"
+  -F kubeConfig="${CFG}"\
+  -i ${PRIMAZA_URL}/clusters
