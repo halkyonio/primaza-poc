@@ -37,5 +37,6 @@ jobs:
           script: |
             echo "Installing pv tool"
             sudo apt-get install pv
-            bash ./scripts/primaza.sh build
+            pe "mvn -version"
+            #bash ./scripts/primaza.sh build
             #bash ./scripts/primaza.sh localdeploy
