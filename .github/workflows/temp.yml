@@ -21,6 +21,7 @@ jobs:
         java-version: [ 17 ]
     env:
       PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
       GITHUB_SHA_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v3
