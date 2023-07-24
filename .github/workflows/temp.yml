@@ -20,29 +20,30 @@ jobs:
       GITHUB_SHA_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
-          cache: 'maven'
-      - name: Kubernetes KinD Cluster
-        uses: container-tools/kind-action@v2
-        with:
-          version: v0.11.1
-          registry: true
+      #- name: Set up JDK 17
+      #  uses: actions/setup-java@v3
+      #  with:
+      #    distribution: 'temurin'
+      #    java-version: ${{ matrix.java-version }}
+      #    cache: 'maven'
+      #- name: Kubernetes KinD Cluster
+      #  uses: container-tools/kind-action@v2
+      #  with:
+      #    version: v0.11.1
+      #    registry: true
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           CONTEXT="no-tty"
           CMD="mvn -version"
           function execCmd() {
             if [ "$CONTEXT" = "no-tty" ]; then
-              echo $CMD
-              eval $CMD
+              echo $1
+              eval $1
             else
-              pe $CMD
+              pe $1
             fi
           }
           
+          execCmd $CMD
           #bash ./scripts/primaza.sh build
           #bash ./scripts/primaza.sh localdeploy
