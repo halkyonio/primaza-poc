@@ -104,7 +104,8 @@ function deploy() {
     note "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
     set -x
-    cmdExec "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
+    cmxExec "kind --version"
+    cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
