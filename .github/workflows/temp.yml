@@ -42,6 +42,11 @@ jobs:
       - name: Deploy primaza helm chart
         run: |
           bash ./scripts/primaza.sh localdeploy
+      - name: Check pod, services, etc
+        run: |
+          kubectl get pods -A
+          kubectl get svc -A
+          kubectl get ingress -A
       - name: Load the data such as cluster, services, credentials & claims
         run: |
           bash ./scripts/primaza.sh loaddata
