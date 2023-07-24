@@ -22,7 +22,7 @@ jobs:
     env:
       PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
-      PRIMAZA_URL: primaza-app.primaza.svc.cluster.local
+      PRIMAZA_URL: primaza-app.primaza.svc.cluster.local:80
       GITHUB_SHA_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v3
