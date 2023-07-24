@@ -53,6 +53,10 @@ function primazaUsage() {
   fmt ""
 }
 
+function dummy() {
+  cmdExec "mvn -v"
+}
+
 function build() {
   #pushd ${PROJECT_DIR}
   pe "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
@@ -172,6 +176,7 @@ case $1 in
     localdeploy)  localDeploy; exit;;
     remove)       "$@"; exit;;
     *)
+      dummy
       build
       localdeploy
       exit;;

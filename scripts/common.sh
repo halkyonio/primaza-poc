@@ -63,3 +63,15 @@ log() {
   MSG="${@:2}"
   echo; repeat_char ${1} '#'; msg ${1} ${MSG}; repeat_char ${1} '#'; echo
 }
+
+function cmdExec() {
+  COMMAND=${1}
+  if [ "$CONTEXT" = "no-tty" ]; then
+    set -x
+    eval "${COMMAND}"
+    exit 0
+    set +x
+  else
+    pe "$1"
+  fi
+}

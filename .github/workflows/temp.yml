@@ -18,6 +18,7 @@ jobs:
     env:
       PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       GITHUB_SHA_COMMIT: ${{ github.sha }}
+      CONTEXT: "no-tty"
     steps:
       - uses: actions/checkout@v3
       #- name: Set up JDK 17
@@ -33,18 +34,6 @@ jobs:
       #    registry: true
       - name: Build primaza, generate image, Helm chart and push image
         run: |
-          CONTEXT="no-tty"
-          CMD="mvn -v"
-          function execCmd() {
-            if [ "$CONTEXT" = "no-tty" ]; then
-              set -x
-              eval "$1"
-              set +x
-            else
-              pe "$1"
-            fi
-          }
+          bash ./scripts/primaza.sh
           
-          execCmd "$CMD"
-          #bash ./scripts/primaza.sh build
           #bash ./scripts/primaza.sh localdeploy
