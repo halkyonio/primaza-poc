@@ -11,7 +11,6 @@
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
 source ${SCRIPTS_DIR}/../common.sh
-source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
 export TYPE_SPEED=400
@@ -21,7 +20,7 @@ NO_WAIT=true
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 INSTALLABLE=${INSTALLABLE-off}
 
-p "Primaza server: ${PRIMAZA_URL}"
+note "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
   "name=postgresql&version=14.5&type=postgresql&endpoint=tcp:5432&installable=$INSTALLABLE&helmRepo=https://charts.bitnami.com/bitnami&helmChart=postgresql&helmChartVersion=11.9.13"

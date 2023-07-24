@@ -11,7 +11,6 @@
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
 source ${SCRIPTS_DIR}/../common.sh
-source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
 export TYPE_SPEED=400
@@ -21,7 +20,7 @@ NO_WAIT=true
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 SERVICE_ID=${SERVICE_ID:-1}
 
-p "Primaza server: ${PRIMAZA_URL}"
+note "Primaza server: ${PRIMAZA_URL}"
 
 declare -a arr=(
   "name=fruits_database-vault-creds&serviceId=$SERVICE_ID&vaultKvPath=primaza/fruits"
