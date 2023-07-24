@@ -148,20 +148,26 @@ function localDeploy() {
 }
 
 function loadData() {
-   note "Get the kubeconf and creating a primaza's cluster record"
-   cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-   cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
-
    note "Creating the cluster's record"
-   RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
-   if [ "$RESULT" = *"500 Internal Server Error"* ]
-   then
-       note "Cluster failed to be saved in Primaza: $RESULT"
-       k describe $POD_NAME -n ${NAMESPACE}
-       k logs $POD_NAME -n ${NAMESPACE}
-       exit 1
+   #RESPONSE=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+   RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
+
+   # Extract the HTTP status code and response code from the response
+   http_status_code="${RESPONSE%%:*}"
+   response_code="${RESPONSE##*:}"
+
+   # Check if the HTTP status code indicates an error (e.g., 500)
+   if [ "$http_status_code" -eq 200 ]; then
+     note "Local k8s cluster registered: $response_code"
+   else
+     note "Curl request failed with HTTP Status Code: $http_status_code"
+     note "Error Message: $response_code"
+
+     k describe $POD_NAME -n ${NAMESPACE}
+     k logs $POD_NAME -n ${NAMESPACE}
+
+     exit 1
    fi
-   note "Local k8s cluster registered: $RESULT"
 }
 
 function remove() {

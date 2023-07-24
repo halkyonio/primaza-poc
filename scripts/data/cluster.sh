@@ -28,7 +28,12 @@ KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
 note "Primaza server: ${PRIMAZA_URL}"
 note "Kubernetes API server: ${KIND_URL}"
 
+note "Get the kubeconf and creating a primaza's cluster record"
+
+#cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
+#cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
+
 note "Creating a Primaza DEV cluster for local kind usage ..."
 
 cmdExec "curl -X POST -H 'Content-Type: multipart/form-data' \
