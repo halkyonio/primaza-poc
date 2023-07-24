@@ -37,13 +37,13 @@ jobs:
           CMD="ls -la"
           function execCmd() {
             if [ "$CONTEXT" = "no-tty" ]; then
-              echo $1
-              $1
+              echo "Command to be executed: $1"
+              eval "$1"
             else
-              pe $1
+              pe "$1"
             fi
           }
           
-          execCmd $CMD
+          execCmd "$CMD"
           #bash ./scripts/primaza.sh build
           #bash ./scripts/primaza.sh localdeploy
