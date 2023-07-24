@@ -23,19 +23,18 @@ NO_WAIT=true
 NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault}
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
-KIND_URL=${KIND_URL:-$(pwd)/scripts/data/cluster.sh }
+KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
 
 note "Primaza server: ${PRIMAZA_URL}"
 note "Kubernetes API server: ${KIND_URL}"
 
 CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 note "Creating a Primaza DEV cluster for local kind usage ..."
-note "curl -X POST -H 'Content-Type: multipart/form-data' ${PRIMAZA_URL}/clusters -s -i -F excludedNamespaces=${NS_TO_BE_EXCLUDED} -F name=${CONTEXT_TO_USE} -F environment=DEV -F url=${KIND_URL} -F kubeConfig=\"NOT_SHOW\" -o /dev/null"
 
-curl -X POST -H 'Content-Type: multipart/form-data' \
+cmdExec "curl -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\
-  -F kubeConfig="${CFG}"\
-  -s -i ${PRIMAZA_URL}/clusters
+  -F kubeConfig=${CFG}\
+  -s -i ${PRIMAZA_URL}/clusters"
