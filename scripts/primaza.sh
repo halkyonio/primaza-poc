@@ -3,7 +3,6 @@
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 
 source ${SCRIPTS_DIR}/common.sh
-source ${SCRIPTS_DIR}/play-demo.sh
 
 ####################################
 ## Variables
