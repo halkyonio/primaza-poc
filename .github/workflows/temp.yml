@@ -14,7 +14,7 @@ env:
   CONTEXT: "no-tty"
 
 jobs:
-  setup-k8s-platform:
+  setup-primaza-k8s-platform:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -44,3 +44,6 @@ jobs:
       - name: Load the data such as cluster, services, credentials & claims
         run: |
           bash ./scripts/primaza.sh loaddata
+      - name: Installing vault
+        run: |
+          bash ./scripts/vault.sh
