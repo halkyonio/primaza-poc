@@ -52,13 +52,9 @@ function primazaUsage() {
   fmt ""
 }
 
-function dummy() {
-  cmdExec "mvn -v"
-}
-
 function build() {
   #pushd ${PROJECT_DIR}
-  pe "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
+  cmdExec "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
      -Dquarkus.container-image.group=${REGISTRY_GROUP} \
@@ -69,7 +65,7 @@ function build() {
      -Dgit.sha.commit=${GITHUB_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
 
-  #pe "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
+  #cmdExec "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
   #popd
 }
 
@@ -79,9 +75,9 @@ function deploy() {
     if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
     if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
 
-    pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
-    pe "k config set-context --current --namespace=${NAMESPACE}"
-    pe "helm install \
+    cmdExec "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
+    cmdExec "k config set-context --current --namespace=${NAMESPACE}"
+    cmdExec "helm install \
       --devel \
       --repo ${HALKYONIO_HELM_REPO} \
       primaza-app \
@@ -94,7 +90,7 @@ function deploy() {
       ${ENVARGS} \
       2>&1 1>/dev/null"
 
-    pe "k wait -n ${NAMESPACE} \
+    cmdExec "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
       -l app.kubernetes.io/name=primaza-app \
       --timeout=7m"
@@ -107,8 +103,8 @@ function deploy() {
 
     p "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
-    pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-    pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
+    cmdExec "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
+    cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
@@ -127,9 +123,9 @@ function localDeploy() {
     if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
     if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
 
-    pe "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
-    pe "k config set-context --current --namespace=${NAMESPACE}"
-    pe "helm install --devel primaza-app \
+    cmdExec "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
+    cmdExec "k config set-context --current --namespace=${NAMESPACE}"
+    cmdExec "helm install --devel primaza-app \
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
       -n ${NAMESPACE} \
@@ -137,7 +133,7 @@ function localDeploy() {
       ${ENVARGS} \
       2>&1 1>/dev/null"
 
-    pe "k wait -n ${NAMESPACE} \
+    cmdExec "k wait -n ${NAMESPACE} \
       --for=condition=ready pod \
       -l app.kubernetes.io/name=primaza-app \
       --timeout=7m"
@@ -150,8 +146,8 @@ function localDeploy() {
 
     p "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
-    pe "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-    pe "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
+    cmdExec "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
+    cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
@@ -165,7 +161,7 @@ function localDeploy() {
 }
 
 function remove() {
-  pe "helm uninstall primaza-app -n ${NAMESPACE}" || true
+  cmdExec "helm uninstall primaza-app -n ${NAMESPACE}" || true
 }
 
 case $1 in
@@ -175,7 +171,6 @@ case $1 in
     localdeploy)  localDeploy; exit;;
     remove)       "$@"; exit;;
     *)
-      dummy
       build
       localdeploy
       exit;;

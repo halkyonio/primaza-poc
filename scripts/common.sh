@@ -74,7 +74,6 @@ function cmdExec() {
   if [ "$CONTEXT" = "no-tty" ]; then
     fmt "${COMMAND}"
     eval "${COMMAND}"
-    exit 0
   else
     if "$HAS_PV"; then
       pe "$1"
