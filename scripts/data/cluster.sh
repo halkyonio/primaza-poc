@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 #
 # Usage:
 # ./scripts/data/cluster.sh
