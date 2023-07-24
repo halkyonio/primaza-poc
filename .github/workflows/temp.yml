@@ -38,4 +38,6 @@ jobs:
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh build
+      - name: Deploy primaza helm chart
+        run: |
           bash ./scripts/primaza.sh localdeploy

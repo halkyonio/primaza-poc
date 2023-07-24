@@ -147,8 +147,8 @@ function localDeploy() {
     note "Primaza application is alive :-)"
 
     KIND_URL=https://kubernetes.default.svc
-    note "Get the kubeconf and creating a cluster"
-    cmxExec "kind --version"
+    note "Get the kubeconf and creating a primaza's cluster record"
+    cmdExec "kind --version"
     cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
