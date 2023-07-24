@@ -34,7 +34,8 @@ jobs:
           registry: true
       - name: Build primaza, generate image, Helm chart and push image
         run: |
-          echo "Installing pv tool"
-          sudo apt-get install pv
-          bash ./scripts/primaza.sh build
-          #bash ./scripts/primaza.sh localdeploy
+          script: |
+            echo "Installing pv tool"
+            sudo apt-get install pv
+            bash ./scripts/primaza.sh build
+            #bash ./scripts/primaza.sh localdeploy
