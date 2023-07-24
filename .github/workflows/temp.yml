@@ -22,7 +22,7 @@ jobs:
     env:
       PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
-      PRIMAZA_URL: primaza-app.primaza.svc.cluster.local:80
+      PRIMAZA_URL: primaza-app.127.0.0.1.nip.io
       GITHUB_SHA_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v3
@@ -36,6 +36,7 @@ jobs:
         uses: container-tools/kind-action@v2
         with:
           registry: true
+          knative_kourier: v1.10.2
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh build
