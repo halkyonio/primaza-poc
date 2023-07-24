@@ -143,6 +143,7 @@ function localDeploy() {
 
     note "waiting till Primaza Application is running"
     POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
+    note "Primaza pod name: $POD_NAME"
     while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
       do sleep 1
     done
