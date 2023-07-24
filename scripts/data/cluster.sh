@@ -38,7 +38,7 @@ ONE_LINE_CFG=$(echo "$CFG" | tr -d '\n')
 
 note "Creating a Primaza DEV cluster for local kind usage ..."
 
-cmdExec "curl -V -X POST -H 'Content-Type: multipart/form-data' \
+cmdExec "curl -v -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
