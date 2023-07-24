@@ -37,8 +37,9 @@ jobs:
           CMD="mvn -v"
           function execCmd() {
             if [ "$CONTEXT" = "no-tty" ]; then
-              echo "Command to be executed: $1"
+              set +x
               eval "$1"
+              set -x
             else
               pe "$1"
             fi
