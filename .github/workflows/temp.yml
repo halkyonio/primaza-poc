@@ -33,7 +33,16 @@ jobs:
           registry: true
       - name: Build primaza, generate image, Helm chart and push image
         run: |
+          CONTEXT="no-tty"
           CMD="mvn -version"
-          eval $CMD
+          function execCmd() {
+            if [ "$CONTEXT" = "no-tty" ]; then
+              echo $CMD
+              eval $CMD
+            else
+              pe $CMD
+            fi
+          }
+          
           #bash ./scripts/primaza.sh build
           #bash ./scripts/primaza.sh localdeploy
