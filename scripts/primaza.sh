@@ -33,8 +33,8 @@ NS_TO_BE_EXCLUDED=${NS_TO_BE_EXCLUDED:-default,kube-system,ingress,pipelines-as-
 export TYPE_SPEED=400
 NO_WAIT=true
 
-p "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
-p "Ingress host is: ${INGRESS_HOST}"
+fmt "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
+fmt "Ingress host is: ${INGRESS_HOST}"
 
 #########################
 ## Help / Usage
