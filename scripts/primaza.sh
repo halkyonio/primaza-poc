@@ -103,6 +103,7 @@ function deploy() {
 
     note "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
+    set -x
     cmdExec "kind get kubeconfig -n ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
@@ -115,6 +116,7 @@ function deploy() {
         exit 1
     fi
     note "Local k8s cluster registered: $RESULT"
+    set +x
 }
 
 function localDeploy() {
