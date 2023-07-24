@@ -34,9 +34,8 @@ note "Get the kubeconf and creating a primaza's cluster record"
 #cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
 #cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 #CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
-CFG=$(kind get kubeconfig --name ${CONTEXT_TO_USE})
-note "Kind context: "
-note $CFG
+CFG=$(kind get kubeconfig --name ${CONTEXT_TO_USE} | tr -d '\n')
+ONE_LINE_CFG=$(echo "$CFG" | tr -d '\n')
 
 note "Creating a Primaza DEV cluster for local kind usage ..."
 
@@ -45,5 +44,5 @@ cmdExec "curl -X POST -H 'Content-Type: multipart/form-data' \
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\
-  -F kubeConfig=\"${CFG}\"\
+  -F kubeConfig=${ONE_LINE_CFG}\
   -s -i ${PRIMAZA_URL}/clusters"
