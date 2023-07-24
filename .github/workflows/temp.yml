@@ -38,7 +38,7 @@ jobs:
           function execCmd() {
             if [ "$CONTEXT" = "no-tty" ]; then
               echo $1
-              eval $1
+              $1
             else
               pe $1
             fi
