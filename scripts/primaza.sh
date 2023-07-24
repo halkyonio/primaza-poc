@@ -105,7 +105,7 @@ function deploy() {
     KIND_URL=https://kubernetes.default.svc
     cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
-    set -x
+
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
@@ -115,7 +115,6 @@ function deploy() {
         exit 1
     fi
     note "Local k8s cluster registered: $RESULT"
-    set +x
 }
 
 function localDeploy() {
@@ -152,7 +151,8 @@ function localDeploy() {
     cmdExec "kind --version"
     cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
     cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
-    set
+
+    set -x
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
@@ -162,6 +162,7 @@ function localDeploy() {
         exit 1
     fi
     note "Local k8s cluster registered: $RESULT"
+    set +x
 }
 
 function remove() {
