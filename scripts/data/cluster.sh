@@ -45,5 +45,5 @@ cmdExec "curl -X POST -H 'Content-Type: multipart/form-data' \
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\
-  -F kubeConfig=${CFG}\
+  -F kubeConfig=\"${CFG}\"\
   -s -i ${PRIMAZA_URL}/clusters"
