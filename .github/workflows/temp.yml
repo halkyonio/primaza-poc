@@ -36,6 +36,7 @@ jobs:
         uses: container-tools/kind-action@v2
         with:
           registry: true
+          knative_serving: v1.10.0
           knative_kourier: v1.10.0
       - name: Build primaza, generate image, Helm chart and push image
         run: |
