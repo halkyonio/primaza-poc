@@ -32,13 +32,12 @@ jobs:
           version: v0.11.1
           registry: true
       - name: Build primaza, generate image, Helm chart and push image
+        pty: true
         run: |
-          script: |
-            echo "Installing pv tool"
-            sudo apt-get install pv
-            SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-            source ${SCRIPTS_DIR}/common.sh
-            source ${SCRIPTS_DIR}/play-demo.sh
-            pe "mvn -version"
-            #bash ./scripts/primaza.sh build
-            #bash ./scripts/primaza.sh localdeploy
+          sudo apt-get install pv
+          SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
+          source ${SCRIPTS_DIR}/common.sh
+          source ${SCRIPTS_DIR}/play-demo.sh
+          pe "mvn -version"
+          #bash ./scripts/primaza.sh build
+          #bash ./scripts/primaza.sh localdeploy
