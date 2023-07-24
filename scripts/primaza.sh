@@ -145,21 +145,23 @@ function localDeploy() {
       do sleep 1
     done
     note "Primaza application is alive :-)"
+}
 
-    note "Get the kubeconf and creating a primaza's cluster record"
-    cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-    cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
+function loadData() {
+   note "Get the kubeconf and creating a primaza's cluster record"
+   cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
+   cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    note "Creating the record against primaza using curl executed from primaza container"
-    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
-    if [ "$RESULT" = *"500 Internal Server Error"* ]
-    then
-        note "Cluster failed to be saved in Primaza: $RESULT"
-        k describe $POD_NAME -n ${NAMESPACE}
-        k logs $POD_NAME -n ${NAMESPACE}
-        exit 1
-    fi
-    note "Local k8s cluster registered: $RESULT"
+   note "Creating the cluster's record"
+   RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+   if [ "$RESULT" = *"500 Internal Server Error"* ]
+   then
+       note "Cluster failed to be saved in Primaza: $RESULT"
+       k describe $POD_NAME -n ${NAMESPACE}
+       k logs $POD_NAME -n ${NAMESPACE}
+       exit 1
+   fi
+   note "Local k8s cluster registered: $RESULT"
 }
 
 function remove() {
@@ -171,9 +173,11 @@ case $1 in
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; exit;;
+    loadData)     loadData; exit;;
     remove)       "$@"; exit;;
     *)
       build
       localdeploy
+      loadData
       exit;;
 esac
