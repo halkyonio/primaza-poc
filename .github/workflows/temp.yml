@@ -10,6 +10,7 @@ on:
       - '**/*.md'       # Ignores .md files within subdirectories
 
 env:
+  # Variable used disable the pv tool which is not working here as pseudo tty is not supported by action flow
   CONTEXT: "no-tty"
 
 jobs:
@@ -37,4 +38,4 @@ jobs:
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh build
-          #bash ./scripts/primaza.sh localdeploy
+          bash ./scripts/primaza.sh localdeploy
