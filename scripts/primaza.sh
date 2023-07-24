@@ -150,7 +150,6 @@ function localDeploy() {
 function loaddata() {
    note "Creating the cluster's record"
    RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
-   #${SCRIPTS_DIR}/data/cluster.sh
 
    # Extract the HTTP status code and response code from the response
    http_status_code="${RESPONSE%%:*}"
@@ -166,6 +165,9 @@ function loaddata() {
 
      exit 1
    fi
+
+   note "Creating the services's records"
+   ${SCRIPTS_DIR}/data/services.sh
 }
 
 function remove() {

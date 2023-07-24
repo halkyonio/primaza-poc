@@ -9,7 +9,6 @@
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/../common.sh
 
 # Parameters to play the script
@@ -20,8 +19,6 @@ NO_WAIT=true
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 INSTALLABLE=${INSTALLABLE-off}
 
-note "Primaza server: ${PRIMAZA_URL}"
-
 declare -a arr=(
   "name=postgresql&version=14.5&type=postgresql&endpoint=tcp:5432&installable=$INSTALLABLE&helmRepo=https://charts.bitnami.com/bitnami&helmChart=postgresql&helmChartVersion=11.9.13"
   "name=mysql&version=8.0&type=mysql&endpoint=tcp:3306"
@@ -31,5 +28,6 @@ declare -a arr=(
 
 for i in "${arr[@]}"
 do
-  pe "curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\" -o /dev/null"
+  note "curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\"" >&2
+  curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\" -o /dev/null
 done

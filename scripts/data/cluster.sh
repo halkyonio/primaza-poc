@@ -12,7 +12,6 @@
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/../common.sh
 
 # Parameters to play the script
@@ -30,7 +29,7 @@ KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
 #CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 CFG=$(kind get kubeconfig --name ${CONTEXT_TO_USE})
 
-warn "curl -sS -o /dev/null -w '%{http_code}'\
+note "curl -sS -o /dev/null -w '%{http_code}'\
         -X POST -H 'Content-Type: multipart/form-data' \
         -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
         -F name=${CONTEXT_TO_USE}\
