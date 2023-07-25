@@ -28,5 +28,5 @@ declare -a arr=(
 for i in "${arr[@]}"
 do
   note "curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\"" >&2
-  curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\" -o /dev/null
+  curl -X POST ${PRIMAZA_URL}/credentials -s -k -d "${i}" -o /dev/null
 done
