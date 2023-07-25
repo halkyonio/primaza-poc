@@ -67,3 +67,6 @@ jobs:
       - name: Installing Crossplane
         run: |
           bash ./scripts/crossplane.sh
+      - name: Installing Postgresql DB and Atomic fruits
+        run: |
+          bash ./scripts/atomic-fruits.sh

@@ -224,7 +224,7 @@ function logRootToken() {
 
 case $1 in
     -h) usage; exit;;
-    install) "$@"; exit;;
+    deploy) "$@"; exit;;
     remove) "$@"; exit;;
     unseal) "$@"; exit;;
     enableKV1SecretEngine) "$@"; exit;;
@@ -238,7 +238,7 @@ case $1 in
     loginAsUser) "$@"; exit;;
     vaultExec) "$@"; exit;;
     *)
-      install
+      deploy
       unseal
       login
       enableKV2SecretEngine
