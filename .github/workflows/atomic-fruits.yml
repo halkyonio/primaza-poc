@@ -103,7 +103,7 @@ jobs:
           max_retries=5
           retry_delay=5
           retry_attempt=1
-          set -x
+
           function discover_atomic_fruits() {
             APPLICATION=$(curl -H 'Accept: application/json' -s "$PRIMAZA_URL/applications/name/atomic-fruits")
             if [[ $(echo "$APPLICATION" | jq -r '.name') == "atomic-fruits" ]]; then
@@ -123,7 +123,6 @@ jobs:
               sleep $retry_delay
             fi
           done
-          set +x
 
       - name: Bind application
         env:
