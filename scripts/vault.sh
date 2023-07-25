@@ -46,7 +46,7 @@ function vaultExec() {
   kubectl exec vault-0 -n ${VAULT_NAMESPACE} -- sh -c "${COMMAND}" 2> /dev/null
 }
 
-function install() {
+function deploy() {
   log BLUE "Installing Vault repository and Helm chart"
   cmdExec "helm repo add hashicorp https://helm.releases.hashicorp.com"
 
