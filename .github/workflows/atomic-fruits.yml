@@ -19,16 +19,7 @@ jobs:
     strategy:
       matrix:
         java-version: [ 17 ]
-    env:
-      PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-      PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
-      PRIMAZA_URL: primaza.127.0.0.1.nip.io
-      # Variable needed by the helm chart to configure primaza vault client
-      VAULT_URL: http://vault-internal.vault:8200
-      GITHUB_SHA_COMMIT: ${{ github.sha }}
 
-      REGISTRY_NAME: kind-registry
-      REGISTRY_PORT: 5000
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -38,6 +29,9 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
       - name: Setup Kubernetes using kind and deploy a local container registry
+        env:
+          REGISTRY_NAME: kind-registry
+          REGISTRY_PORT: 5000
         run: |
           curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install
           
@@ -48,15 +42,26 @@ jobs:
           echo "KIND_REGISTRY=${REGISTRY_NAME}:${REGISTRY_PORT}" >> $GITHUB_ENV
 
       - name: Build primaza, generate image, Helm chart and push image
+        env:
+          PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          # Variable needed by the helm chart to configure primaza vault client
+          VAULT_URL: http://vault-internal.vault:8200
+          GITHUB_SHA_COMMIT: ${{ github.sha }}
         run: |
           bash ./scripts/primaza.sh build
 
       - name: Deploy primaza helm chart
+        env:
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
         run: |
           bash ./scripts/primaza.sh localdeploy
           bash ./scripts/primaza.sh isAlive
 
       - name: Load the data such as cluster, services & credentials
+        env:
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
         run: |
           bash ./scripts/primaza.sh loaddata
 
@@ -84,17 +89,16 @@ jobs:
           ./scripts/vault.sh vaultExec "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
 
       - name: Wait until atomic-fruits is registered in Primaza
+        env:
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
         run: |
           source ./scripts/common.sh
           max_retries=5
           retry_delay=5
           retry_attempt=1
           
-          
           function discover_atomic_fruits() {
-            PRIMAZA_KUBERNETES_NAMESPACE=primaza
-            POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
-            APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/atomic-fruits")
+            APPLICATION=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/applications/name/atomic-fruits")
             if [[ $(echo "$APPLICATION" | jq -r '.name') == "atomic-fruits" ]]; then
               return 0
             else
@@ -114,11 +118,15 @@ jobs:
           done
 
       - name: Bind application
+        env:
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
         run: |
           bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
 
       - id: wait-for-atomic-fruits
         name: atomic-fruits should now be up and running
+        env:
+          PRIMAZA_URL: primaza.127.0.0.1.nip.io
         run: |
           APP_NAMESPACE=app
           # Ready means that the application is now binded with the service, so we're ok!
