@@ -79,7 +79,7 @@ jobs:
           retry_delay=5
           retry_attempt=1
           
-          discover_atomic_fruits() {
+          function discover_atomic_fruits() {
             PRIMAZA_KUBERNETES_NAMESPACE=primaza
             POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
             APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/atomic-fruits")
@@ -93,7 +93,7 @@ jobs:
           while [ $retry_attempt -le $max_retries ]; do
             note "Attempt $retry_attempt of $max_retries"
             if [[ discover_atomic_fruits ]]; then
-              node "Primaza discovered the atomic-fruits application: $APPLICATION"
+              note "Primaza discovered the atomic-fruits application: $APPLICATION"
               exit 0
             else
               warn "Primaza didn't yet discovered the atomic-fruits application: $APPLICATION."
