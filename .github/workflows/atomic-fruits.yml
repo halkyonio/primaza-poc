@@ -103,7 +103,7 @@ jobs:
           max_retries=5
           retry_delay=5
           retry_attempt=1
-          
+          set -x
           function discover_atomic_fruits() {
             APPLICATION=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/applications/name/atomic-fruits")
             if [[ $(echo "$APPLICATION" | jq -r '.name') == "atomic-fruits" ]]; then
@@ -116,13 +116,14 @@ jobs:
           while [ $retry_attempt -le $max_retries ]; do
             note "Attempt $retry_attempt of $max_retries"
             if discover_atomic_fruits; then
-              note "Primaza discovered the atomic-fruits application: $APPLICATION"
+              note "Primaza discovered the atomic-fruits application: $APPLICATION."
               exit 0
             else
               warn "Primaza didn't yet discovered the atomic-fruits application: $APPLICATION."
               sleep $retry_delay
             fi
           done
+          set +x
 
       - name: Bind application
         env:
