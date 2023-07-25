@@ -55,7 +55,7 @@ spec:
       name: debug-config
 EOF
 
-    pe "kubectl wait provider.pkg.crossplane.io/kubernetes-provider --for condition=Healthy=true --timeout=300s"
+    cmdExec "kubectl wait provider.pkg.crossplane.io/kubernetes-provider --for condition=Healthy=true --timeout=300s"
 
     note "Give more RBAC rights to the crossplane service account"
     SA=$(kubectl -n crossplane-system get sa -o name | grep kubernetes-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
@@ -86,16 +86,16 @@ spec:
       name: debug-config
 EOF
 
-  pe "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
+  cmdExec "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
 
-  pe "kubectl rollout status deployment/crossplane -n crossplane-system"
+  cmdExec "kubectl rollout status deployment/crossplane -n crossplane-system"
   note "Give more RBAC rights to the crossplane service account"
   SA=$(kubectl -n crossplane-system get sa -o name | grep helm-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
   echo ${SA}
 
   kubectl create clusterrolebinding helm-provider-admin-binding --clusterrole cluster-admin --serviceaccount=${SA}
 
-  pe "kubectl wait providerrevision -lpkg.crossplane.io/package=helm-provider --for condition=Healthy=true --timeout=300s"
+  cmdExec "kubectl wait providerrevision -lpkg.crossplane.io/package=helm-provider --for condition=Healthy=true --timeout=300s"
 
   note "Configure the Crossplane Helm Provider"
   cat <<EOF | kubectl apply -f -
