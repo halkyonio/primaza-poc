@@ -145,6 +145,8 @@ function localDeploy() {
       do sleep 1
     done
     note "Primaza application is alive :-)"
+
+
 }
 
 function loaddata() {
@@ -160,6 +162,7 @@ function loaddata() {
    else
      note "Curl request failed with HTTP Status Code: $http_status_code"
 
+     POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
      k describe $POD_NAME -n ${NAMESPACE}
      k logs $POD_NAME -n ${NAMESPACE}
 
