@@ -10,7 +10,7 @@ on:
       - '**/*.md'       # Ignores .md files within subdirectories
 
 env:
-  # Variable used disable the pv tool which is not working here as pseudo tty is not supported by action flow
+  # Variable used to disable the pv tool which is not working here as pseudo tty is not supported by GitHub steps
   CONTEXT: "no-tty"
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
         run: |
           curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install
           
-          # Adding registry to /etc/hosts
+          # Adding registry name to the /etc/hosts file
           echo "127.0.0.1 $REGISTRY_NAME" | sudo tee -a /etc/hosts
 
           # Exporting the registry location for subsequent jobs
@@ -50,22 +50,28 @@ jobs:
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh build
+
       - name: Deploy primaza helm chart
         run: |
           bash ./scripts/primaza.sh localdeploy
           bash ./scripts/primaza.sh isAlive
+
       - name: Load the data such as cluster, services & credentials
         run: |
           bash ./scripts/primaza.sh loaddata
+
       - name: Installing Vault
         run: |
           bash ./scripts/vault.sh
+
       - name: Installing Crossplane
         run: |
           bash ./scripts/crossplane.sh
+
       - name: Installing Postgresql DB and Atomic fruits
         run: |
           bash ./scripts/atomic-fruits.sh
+
       - name: Creating the Primaza fruits Vault KV key
         run: |
           source ./scripts/common.sh
@@ -76,6 +82,7 @@ jobs:
           # Register the primaza KV entries
           note "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
           ./scripts/vault.sh vaultExec "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+
       - name: Wait until atomic-fruits is registered in Primaza
         run: |
           source ./scripts/common.sh
@@ -105,9 +112,11 @@ jobs:
               sleep $retry_delay
             fi
           done
+
       - name: Bind application
         run: |
           bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
+
       - id: wait-for-atomic-fruits
         name: atomic-fruits should now be up and running
         run: |
@@ -122,6 +131,7 @@ jobs:
             error "Status of the claim: fruits-claim is: $CLAIM_STATUS" 
             exit 1
           fi
+
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: |
