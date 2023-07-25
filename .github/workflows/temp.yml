@@ -77,6 +77,8 @@ jobs:
           
           # Register the primaza KV entries
           kubectl exec vault-0 -n vault -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+      - name: Bind application to claim
+        run: .github/bind_application_to_claim_in_primaza.sh atomic-fruits fruits-claim
           
           
           
