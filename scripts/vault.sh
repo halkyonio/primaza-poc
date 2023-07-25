@@ -47,7 +47,9 @@ function vaultExec() {
 }
 
 function install() {
-  log BLUE "Installing Vault Helm"
+  log BLUE "Installing Vault repository and Helm chart"
+  cmdExec "helm repo add hashicorp https://helm.releases.hashicorp.com"
+
   cat <<EOF > ${TMP_DIR}/my-values.yml
 server:
   image:
@@ -65,7 +67,7 @@ ui:
   enabled: true
   serviceType: "ClusterIP"
 EOF
-  helm install vault hashicorp/vault --create-namespace -n ${VAULT_NAMESPACE} -f ${TMP_DIR}/my-values.yml
+  cmdExec "helm install vault hashicorp/vault --create-namespace -n ${VAULT_NAMESPACE} -f ${TMP_DIR}/my-values.yml"
 
   while [[ $(kubectl get pod/vault-0 -n vault -ojson | jq -r 'if .status.phase == "Running" then "true" else "false" end') != "true" ]]; do
      echo "Still waiting for vault pod to be ready"
