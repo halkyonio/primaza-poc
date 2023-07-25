@@ -61,6 +61,9 @@ jobs:
       - name: Load the data such as cluster, services, credentials & claims
         run: |
           bash ./scripts/primaza.sh loaddata
-      - name: Installing vault
+      - name: Installing Vault
         run: |
           bash ./scripts/vault.sh
+      - name: Installing Crossplane
+        run: |
+          bash ./scripts/crossplane.sh
