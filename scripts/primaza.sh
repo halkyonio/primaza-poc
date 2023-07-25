@@ -7,24 +7,23 @@ source ${SCRIPTS_DIR}/common.sh
 ####################################
 ## Variables
 ####################################
-useConfirm=true
 VM_IP=${VM_IP:=127.0.0.1}
-NAMESPACE=primaza
 PROJECT_DIR=app
 
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
 GITHUB_SHA_COMMIT=${GITHUB_SHA_COMMIT:-$(git rev-parse --short HEAD)}
 
 # Parameters to be used when we build and push to a local container registry
-REGISTRY_GROUP=local
-REGISTRY=kind-registry:5000
-IMAGE_VERSION=latest
-#INGRSS_HOST=primaza.${VM_IP}.nip.io
+REGISTRY_GROUP=${REGISTRY_GROUP:-local}
+REGISTRY=${KIND_REGISTRY:-kind-registry:5000}
+IMAGE_TAG=${IMAGE_TAG:-latest}
+#INGRESS_HOST=primaza.${VM_IP}.nip.io
 PRIMAZA_URL=${PRIMAZA_URL:-primaza.$VM_IP.nip.io}
 
 # Parameters used when using the image from an external container registry: quay.io/halkyonio/primaza-app
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
 PRIMAZA_GITHUB_REPO=https://github.com/halkyonio/primaza-poc
+PRIMAZA_NAMESPACE=${PRIMAZA_NAMESPACE:-primaza}
 HALKYONIO_HELM_REPO=https://halkyonio.github.io/helm-charts/
 PRIMAZA_IMAGE_NAME=${PRIMAZA_IMAGE_NAME:-quay.io/halkyonio/primaza-app:${GITHUB_SHA_COMMIT}}
 
@@ -55,20 +54,16 @@ function primazaUsage() {
 }
 
 function build() {
-  #pushd ${PROJECT_DIR}
   cmdExec "mvn clean install -DskipTests -Dquarkus.container-image.build=true \
      -Dquarkus.container-image.push=true \
      -Dquarkus.container-image.registry=${REGISTRY} \
      -Dquarkus.container-image.group=${REGISTRY_GROUP} \
-     -Dquarkus.container-image.tag=${IMAGE_VERSION} \
+     -Dquarkus.container-image.tag=${IMAGE_TAG} \
      -Dquarkus.container-image.insecure=true \
      -Dquarkus.kubernetes.ingress.host=${PRIMAZA_URL} \
      -Dlog.level=INFO \
      -Dgit.sha.commit=${GITHUB_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
-
-  #cmdExec "kind load docker-image ${REGISTRY}/${REGISTRY_GROUP}/primaza-app -n ${CONTEXT_TO_USE}"
-  #popd
 }
 
 function deploy() {
@@ -77,14 +72,14 @@ function deploy() {
     if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
     if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
 
-    cmdExec "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
-    cmdExec "k config set-context --current --namespace=${NAMESPACE}"
+    cmdExec "k create namespace ${PRIMAZA_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
+    cmdExec "k config set-context --current --namespace=${PRIMAZA_NAMESPACE}"
     cmdExec "helm install \
       --devel \
       --repo ${HALKYONIO_HELM_REPO} \
       primaza-app \
       primaza-app \
-      -n ${NAMESPACE} \
+      -n ${PRIMAZA_NAMESPACE} \
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       --set app.host=${PRIMAZA_URL} \
       --set app.envs.git.sha.commit=${GITHUB_SHA_COMMIT} \
@@ -92,28 +87,28 @@ function deploy() {
       ${ENVARGS} \
       2>&1 1>/dev/null"
 
-    cmdExec "k wait -n ${NAMESPACE} \
+    cmdExec "k wait -n ${PRIMAZA_NAMESPACE} \
       --for=condition=ready pod \
       -l app.kubernetes.io/name=primaza-app \
       --timeout=7m"
 
     note "waiting till Primaza Application is running"
-    POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
-    while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+    POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
+    while [[ $(k exec -i $POD_NAME -c primaza-app -n ${PRIMAZA_NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
       do sleep 1
     done
 
     note "Get the kubeconf and creating a cluster"
     KIND_URL=https://kubernetes.default.svc
     cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-    cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
+    cmdExec "k cp local-kind-kubeconfig ${PRIMAZA_NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
-    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
+    RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
     if [ "$RESULT" = *"500 Internal Server Error"* ]
     then
         note "Cluster failed to be saved in Primaza: $RESULT"
-        k describe $POD_NAME -n ${NAMESPACE}
-        k logs $POD_NAME -n ${NAMESPACE}
+        k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
+        k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
         exit 1
     fi
     note "Local k8s cluster registered: $RESULT"
@@ -125,25 +120,25 @@ function localDeploy() {
     if [[ -n "${VAULT_USER}" ]]; then ENVARGS+="--set app.envs.vault.user=${VAULT_USER}"; fi
     if [[ -n "${VAULT_PASSWORD}" ]]; then ENVARGS+="--set app.envs.vault.password=${VAULT_PASSWORD}"; fi
 
-    cmdExec "k create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
-    cmdExec "k config set-context --current --namespace=${NAMESPACE}"
+    cmdExec "k create namespace ${PRIMAZA_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -"
+    cmdExec "k config set-context --current --namespace=${PRIMAZA_NAMESPACE}"
     cmdExec "helm install --devel primaza-app \
       --dependency-update \
       ${PROJECT_DIR}/target/helm/kubernetes/primaza-app \
-      -n ${NAMESPACE} \
+      -n ${PRIMAZA_NAMESPACE} \
       --set app.image=${PRIMAZA_IMAGE_NAME} \
       ${ENVARGS} \
       2>&1 1>/dev/null"
 
-    cmdExec "k wait -n ${NAMESPACE} \
+    cmdExec "k wait -n ${PRIMAZA_NAMESPACE} \
       --for=condition=ready pod \
       -l app.kubernetes.io/name=primaza-app \
       --timeout=7m"
 
     note "waiting till Primaza Application is running"
-    POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
+    POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
     note "Primaza pod name: $POD_NAME"
-    while [[ $(k exec -i $POD_NAME -c primaza-app -n ${NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
+    while [[ $(k exec -i $POD_NAME -c primaza-app -n ${PRIMAZA_NAMESPACE} -- bash -c "curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/home") != "200" ]];
       do sleep 1
     done
     note "Primaza application is alive :-)"
@@ -155,18 +150,18 @@ function bindApplication() {
   APPLICATION_NAME=$1
   CLAIM_NAME=$2
 
-  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
+  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
 
-  APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/$APPLICATION_NAME")
+  APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/$APPLICATION_NAME")
   APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
   note "Application ID to be bound: $APPLICATION_ID"
 
-  CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/claims/name/$CLAIM_NAME")
+  CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/claims/name/$CLAIM_NAME")
   CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
   note "Claim ID to be bound: $CLAIM_ID"
 
   note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID"
-  RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
+  RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
   if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
     error "Application failed to be bound in Primaza: $RESULT"
     exit 1
@@ -199,9 +194,9 @@ function loaddata() {
    else
      note "Curl request failed with HTTP Status Code: $http_status_code"
 
-     POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${NAMESPACE} -o name)
-     k describe $POD_NAME -n ${NAMESPACE}
-     k logs $POD_NAME -n ${NAMESPACE}
+     POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
+     k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
+     k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
 
      exit 1
    fi
@@ -217,17 +212,17 @@ function loaddata() {
 }
 
 function remove() {
-  cmdExec "helm uninstall primaza-app -n ${NAMESPACE}"
+  cmdExec "helm uninstall primaza-app -n ${PRIMAZA_NAMESPACE}"
 }
 
 function log() {
-  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $NAMESPACE -o name)
+  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_NAMESPACE -o name)
 
   warn "Primaza application log ..."
-  k logs $POD_NAME -n $NAMESPACE
+  k logs $POD_NAME -n $PRIMAZA_NAMESPACE
 
   warn "Primaza pod information"
-  k describe $POD_NAME -n $NAMESPACE
+  k describe $POD_NAME -n $PRIMAZA_NAMESPACE
 }
 
 function isAlive() {

@@ -43,18 +43,23 @@ jobs:
 
       - name: Build primaza, generate image, Helm chart and push image
         env:
+          REGISTRY_GROUP: local
+
           PRIMAZA_GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          GITHUB_SHA_COMMIT: ${{ github.sha }}
           PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
+          PRIMAZA_NAMESPACE: primaza
+
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           # Variable needed by the helm chart to configure primaza vault client
           VAULT_URL: http://vault-internal.vault:8200
-          GITHUB_SHA_COMMIT: ${{ github.sha }}
         run: |
           bash ./scripts/primaza.sh build
 
       - name: Deploy primaza helm chart
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          PRIMAZA_NAMESPACE: primaza
         run: |
           bash ./scripts/primaza.sh localdeploy
           bash ./scripts/primaza.sh isAlive
@@ -62,6 +67,7 @@ jobs:
       - name: Load the data such as cluster, services & credentials
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          PRIMAZA_NAMESPACE: primaza
         run: |
           bash ./scripts/primaza.sh loaddata
 
@@ -120,6 +126,7 @@ jobs:
       - name: Bind application
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          PRIMAZA_NAMESPACE: primaza
         run: |
           bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
 
@@ -127,10 +134,10 @@ jobs:
         name: atomic-fruits should now be up and running
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          PRIMAZA_NAMESPACE: primaza
         run: |
-          APP_NAMESPACE=app
           # Ready means that the application is now binded with the service, so we're ok!
-          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $APP_NAMESPACE
+          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $PRIMAZA_NAMESPACE
           
           CLAIM_STATUS=$(curl -s http://$PRIMAZA_URL/claims/name/fruits-claim | jq -r .status)
           if [[ "$CLAIM_STATUS" == "bound" ]]; then
