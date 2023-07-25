@@ -72,11 +72,11 @@ jobs:
           bash ./scripts/atomic-fruits.sh
       - name: Creating the Primaza fruits Vault KV key
         run: |
-          # Login as user bob and password sinclar
+          # Login as user bob and password sinclair
           bash ./scripts/vault.sh loginAsUser bob sinclair
           
           # Register the primaza KV entries
-          kubectl exec vault-0 -n ${VAULT_NAMESPACE} -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+          kubectl exec vault-0 -n vault -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
           
           
           
