@@ -250,6 +250,7 @@ case $1 in
     enableKV2SecretEngine) "$@"; exit;;
     enableK8sSecretEngine) "$@"; exit;;
     login) "$@"; exit;;
+    logRootToken) logRootToken; exit;;
     rootToken) "$@"; exit;;
     enableUserPasswordAuth) "$@"; exit;;
     createUserPolicy) "$@"; exit;;

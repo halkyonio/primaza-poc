@@ -71,7 +71,8 @@ jobs:
           bash ./scripts/vault.sh loginAsUser bob sinclair
           
           # Register the primaza KV entries
-          kubectl exec vault-0 -n vault -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+          note "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+          ./scripts/vault.sh vaultExec "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
       - name: Wait until atomic-fruits is registered in Primaza
         run: |
           source ./scripts/common.sh
