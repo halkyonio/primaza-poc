@@ -74,14 +74,31 @@ jobs:
           kubectl exec vault-0 -n vault -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
       - name: Wait until atomic-fruits is registered in Primaza
         run: |
-          PRIMAZA_KUBERNETES_NAMESPACE=primaza
-          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
-          APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/atomic-fruits")
-          if [[ $(echo "$APPLICATION" | jq -r '.name') != "atomic-fruits" ]]
-          then
-            echo "Primaza didn't discovery the atomic-fruits application: $APPLICATION"
-            exit 1
-          fi
+          max_retries=5
+          retry_delay=5
+          retry_attempt=1
+          
+          discover_atomic_fruits {
+            PRIMAZA_KUBERNETES_NAMESPACE=primaza
+            POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
+            APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/atomic-fruits")
+            if [[ $(echo "$APPLICATION" | jq -r '.name') == "atomic-fruits" ]]; then
+              return 0
+            else
+              return 1
+            fi
+          }
+          
+          while [ $retry_attempt -le $max_retries ]; do
+            note "Attempt $retry_attempt of $max_retries"
+            if [[ discover_atomic_fruits ]]; then
+              node "Primaza discovered the atomic-fruits application: $APPLICATION"
+              exit 0
+            else
+              warn "Primaza didn't yet discovered the atomic-fruits application: $APPLICATION."
+              sleep $retry_delay
+            fi
+          done
       - name: Bind application
         run: |
           bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
