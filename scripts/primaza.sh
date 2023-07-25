@@ -210,7 +210,7 @@ function loaddata() {
    note "Creating the credential record"
    ${SCRIPTS_DIR}/data/credentials.sh
 
-   note "Creating the credential record"
+   note "Creating the claim record"
    ${SCRIPTS_DIR}/data/claims.sh
 }
 
@@ -228,7 +228,7 @@ case $1 in
     remove)       "$@"; exit;;
     *)
       build
-      localdeploy
+      localDeploy
       loaddata
       exit;;
 esac
