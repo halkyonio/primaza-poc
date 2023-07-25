@@ -9,7 +9,6 @@
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/../common.sh
 
 # Parameters to play the script
@@ -28,5 +27,6 @@ declare -a arr=(
 
 for i in "${arr[@]}"
 do
-  pe "curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\" -o /dev/null"
+  note "curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\"" >&2
+  curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\" -o /dev/null
 done

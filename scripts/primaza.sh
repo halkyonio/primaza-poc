@@ -171,6 +171,9 @@ function loaddata() {
 
    note "Creating the services's records"
    ${SCRIPTS_DIR}/data/services.sh
+
+   note "Creating the credential record"
+   ${SCRIPTS_DIR}/data/primaza.sh
 }
 
 function remove() {
