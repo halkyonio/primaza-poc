@@ -150,18 +150,16 @@ function bindApplication() {
   APPLICATION_NAME=$1
   CLAIM_NAME=$2
 
-  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
-
-  APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/$APPLICATION_NAME")
+  APPLICATION=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/applications/name/$APPLICATION_NAME)
   APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
   note "Application ID to be bound: $APPLICATION_ID"
 
-  CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/claims/name/$CLAIM_NAME")
+  CLAIM=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/claims/name/$CLAIM_NAME)
   CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
   note "Claim ID to be bound: $CLAIM_ID"
 
-  note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID"
-  RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
+  note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
+  RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
   if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
     error "Application failed to be bound in Primaza: $RESULT"
     exit 1
