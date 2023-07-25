@@ -95,8 +95,7 @@ jobs:
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: |
-          PRIMAZA_KUBERNETES_NAMESPACE=primaza
-          bash .github/print_primaza_logs.sh
+          bash ./scripts/primaza.sh log
 
       - name: (Only if it failed) Log Atomic Fruits traces at failures
         if: failure()

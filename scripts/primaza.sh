@@ -49,6 +49,7 @@ function primazaUsage() {
   fmt "\tbuild         \tBuild the Primaza quarkus application"
   fmt "\tdeploy        \tDeploy the primaza helm chart using Halkyon Helm repo"
   fmt "\tlocaldeploy   \tDeploy the primaza helm chart using local build application"
+  fmt "\tlog           \tPrint the log of the primaza quarkus application pod like the information of the pod"
   fmt ""
 }
 
@@ -218,6 +219,16 @@ function remove() {
   cmdExec "helm uninstall primaza-app -n ${NAMESPACE}"
 }
 
+function log() {
+  POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $NAMESPACE -o name)
+
+  warn "Primaza application log ..."
+  k logs $POD_NAME -n $NAMESPACE
+
+  warn "Primaza pod information"
+  k describe $POD_NAME -n $NAMESPACE
+}
+
 case $1 in
     -h)           primazaUsage; exit;;
     build)        "$@"; exit;;
@@ -226,6 +237,7 @@ case $1 in
     loaddata)     loaddata; exit;;
     bindApplication) "$@"; exit;;
     remove)       "$@"; exit;;
+    log)          log; exit;;
     *)
       build
       localDeploy
