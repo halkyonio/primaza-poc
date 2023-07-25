@@ -58,7 +58,7 @@ jobs:
       #    kubectl get ingress -A
       #    echo "Curl primaza ...."
       #    curl -v http://$PRIMAZA_URL/clusters
-      - name: Load the data such as cluster, services, credentials & claims
+      - name: Load the data such as cluster, services & credentials
         run: |
           bash ./scripts/primaza.sh loaddata
       - name: Installing Vault
@@ -70,3 +70,13 @@ jobs:
       - name: Installing Postgresql DB and Atomic fruits
         run: |
           bash ./scripts/atomic-fruits.sh
+      - name: Creating the Primaza fruits Vault KV key
+        run: |
+          # Login as user bob and password sinclar
+          bash ./scripts/vault.sh loginAsUser bob sinclair
+          
+          # Register the primaza KV entries
+          kubectl exec vault-0 -n ${VAULT_NAMESPACE} -- sh -c "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
+          
+          
+          

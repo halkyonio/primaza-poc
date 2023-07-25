@@ -216,6 +216,25 @@ function putHelloKey() {
   vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/hello target=world"
 }
 
+function putKey() {
+    if [ -v 1 ]; then
+      # primaza
+      KV_APP_NAME=$1
+    fi
+    if [ -v 2 ]; then
+      # fruits
+      KV_KEY=$2
+    fi
+    if [ -v 3 ]; then
+      # username=healthy password=healthy database=fruits_database
+      KV_ENTRIES=$3
+    fi
+
+    loginAsUser
+    log BLUE "Executing: vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/${KV_KEY} ${KV_ENTRIES}"
+    vaultExec "vault kv put -mount=${KV2_PREFIX} ${KV_APP_NAME}/${KV_KEY} ${KV_ENTRIES}"
+}
+
 function logRootToken() {
   log YELLOW "Vault temp folder containing the generated files: ${SCRIPTS_DIR}/../${TMP_DIR}"
   log YELLOW "Vault Root Token: $(jq -r ".root_token" ${TMP_DIR}/cluster-keys.json)"
@@ -236,6 +255,7 @@ case $1 in
     createUserPolicy) "$@"; exit;;
     registerUser) "$@"; exit;;
     loginAsUser) "$@"; exit;;
+    putKey) "$@"; exit;;
     vaultExec) "$@"; exit;;
     *)
       deploy
