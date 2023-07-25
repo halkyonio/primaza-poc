@@ -80,6 +80,7 @@ jobs:
           retry_delay=5
           retry_attempt=1
           
+          
           function discover_atomic_fruits() {
             PRIMAZA_KUBERNETES_NAMESPACE=primaza
             POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -o name)
@@ -110,7 +111,14 @@ jobs:
           APP_NAMESPACE=app
           # Ready means that the application is now binded with the service, so we're ok!
           kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $APP_NAMESPACE
-
+          
+          CLAIM_STATUS=$(curl -s http://$PRIMAZA_URL/claims/name/fruits-claim | jq -r .status)
+          if [[ "$CLAIM_STATUS" == "bound" ]]; then
+            exit 0
+          else
+            error "Status of the claim: fruits-claim is: $CLAIM_STATUS" 
+            exit 1
+          fi
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: |
