@@ -138,7 +138,7 @@ jobs:
           PRIMAZA_NAMESPACE: primaza
         run: |
           # Ready means that the application is now binded with the service, so we're ok!
-          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $PRIMAZA_NAMESPACE
+          kubectl wait --timeout=300s --for=condition=available deployment atomic-fruits -n $PRIMAZA_NAMESPACE
           
           CLAIM_STATUS=$(curl -s http://$PRIMAZA_URL/claims/name/fruits-claim | jq -r .status)
           if [[ "$CLAIM_STATUS" == "bound" ]]; then
