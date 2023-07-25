@@ -51,13 +51,6 @@ jobs:
       - name: Deploy primaza helm chart
         run: |
           bash ./scripts/primaza.sh localdeploy
-      #- name: Check pod, services, etc
-      #  run: |
-      #    kubectl get pods -A
-      #    kubectl get svc -A
-      #    kubectl get ingress -A
-      #    echo "Curl primaza ...."
-      #    curl -v http://$PRIMAZA_URL/clusters
       - name: Load the data such as cluster, services & credentials
         run: |
           bash ./scripts/primaza.sh loaddata
@@ -93,9 +86,9 @@ jobs:
       - id: wait-for-atomic-fruits
         name: atomic-fruits should now be up and running
         run: |
-          KUBERNETES_NAMESPACE=app
+          APP_NAMESPACE=app
           # Ready means that the application is now binded with the service, so we're ok!
-          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $KUBERNETES_NAMESPACE
+          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $APP_NAMESPACE
 
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
