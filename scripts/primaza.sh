@@ -174,10 +174,13 @@ function loaddata() {
 
    note "Creating the credential record"
    ${SCRIPTS_DIR}/data/credentials.sh
+
+   note "Creating the credential record"
+   ${SCRIPTS_DIR}/data/claims.sh
 }
 
 function remove() {
-  cmdExec "helm uninstall primaza-app -n ${NAMESPACE}" || true
+  cmdExec "helm uninstall primaza-app -n ${NAMESPACE}"
 }
 
 case $1 in

@@ -9,9 +9,7 @@
 #
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/../common.sh
-source ${SCRIPTS_DIR}/../play-demo.sh
 
 # Parameters to play the script
 export TYPE_SPEED=400
@@ -21,13 +19,10 @@ NO_WAIT=true
 PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 SERVICE_ID=${SERVICE_ID:-1}
 
-p "Primaza server: ${PRIMAZA_URL}"
+CLAIM_NAME=${CLAIM_NAME:-fruits-claim}
+CLAIM_DESCRIPTION=${CLAIM_DESCRIPTION:-postgresql-fruits-db}
+CLAIM_REQUESTED_SERVICE=${CLAIM_REQUESTED_SERVICE:-1}
+PARAMS="name=$CLAIM_NAME&description=$CLAIM_DESCRIPTION&serviceRequested=$CLAIM_REQUESTED_SERVICE"
 
-declare -a arr=(
-  "name=fruits-claim&description=postgresql-fruits-db&serviceId=$SERVICE_ID&owner=snowdrop"
-)
-
-for i in "${arr[@]}"
-do
-  pe "curl -X POST ${PRIMAZA_URL}/claims -s -k -d \"${i}\" -o /dev/null"
-done
+note "curl -X POST ${PRIMAZA_URL}/claims -s -k -d \"${PARAMS}\""
+curl -X POST ${PRIMAZA_URL}/claims -s -k -d "${PARAMS}" -o /dev/null
