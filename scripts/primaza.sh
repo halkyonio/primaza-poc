@@ -181,7 +181,7 @@ function bindApplication() {
   note "Application bound in Primaza: $RESULT"
 }
 
-function loaddata() {
+function loadData() {
    note "Creating the cluster's record"
    RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
 
@@ -256,7 +256,7 @@ case $1 in
     build)        "$@"; exit;;
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; exit;;
-    loaddata)     loaddata; exit;;
+    loaddata)     loadData; exit;;
     bindApplication) "$@"; exit;;
     isAlive)      isAlive; exit;;
     remove)       "$@"; exit;;
@@ -264,6 +264,6 @@ case $1 in
     *)
       build
       localDeploy
-      loaddata
+      loadData
       exit;;
 esac

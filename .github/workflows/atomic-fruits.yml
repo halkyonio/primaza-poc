@@ -59,6 +59,7 @@ jobs:
       - name: Deploy primaza helm chart
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
+          PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
           PRIMAZA_NAMESPACE: primaza
         run: |
           bash ./scripts/primaza.sh localdeploy
