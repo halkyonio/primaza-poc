@@ -8,9 +8,6 @@ POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=primaza-app -n $PRIMAZA_KUB
 
 APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/$APPLICATION_NAME")
 APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
-echo "----------------- pods ---------------------"
-kubectl get pods -A
-echo "----------------- end pods -----------------"
 echo "Application ID to be bound $APPLICATION_ID"
 
 CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETES_NAMESPACE -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/claims/name/$CLAIM_NAME")
@@ -21,9 +18,6 @@ RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n $PRIMAZA_KUBERNETE
 if [[ "$RESULT" = *"500 Internal Server Error"* ]]
 then
   echo "Application failed to be bound in Primaza: $RESULT"
-  echo "----------------- secrets ---------------------"
-  kubectl get secrets -A
-  echo "----------------- end secrets -----------------"
   exit 1
 fi
 if [[ "$RESULT" = *"404 Not Found"* ]]

@@ -164,7 +164,6 @@ public class KubernetesClientService {
      */
     public void mountSecretInApplication(Application application, Map<String, String> secretData)
             throws ClusterConnectException {
-        LOG.debug(" About to mount secret in cluster");
         client = getClientForCluster(application.cluster);
 
         // create secret

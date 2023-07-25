@@ -14,6 +14,7 @@ mvn clean install -DskipTests -Dquarkus.container-image.build=true \
   -Dquarkus.container-image.group=$KIND_REGISTRY_GROUP \
   -Dquarkus.container-image.tag=$VERSION \
   -Dquarkus.container-image.insecure=true \
+  -Dquarkus.vault.url=http://vault-internal.vault:8200 \
   -Dgithub.repo=$GITHUB_REPOSITORY \
   -Dgit.sha.commit=$GITHUB_COMMIT_SHA
 
