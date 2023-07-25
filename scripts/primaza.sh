@@ -157,12 +157,13 @@ function bindApplication() {
 
   APPLICATION=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/applications/name/$APPLICATION_NAME")
   APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
-  note "Application ID to be bound $APPLICATION_ID"
+  note "Application ID to be bound: $APPLICATION_ID"
 
   CLAIM=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -H 'Accept: application/json' -s localhost:8080/claims/name/$CLAIM_NAME")
   CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
-  note "Claim ID to be bound $CLAIM_ID"
+  note "Claim ID to be bound: $CLAIM_ID"
 
+  note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID"
   RESULT=$(kubectl exec -i $POD_NAME --container primaza-app -n ${NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i localhost:8080/applications/claim/$APPLICATION_ID")
   if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
     error "Application failed to be bound in Primaza: $RESULT"
