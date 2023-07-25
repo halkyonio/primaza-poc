@@ -32,12 +32,9 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
-      - name: Kubernetes KinD Cluster
-        uses: container-tools/kind-action@v2
-        with:
-          registry: true
-          knative_serving: v1.10.0
-          knative_kourier: v1.10.0
+      - name: Setup Kubernetes using kind and deploy a local container registry
+        run: |
+          curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install
       - name: Build primaza, generate image, Helm chart and push image
         run: |
           bash ./scripts/primaza.sh build
