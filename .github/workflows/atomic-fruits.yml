@@ -53,6 +53,7 @@ jobs:
       - name: Deploy primaza helm chart
         run: |
           bash ./scripts/primaza.sh localdeploy
+          bash ./scripts/primaza.sh isAlive
       - name: Load the data such as cluster, services & credentials
         run: |
           bash ./scripts/primaza.sh loaddata
@@ -67,6 +68,8 @@ jobs:
           bash ./scripts/atomic-fruits.sh
       - name: Creating the Primaza fruits Vault KV key
         run: |
+          source ./scripts/common.sh
+          
           # Login as user bob and password sinclair
           bash ./scripts/vault.sh loginAsUser bob sinclair
           
@@ -94,7 +97,7 @@ jobs:
           
           while [ $retry_attempt -le $max_retries ]; do
             note "Attempt $retry_attempt of $max_retries"
-            if [[ discover_atomic_fruits ]]; then
+            if discover_atomic_fruits; then
               note "Primaza discovered the atomic-fruits application: $APPLICATION"
               exit 0
             else

@@ -19,7 +19,8 @@ GITHUB_SHA_COMMIT=${GITHUB_SHA_COMMIT:-$(git rev-parse --short HEAD)}
 REGISTRY_GROUP=local
 REGISTRY=kind-registry:5000
 IMAGE_VERSION=latest
-INGRESS_HOST=primaza.${VM_IP}.nip.io
+#INGRSS_HOST=primaza.${VM_IP}.nip.io
+PRIMAZA_URL=${PRIMAZA_URL:-primaza.$VM_IP.nip.io}
 
 # Parameters used when using the image from an external container registry: quay.io/halkyonio/primaza-app
 # and helm chart published on: http://halkyonio.github.io/primaza-helm
@@ -34,7 +35,7 @@ export TYPE_SPEED=400
 NO_WAIT=true
 
 fmt "SCRIPTS_DIR dir: ${SCRIPTS_DIR}"
-fmt "Ingress host is: ${INGRESS_HOST}"
+fmt "Ingress host is: ${PRIMAZA_URL}"
 
 #########################
 ## Help / Usage
@@ -61,7 +62,7 @@ function build() {
      -Dquarkus.container-image.group=${REGISTRY_GROUP} \
      -Dquarkus.container-image.tag=${IMAGE_VERSION} \
      -Dquarkus.container-image.insecure=true \
-     -Dquarkus.kubernetes.ingress.host=${INGRESS_HOST} \
+     -Dquarkus.kubernetes.ingress.host=${PRIMAZA_URL} \
      -Dlog.level=INFO \
      -Dgit.sha.commit=${GITHUB_SHA_COMMIT} \
      -Dgithub.repo=${PRIMAZA_GITHUB_REPO}"
@@ -85,7 +86,7 @@ function deploy() {
       primaza-app \
       -n ${NAMESPACE} \
       --set app.image=${PRIMAZA_IMAGE_NAME} \
-      --set app.host=${INGRESS_HOST} \
+      --set app.host=${PRIMAZA_URL} \
       --set app.envs.git.sha.commit=${GITHUB_SHA_COMMIT} \
       --set app.envs.github.repo=${PRIMAZA_GITHUB_REPO} \
       ${ENVARGS} \
@@ -229,6 +230,32 @@ function log() {
   k describe $POD_NAME -n $NAMESPACE
 }
 
+function isAlive() {
+  max_retries=5
+  retry_delay=5
+  retry_attempt=1
+
+  function healthStatus() {
+    STATUS=$(curl -s $PRIMAZA_URL/q/health/live | jq -r .status)
+    if [[ "$STATUS" = "UP" ]]; then
+      return 0
+    else
+      return 1
+    fi
+  }
+
+  while [ $retry_attempt -le $max_retries ]; do
+    note "Attempt $retry_attempt of $max_retries"
+    if healthStatus; then
+      succeeded "Primaza is alive :-)"
+      exit 0
+    else
+      warn "Primaza is not yet alive."
+      sleep $retry_delay
+    fi
+  done
+}
+
 case $1 in
     -h)           primazaUsage; exit;;
     build)        "$@"; exit;;
@@ -236,6 +263,7 @@ case $1 in
     localdeploy)  localDeploy; exit;;
     loaddata)     loaddata; exit;;
     bindApplication) "$@"; exit;;
+    isAlive)      isAlive; exit;;
     remove)       "$@"; exit;;
     log)          log; exit;;
     *)
