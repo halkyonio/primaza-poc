@@ -80,6 +80,38 @@ jobs:
       - name: Bind application
         run: |
           bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
+      - id: wait-for-atomic-fruits
+        name: atomic-fruits should now be up and running
+        run: |
+          KUBERNETES_NAMESPACE=app
+          # Ready means that the application is now binded with the service, so we're ok!
+          kubectl wait --timeout=160s --for=condition=available deployment atomic-fruits -n $KUBERNETES_NAMESPACE
+
+      - name: (Only if it failed) Log Primaza traces at failures
+        if: failure()
+        run: |
+          PRIMAZA_KUBERNETES_NAMESPACE=primaza
+          bash .github/print_primaza_logs.sh
+
+      - name: (Only if it failed) Log Atomic Fruits traces at failures
+        if: failure()
+        run: |
+          KUBERNETES_NAMESPACE=app
+          echo "All pods in cluster"
+          kubectl get pods -A
+          echo "Deployment resource:"
+          kubectl get deployment atomic-fruits -o yaml -n $KUBERNETES_NAMESPACE
+          echo "Logs of the deployment:"
+          kubectl logs deploy/atomic-fruits --all-containers=true -n $KUBERNETES_NAMESPACE
+          echo "Print secret: "
+          kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE
+          POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=atomic-fruits -n $KUBERNETES_NAMESPACE -o name)
+          echo "Describe pod:"
+          kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
+          echo "Logs of running pod:"
+          kubectl logs $POD_NAME -n $KUBERNETES_NAMESPACE
+          echo "Logs of terminated pod:"
+          kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE          
           
           
           
