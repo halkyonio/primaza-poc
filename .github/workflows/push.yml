@@ -35,11 +35,14 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
 
-      - name: Kubernetes KinD Cluster
-        uses: container-tools/kind-action@v2
-        with:
-          version: v0.11.1
-          registry: true
+      #- name: Kubernetes KinD Cluster
+      #  uses: container-tools/kind-action@v2
+      #  with:
+      #    version: v0.11.1
+      #    registry: true
+      - name: Setup Kubernetes using kind and deploy a local container registry
+        run: |
+          curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install 
 
       - name: Generate Helm chart, build/push the docker image and install Primaza
         run: .github/install_primaza.sh ${{ github.repository }} $(git rev-parse --short HEAD)
