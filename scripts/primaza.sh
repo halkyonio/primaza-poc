@@ -148,9 +148,6 @@ function localDeploy() {
 }
 
 function loaddata() {
-   note "trying to curl the service ..."
-   curl -v http://primaza-app.primaza.svc.cluster.local/
-
    note "Creating the cluster's record"
    RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
 
