@@ -1,17 +1,15 @@
 package io.halkyon.exceptions;
 
-import io.halkyon.model.Cluster;
-
 public class ClusterConnectException extends Exception {
-    private final Cluster cluster;
+    private final String clusterName;
 
-    public ClusterConnectException(Cluster cluster, Exception cause) {
+    public ClusterConnectException(String clusterName, Exception cause) {
         super(cause);
 
-        this.cluster = cluster;
+        this.clusterName = clusterName;
     }
 
-    public Cluster getCluster() {
-        return cluster;
+    public String getClusterName() {
+        return clusterName;
     }
 }
