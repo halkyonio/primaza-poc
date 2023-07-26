@@ -15,7 +15,7 @@ HELM_APP_NAME=atomic-fruits
 IMAGE=quay.io/halkyonio/atomic-fruits:latest
 INGRESS_HOST=atomic-fruits.${VM_IP}.nip.io
 
-NAMESPACE=${NAMESPACE:-app}
+ATOMIC_FRUITS_NAMESPACE=${ATOMIC_FRUITS_NAMESPACE:-app}
 
 DB_USERNAME=${DB_USERNAME:-healthy}
 DB_PASSWORD=${DB_PASSWORD:-healthy}
@@ -28,17 +28,17 @@ TYPE_SPEED=${TYPE_SPEED:=200}
 NO_WAIT=true
 
 function remove() {
-  cmdExec "helm uninstall ${HELM_APP_NAME} -n ${NAMESPACE}"
+  cmdExec "helm uninstall ${HELM_APP_NAME} -n ${ATOMIC_FRUITS_NAMESPACE}"
 }
 
 function deploy() {
-  cmdExec "k create ns $NAMESPACE --dry-run=client -o yaml | k apply -f -"
-  cmdExec "k config set-context --current --namespace=${NAMESPACE}"
+  cmdExec "k create ns $ATOMIC_FRUITS_NAMESPACE --dry-run=client -o yaml | k apply -f -"
+  cmdExec "k config set-context --current --namespace=${ATOMIC_FRUITS_NAMESPACE}"
   
   cmdExec "helm upgrade -i ${HELM_APP_NAME} \
       ${FRUITS_CHART_NAME} \
       --repo http://halkyonio.github.io/helm-charts \
-      -n ${NAMESPACE} \
+      -n ${ATOMIC_FRUITS_NAMESPACE} \
       --set app.image=${IMAGE} \
       --set app.host=${INGRESS_HOST} \
       --set db.auth.database=${DB_DATABASE} \
@@ -56,12 +56,12 @@ function installdb() {
     --set auth.password=$DB_PASSWORD \
     --set auth.database=$DB_DATABASE \
     --create-namespace \
-    -n ${NAMESPACE}"
+    -n ${ATOMIC_FRUITS_NAMESPACE}"
 }
 
 function removedb() {
-  cmdExec "helm uninstall postgresql -n ${NAMESPACE}"
-  cmdExec "kubectl delete pvc -lapp.kubernetes.io/name=$DB_RELEASE_NAME -n ${NAMESPACE}"
+  cmdExec "helm uninstall postgresql -n ${ATOMIC_FRUITS_NAMESPACE}"
+  cmdExec "kubectl delete pvc -lapp.kubernetes.io/name=$DB_RELEASE_NAME -n ${ATOMIC_FRUITS_NAMESPACE}"
 }
 
 case $1 in

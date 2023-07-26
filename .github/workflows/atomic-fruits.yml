@@ -81,8 +81,13 @@ jobs:
           bash ./scripts/crossplane.sh
 
       - name: Installing Postgresql DB and Atomic fruits
+        env:
+          ATOMIC_FRUITS_NAMESPACE: app
         run: |
           bash ./scripts/atomic-fruits.sh
+          
+          # Wait till postgresql pod is ready
+          kubectl wait -n $ATOMIC_FRUITS_NAMESPACE pod/postgresql-0 --for=condition=ready --timeout=300s
 
       - name: Creating the Primaza fruits Vault KV key
         run: |
