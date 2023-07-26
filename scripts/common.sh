@@ -63,6 +63,7 @@ succeeded() {
 
 note() {
   MSG=$1
+
   # Use command substitution to check if the string contains a newline
   if [ -z "$(echo "$MSG" | grep $'\n')" ]; then
     # Single-line string, directly echo it
@@ -111,7 +112,7 @@ log() {
 format_message() {
   local message_format="$1"
   shift
-  local formatted_msg=$(printf "$message_format\n" "$@")
+  local formatted_msg=$(printf "$message_format" "$@")
   echo "$formatted_msg"
 }
 
@@ -142,16 +143,21 @@ log_http_response() {
       error "$(format_message "$ERROR_MSG" "406 Not Acceptable")"
       exit 1
     fi
+    if [[ "$http_code" = 409 ]]; then
+      error "$(format_message "$ERROR_MSG" "409 Conflict")"
+      exit 1
+    fi
     if [[ "$http_code" = 415 ]]; then
       error "$(format_message "$ERROR_MSG" "415 Unsupported Media Type")"
-      error "$(format_message "Body: \n%s" "$response")"
       exit 1
     fi
     if [[ "$response" = *"alert-danger"* ]]; then
       error "$(format_message "$ERROR_MSG" "$response")"
       exit 1
     fi
-    note "$(format_message "$SUCCESS_MSG" "$response")"
+
+    removeHeaders=$(echo $response | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)$")
+    note "$(format_message "$SUCCESS_MSG" "removeHeaders")"
 }
 
 

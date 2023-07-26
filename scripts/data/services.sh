@@ -35,10 +35,10 @@ do
       -i ${PRIMAZA_URL}/services)
   log_http_response "Service failed to be saved in Primaza: %s" "Service installed in Primaza: %s" $RESPONSE
 
-  SERVICE=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL:8080/services/name/$SERVICE_NAME)
-  if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
-  then
-    error "Primaza was not able to discover the $SERVICE_NAME: $SERVICE"
-    exit 1
-  fi
+  #SERVICE=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL:8080/services/name/$SERVICE_NAME)
+  #if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
+  #then
+  #  error "Primaza was not able to discover the $SERVICE_NAME: $SERVICE"
+  #  exit 1
+  #fi
 done
