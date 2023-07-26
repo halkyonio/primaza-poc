@@ -160,27 +160,8 @@ function bindApplication() {
 
   note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d \"claimId=$CLAIM_ID\" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
   RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d "claimId=$CLAIM_ID" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
-  if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
-    error "$(format_message "Application failed to be bound in Primaza: %s" $RESULT)"
-    exit 1
-  fi
-  if [[ "$RESULT" = *"400 Bad Request"* ]]; then
-    error "$(format_message "Application failed to be bound in Primaza: %s" $RESULT)"
-    exit 1
-  fi
-  if [[ "$RESULT" = *"404 Not Found"* ]]; then
-    error "$(format_message "Application failed to be bound in Primaza: %s" $RESULT)"
-    exit 1
-  fi
-  if [[ "$RESULT" = *"406 Not Acceptable"* ]]; then
-    error "$(format_message "Application failed to be bound in Primaza: %s" $RESULT)"
-    exit 1
-  fi
-  if [[ "$RESULT" = *"alert-danger"* ]]; then
-    error "$(format_message "Application failed to be bound in Primaza: %s" $RESULT)"
-    exit 1
-  fi
-  note "$(format_message "Application bound in Primaza: %s" $RESULT)"
+
+  log_http_response "Application failed to be bound in Primaza: %s" "Application bound in Primaza: %s" $RESULT
 }
 
 function loadData() {

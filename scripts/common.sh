@@ -75,6 +75,34 @@ format_message() {
   echo $formatted_msg
 }
 
+log_http_response() {
+    local ERROR_MSG=$1
+    local SUCCESS_MSG=$2
+    local RESULT=$3
+    
+    if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
+      error "$(format_message "$ERROR_MSG" $RESULT)"
+      exit 1
+    fi
+    if [[ "$RESULT" = *"400 Bad Request"* ]]; then
+      error "$(format_message "$ERROR_MSG" $RESULT)"
+      exit 1
+    fi
+    if [[ "$RESULT" = *"404 Not Found"* ]]; then
+      error "$(format_message "$ERROR_MSG" $RESULT)"
+      exit 1
+    fi
+    if [[ "$RESULT" = *"406 Not Acceptable"* ]]; then
+      error "$(format_message "$ERROR_MSG" $RESULT)"
+      exit 1
+    fi
+    if [[ "$RESULT" = *"alert-danger"* ]]; then
+      error "$(format_message "$ERROR_MSG" $RESULT)"
+      exit 1
+    fi
+    note "$(format_message "$SUCCESS_MSG" $RESULT)"
+}
+
 
 function cmdExec() {
   COMMAND=${1}
