@@ -28,5 +28,10 @@ declare -a arr=(
 for i in "${arr[@]}"
 do
   note "curl -X POST ${PRIMAZA_URL}/credentials -s -k -d \"${i}\"" >&2
-  curl -X POST ${PRIMAZA_URL}/credentials -s -k -d "${i}" -o /dev/null
+  RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}' \
+    -X POST \
+    -d "${i}" \
+    -i ${PRIMAZA_URL}/credentials)
+  log_http_response "Credential failed to be saved in Primaza: %s" "Credential installed in Primaza: %s" $RESPONSE
+
 done

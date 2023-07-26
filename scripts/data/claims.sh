@@ -25,5 +25,9 @@ CLAIM_REQUESTED_SERVICE=${CLAIM_REQUESTED_SERVICE:-postgresql-14.5}
 PARAMS="name=$CLAIM_NAME&description=$CLAIM_DESCRIPTION&serviceRequested=$CLAIM_REQUESTED_SERVICE"
 
 note "curl -X POST ${PRIMAZA_URL}/claims -s -i -k -d \"${PARAMS}\""
-RESULT=$(curl -X POST ${PRIMAZA_URL}/claims -s -i -k -d "${PARAMS}")
-log_http_response "Claim failed to be saved in Primaza: %s" "Claim installed in Primaza: %s" "$RESULT"
+RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
+  -X POST \
+  -d "${PARAMS}"\
+  -i ${PRIMAZA_URL}/claims)
+
+log_http_response "Claim failed to be saved in Primaza: %s" "Claim installed in Primaza: %s" "$RESPONSE"

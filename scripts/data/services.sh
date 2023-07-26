@@ -29,5 +29,16 @@ declare -a arr=(
 for i in "${arr[@]}"
 do
   note "curl -X POST ${PRIMAZA_URL}/services -s -k -d \"${i}\"" >&2
-  curl -X POST -k -d "${i}" -s ${PRIMAZA_URL}/services -o /dev/null
+  RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
+      -X POST \
+      -d "${i}" \
+      -i ${PRIMAZA_URL}/services)
+  log_http_response "Service failed to be saved in Primaza: %s" "Service installed in Primaza: %s" $RESPONSE
+
+  SERVICE=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL:8080/services/name/$SERVICE_NAME)
+  if [ $(echo "$SERVICE" | jq -r '.available') != "true" ]
+  then
+    error "Primaza was not able to discover the $SERVICE_NAME: $SERVICE"
+    exit 1
+  fi
 done

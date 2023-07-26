@@ -48,19 +48,59 @@ msg() {
 }
 
 succeeded() {
-  echo -e "${GREEN}NOTE:${NC} $1"
+  MSG=$1
+  # Use command substitution to check if the string contains a newline
+  if [ -z "$(echo "$MSG" | grep $'\n')" ]; then
+    # Single-line string, directly echo it
+    echo -e "${GREEN}NOTE:${NC} $MSG"
+  else
+    # Multiline string, iterate over each line using a while loop and read
+    while IFS= read -r line; do
+      echo -e "${GREEN}NOTE:${NC} $line"
+    done <<< "$MSG"
+  fi
 }
 
 note() {
-  echo -e "${BLUE}NOTE:${NC} $1"
+  MSG=$1
+  # Use command substitution to check if the string contains a newline
+  if [ -z "$(echo "$MSG" | grep $'\n')" ]; then
+    # Single-line string, directly echo it
+    echo -e "${BLUE}NOTE:${NC} $MSG"
+  else
+    # Multiline string, iterate over each line using a while loop and read
+    while IFS= read -r line; do
+      echo -e "${BLUE}NOTE:${NC} $line"
+    done <<< "$MSG"
+  fi
 }
 
 warn() {
-  echo -e "${YELLOW}WARN:${NC} $1"
+  MSG=$1
+  # Use command substitution to check if the string contains a newline
+  if [ -z "$(echo "$MSG" | grep $'\n')" ]; then
+    # Single-line string, directly echo it
+    echo -e "${YELLOW}WARN:${NC} $MSG"
+  else
+    # Multiline string, iterate over each line using a while loop and read
+    while IFS= read -r line; do
+      echo -e "${YELLOW}WARN:${NC} $line"
+    done <<< "$MSG"
+  fi
 }
 
 error() {
-  echo -e "${RED}ERROR:${NC} $1"
+  MSG=$1
+  # Use command substitution to check if the string contains a newline
+  if [ -z "$(echo "$MSG" | grep $'\n')" ]; then
+    # Single-line string, directly echo it
+    echo -e "${RED}ERROR:${NC} $MSG"
+  else
+    # Multiline string, iterate over each line using a while loop and read
+    while IFS= read -r line; do
+      echo -e "${RED}ERROR:${NC} $line"
+    done <<< "$MSG"
+  fi
 }
 
 log() {
@@ -72,35 +112,46 @@ format_message() {
   local message_format="$1"
   shift
   local formatted_msg=$(printf "$message_format\n" "$@")
-  echo $formatted_msg
+  echo "$formatted_msg"
 }
 
 log_http_response() {
     local ERROR_MSG=$1
     local SUCCESS_MSG=$2
-    local RESULT=$3
+    local RESPONSE=$3
     
-    if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$RESULT")"
+    # Extract the response code from the output
+    http_code=${RESPONSE:${#RESPONSE}-3}
+    
+    # Read the response body from the file
+    response=$(cat response.txt)
+
+    if [[ "$http_code" = 500 ]]; then
+      error "$(format_message "$ERROR_MSG" "500 Internal Server Error")"
       exit 1
     fi
-    if [[ "$RESULT" = *"400 Bad Request"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$RESULT")"
+    if [[ "$http_code" = 400 ]]; then
+      error "$(format_message "$ERROR_MSG" "400 Bad Request")"
       exit 1
     fi
-    if [[ "$RESULT" = *"404 Not Found"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$RESULT")"
+    if [[ "$http_code" = 404 ]]; then
+      error "$(format_message "$ERROR_MSG" "404 Not found")"
       exit 1
     fi
-    if [[ "$RESULT" = *"406 Not Acceptable"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$RESULT")"
+    if [[ "$http_code" = 406 ]]; then
+      error "$(format_message "$ERROR_MSG" "406 Not Acceptable")"
       exit 1
     fi
-    if [[ "$RESULT" = *"alert-danger"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$RESULT")"
+    if [[ "$http_code" = 415 ]]; then
+      error "$(format_message "$ERROR_MSG" "415 Unsupported Media Type")"
+      error "$(format_message "Body: \n%s" "$response")"
       exit 1
     fi
-    note "$(format_message "$SUCCESS_MSG" "$RESULT")"
+    if [[ "$response" = *"alert-danger"* ]]; then
+      error "$(format_message "$ERROR_MSG" "$response")"
+      exit 1
+    fi
+    note "$(format_message "$SUCCESS_MSG" "$response")"
 }
 
 

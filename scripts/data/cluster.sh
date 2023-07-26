@@ -24,9 +24,6 @@ PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
 CONTEXT_TO_USE=${CONTEXT_TO_USE:-kind}
 KIND_URL=${KIND_URL:-https://kubernetes.default.svc}
 
-#cmdExec "kind get kubeconfig --name ${CONTEXT_TO_USE} > local-kind-kubeconfig"
-#cmdExec "k cp local-kind-kubeconfig ${NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
-#CFG=$(kubectl config view --flatten --minify --context=${CONTEXT_TO_USE})
 CFG=$(kind get kubeconfig --name ${CONTEXT_TO_USE})
 
 note "curl -sS -o /dev/null -w '%{http_code}'\
@@ -38,11 +35,13 @@ note "curl -sS -o /dev/null -w '%{http_code}'\
         -F kubeConfig=${CFG}\
         -i ${PRIMAZA_URL}/clusters" >&2
 
-curl -sS -o /dev/null -w '%{http_code}'\
+RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
   -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\
   -F kubeConfig="${CFG}"\
-  -i ${PRIMAZA_URL}/clusters
+  -i ${PRIMAZA_URL}/clusters)
+
+log_http_response "Cluster failed to be saved in Primaza: %s" "Cluster installed in Primaza: %s" "$RESPONSE"
