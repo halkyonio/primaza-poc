@@ -178,7 +178,7 @@ jobs:
           kubectl logs deploy/atomic-fruits --all-containers=true -n $KUBERNETES_NAMESPACE
           
           log BLUE "Show the atomic-fruits-secret secret"
-          kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE
+          kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE 2>/dev/null
           
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=atomic-fruits -n $KUBERNETES_NAMESPACE -o name)
           log BLUE "Information of the primaza app pod"

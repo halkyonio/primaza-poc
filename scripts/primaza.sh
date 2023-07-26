@@ -157,7 +157,7 @@ function bindApplication() {
   CLAIM=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/claims/name/$CLAIM_NAME)
   CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
   note "Claim ID to be bound: $CLAIM_ID"
-  note "curl version: $(curl -V)"
+
   note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d \"claimId=$CLAIM_ID\" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
   RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d "claimId=$CLAIM_ID" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
   if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
