@@ -160,23 +160,7 @@ function bindApplication() {
 
 function loadData() {
    note "Creating the cluster's record"
-   RESPONSE=$(${SCRIPTS_DIR}/data/cluster.sh)
-
-   # Extract the HTTP status code and response code from the response
-   http_status_code="${RESPONSE%%:*}"
-
-   # Check if the HTTP status code indicates an error (e.g., 500)
-   if [ "$http_status_code" -eq 201 ]; then
-     note "Local k8s cluster registered !"
-   else
-     note "Curl request failed with HTTP Status Code: $http_status_code"
-
-     POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
-     k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
-     k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
-
-     exit 1
-   fi
+   ${SCRIPTS_DIR}/data/cluster.sh
 
    note "Creating the services's records"
    ${SCRIPTS_DIR}/data/services.sh

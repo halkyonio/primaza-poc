@@ -45,3 +45,7 @@ RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
   -i ${PRIMAZA_URL}/clusters)
 
 log_http_response "Cluster failed to be saved in Primaza: %s" "Cluster installed in Primaza: %s" "$RESPONSE"
+
+#POD_NAME=$(k get pod -l app.kubernetes.io/name=primaza-app -n ${PRIMAZA_NAMESPACE} -o name)
+#k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
+#k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
