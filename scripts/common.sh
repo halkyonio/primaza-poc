@@ -68,6 +68,13 @@ log() {
   echo; repeat_char ${1} '#'; msg ${1} ${MSG}; repeat_char ${1} '#'; echo
 }
 
+format_message() {
+  local message_format="$1"
+  shift
+  local formatted_msg=$(printf "$message_format\n" "$@")
+  echo $formatted_msg
+}
+
 
 function cmdExec() {
   COMMAND=${1}
