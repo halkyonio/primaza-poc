@@ -165,27 +165,29 @@ jobs:
       - name: (Only if it failed) Log Atomic Fruits traces at failures
         if: failure()
         run: |
+          source ./scripts/common.sh
+          
           KUBERNETES_NAMESPACE=app
-          echo "List of pods deployed on the cluster"
+          log "List of pods deployed on the cluster"
           kubectl get pods -A
           
-          echo "Deployment resource:"
+          log "Description of the atomic-fruits deployment resource"
           kubectl get deployment atomic-fruits -o yaml -n $KUBERNETES_NAMESPACE
           
-          echo "Logs of the deployment:"
+          log "Logs of the atomic-fruits deployment"
           kubectl logs deploy/atomic-fruits --all-containers=true -n $KUBERNETES_NAMESPACE
           
-          echo "Print secret: "
+          log "Show the atomic-fruits-secret secret"
           kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE
           
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=atomic-fruits -n $KUBERNETES_NAMESPACE -o name)
-          echo "Describe pod:"
+          log "Information of the primaza app pod"
           kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          echo "Logs of running pod:"
+          log "Logs of running pod:"
           kubectl logs $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          echo "Logs of terminated pod:"
+          log "Logs of terminated pod:"
           kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE          
           
           
