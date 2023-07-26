@@ -168,26 +168,26 @@ jobs:
           source ./scripts/common.sh
           
           KUBERNETES_NAMESPACE=app
-          log "List of pods deployed on the cluster"
+          log BLUE "List of pods deployed on the cluster"
           kubectl get pods -A
           
-          log "Description of the atomic-fruits deployment resource"
+          log BLUE "Description of the atomic-fruits deployment resource"
           kubectl get deployment atomic-fruits -o yaml -n $KUBERNETES_NAMESPACE
           
-          log "Logs of the atomic-fruits deployment"
+          log BLUE "Logs of the atomic-fruits deployment"
           kubectl logs deploy/atomic-fruits --all-containers=true -n $KUBERNETES_NAMESPACE
           
-          log "Show the atomic-fruits-secret secret"
+          log BLUE "Show the atomic-fruits-secret secret"
           kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE
           
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=atomic-fruits -n $KUBERNETES_NAMESPACE -o name)
-          log "Information of the primaza app pod"
+          log BLUE "Information of the primaza app pod"
           kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          log "Logs of running pod:"
+          log BLUE "Logs of running pod:"
           kubectl logs $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          log "Logs of terminated pod:"
+          log BLUE "Logs of terminated pod:"
           kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE          
           
           
