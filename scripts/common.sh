@@ -116,6 +116,14 @@ format_message() {
   echo "$formatted_msg"
 }
 
+is_multiline_string() {
+  if echo "$1" | grep -q $'\n'; then
+    return 0  # True, string is multiline
+  else
+    return 1  # False, string is single line
+  fi
+}
+
 log_http_response() {
     local ERROR_MSG=$1
     local SUCCESS_MSG=$2
@@ -156,8 +164,9 @@ log_http_response() {
       exit 1
     fi
 
-    removeHeaders=$(echo $response | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)$")
-    note "$(format_message "$SUCCESS_MSG" "$removeHeaders")"
+    removeHeaders=$(echo "$response" | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)")
+    cleanBodyMessage=$(echo "$removeHeaders" | tr -d '\n\r')
+    note "$(format_message "$SUCCESS_MSG" "$cleanBodyMessage")"
 }
 
 
