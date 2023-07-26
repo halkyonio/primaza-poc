@@ -105,7 +105,7 @@ function deploy() {
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
 
-    log_http_response "Cluster failed to be saved in Primaza: %s" "Local k8s cluster registered: %s" $RESULT
+    log_http_response "Cluster failed to be saved in Primaza: %s" "Local k8s cluster registered: %s" "$RESULT"
 }
 
 function localDeploy() {
@@ -155,7 +155,7 @@ function bindApplication() {
   note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d \"claimId=$CLAIM_ID\" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
   RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d "claimId=$CLAIM_ID" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
 
-  log_http_response "Application failed to be bound in Primaza: %s" "Application bound in Primaza: %s" $RESULT
+  log_http_response "Application failed to be bound in Primaza: %s" "Application bound in Primaza: %s" "$RESULT"
 }
 
 function loadData() {
