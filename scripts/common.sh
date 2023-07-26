@@ -157,7 +157,7 @@ log_http_response() {
     fi
 
     removeHeaders=$(echo $response | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)$")
-    note "$(format_message "$SUCCESS_MSG" "removeHeaders")"
+    note "$(format_message "$SUCCESS_MSG" "$removeHeaders")"
 }
 
 
