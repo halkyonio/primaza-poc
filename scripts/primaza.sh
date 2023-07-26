@@ -159,8 +159,12 @@ function bindApplication() {
   note "Claim ID to be bound: $CLAIM_ID"
 
   note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
-  RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
+  RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'claimId=$CLAIM_ID' -s -i "$PRIMAZA_URL/applications/claim/$APPLICATION_ID")
   if [[ "$RESULT" = *"500 Internal Server Error"* ]]; then
+    error "Application failed to be bound in Primaza: $RESULT"
+    exit 1
+  fi
+  if [[ "$RESULT" = *"400 Bad Request"* ]]; then
     error "Application failed to be bound in Primaza: $RESULT"
     exit 1
   fi
