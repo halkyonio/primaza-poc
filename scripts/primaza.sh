@@ -104,14 +104,8 @@ function deploy() {
     cmdExec "k cp local-kind-kubeconfig ${PRIMAZA_NAMESPACE}/${POD_NAME:4}:/tmp/local-kind-kubeconfig -c primaza-app"
 
     RESULT=$(k exec -i $POD_NAME -c primaza-app -n ${PRIMAZA_NAMESPACE} -- sh -c "curl -X POST -H 'Content-Type: multipart/form-data' -F name=local-kind -F excludedNamespaces=$NS_TO_BE_EXCLUDED -F environment=DEV -F url=$KIND_URL -F kubeConfig=@/tmp/local-kind-kubeconfig -s -i localhost:8080/clusters")
-    if [ "$RESULT" = *"500 Internal Server Error"* ]
-    then
-        note "Cluster failed to be saved in Primaza: $RESULT"
-        k describe $POD_NAME -n ${PRIMAZA_NAMESPACE}
-        k logs $POD_NAME -n ${PRIMAZA_NAMESPACE}
-        exit 1
-    fi
-    note "Local k8s cluster registered: $RESULT"
+
+    log_http_response "Cluster failed to be saved in Primaza: %s" "Local k8s cluster registered: %s" $RESULT
 }
 
 function localDeploy() {
