@@ -61,6 +61,8 @@ jobs:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           PRIMAZA_IMAGE_NAME: $KIND_REGISTRY/local/primaza-app
           PRIMAZA_NAMESPACE: primaza
+          # Variable needed by the helm chart to configure primaza vault client
+          VAULT_URL: http://vault-internal.vault:8200
         run: |
           bash ./scripts/primaza.sh localdeploy
           bash ./scripts/primaza.sh isAlive
@@ -168,27 +170,24 @@ jobs:
           source ./scripts/common.sh
           
           KUBERNETES_NAMESPACE=app
-          log BLUE "List of pods deployed on the cluster"
+          log BLUE "List of the pods deployed on the cluster"
           kubectl get pods -A
           
           log BLUE "Description of the atomic-fruits deployment resource"
           kubectl get deployment atomic-fruits -o yaml -n $KUBERNETES_NAMESPACE
           
-          log BLUE "Logs of the atomic-fruits deployment"
+          log BLUE "Logs of the atomic-fruits deployment resource"
           kubectl logs deploy/atomic-fruits --all-containers=true -n $KUBERNETES_NAMESPACE
           
-          log BLUE "Show the atomic-fruits-secret secret"
-          kubectl get secret atomic-fruits-secret -o yaml -n $KUBERNETES_NAMESPACE || true
-          
           POD_NAME=$(kubectl get pod -l app.kubernetes.io/name=atomic-fruits -n $KUBERNETES_NAMESPACE -o name)
-          log BLUE "Information of the primaza app pod"
+          log BLUE "Information of the Atomic-fruits pod"
           kubectl describe $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          log BLUE "Logs of running pod:"
+          log BLUE "Logs of atomic-fruits running pod"
           kubectl logs $POD_NAME -n $KUBERNETES_NAMESPACE
           
-          log BLUE "Logs of terminated pod:"
-          kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE          
+          log BLUE "Logs of atomic-fruits terminated pod"
+          kubectl logs -p $POD_NAME -n $KUBERNETES_NAMESPACE
           
           
           
