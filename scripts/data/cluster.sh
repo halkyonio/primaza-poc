@@ -5,7 +5,7 @@
 # ./scripts/data/cluster.sh
 #
 # To use a different context
-# CONTEXT_TO_USE=my-ctx ./scripts/data/cluster.sh
+# KUBE_CONTEXT=my-ctx ./scripts/data/cluster.sh
 #
 # To create the cluster record on a Primaza server which is not localhost:8080
 # PRIMAZA_URL=myprimaza:8080 ./scripts/data/cluster.sh
@@ -58,14 +58,14 @@ parse_parameters "$@"
 
 PRIMAZA_URL=${PRIMAZA_URL:-$DEFAULT_PRIMAZA_URL}
 NS_TO_EXCLUDE=${NS_TO_EXCLUDE:-$DEFAULT_NS_TO_EXCLUDE}
-KUBE_CONTEXT=${CONTEXT_TO_USE:-$DEFAULT_KUBE_CONTEXT}
+KUBE_CONTEXT=${KUBE_CONTEXT:-$DEFAULT_KUBE_CONTEXT}
 KIND_URL=${KIND_URL:-$DEFAULT_KIND_URL}
 ENVIRONMENT=${ENVIRONMENT:-$DEFAULT_ENVIRONMENT}
 
 note "Getting the kube config using context name: $KUBE_CONTEXT"
 CFG=$(kind get kubeconfig --name ${KUBE_CONTEXT})
 
-note "curl -sS -o /dev/null -w '%{http_code}'\
+note "curl -s -k -o response.txt -w '%{http_code}'\
         -X POST -H 'Content-Type: multipart/form-data' \
         -F excludedNamespaces=${NS_TO_EXCLUDE}\
         -F name=${KUBE_CONTEXT}\
@@ -77,7 +77,7 @@ note "curl -sS -o /dev/null -w '%{http_code}'\
 RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
   -X POST -H 'Content-Type: multipart/form-data' \
   -F excludedNamespaces=${NS_TO_EXCLUDE}\
-  -F name=${CONTEXT_TO_USE}\
+  -F name=${KUBE_CONTEXT}\
   -F environment=DEV\
   -F url=${KIND_URL}\
   -F kubeConfig="${CFG}"\
