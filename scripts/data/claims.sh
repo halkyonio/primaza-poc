@@ -15,19 +15,52 @@ source ${SCRIPTS_DIR}/../common.sh
 export TYPE_SPEED=400
 NO_WAIT=true
 
-# Script parameters
-PRIMAZA_URL=${PRIMAZA_URL:-localhost:8080}
-SERVICE_ID=${SERVICE_ID:-1}
+# Default parameter values
+DEFAULT_PRIMAZA_URL="localhost:8080"
+DEFAULT_CLAIM_NAME="fruits-claim"
+DEFAULT_CLAIM_DESCRIPTION="postgresql-fruits-db"
+DEFAULT_CLAIM_REQUESTED_SERVICE="postgresql-14.5"
 
-CLAIM_NAME=${CLAIM_NAME:-fruits-claim}
-CLAIM_DESCRIPTION=${CLAIM_DESCRIPTION:-postgresql-fruits-db}
-CLAIM_REQUESTED_SERVICE=${CLAIM_REQUESTED_SERVICE:-postgresql-14.5}
-PARAMS="name=$CLAIM_NAME&description=$CLAIM_DESCRIPTION&serviceRequested=$CLAIM_REQUESTED_SERVICE"
+# Function to parse named parameters
+parse_parameters() {
+  for arg in "$@"; do
+    case $arg in
+      url=*)
+        PRIMAZA_URL="${arg#*=}"
+        ;;
+      claim_name=*)
+        CLAIM_NAME="${arg#*=}"
+        ;;
+      description=*)
+        CLAIM_DESCRIPTION="${arg#*=}"
+        ;;
+      requested_service=*)
+        CLAIM_REQUESTED_SERVICE="${arg#*=}"
+        ;;
+      *)
+        # Handle any other unrecognized parameters
+        echo "Unrecognized parameter: $arg"
+        exit 1
+        ;;
+    esac
+  done
+}
 
-note "curl -X POST ${PRIMAZA_URL}/claims -s -i -k -d \"${PARAMS}\""
+# Parse the named parameters with defaults
+parse_parameters "$@"
+
+# Set defaults if parameters are not provided
+PRIMAZA_URL=${PRIMAZA_URL:-DEFAULT_PRIMAZA_URL}
+CLAIM_NAME=${CLAIM_NAME:-DEFAULT_CLAIM_NAME}
+CLAIM_DESCRIPTION=${CLAIM_DESCRIPTION:-DEFAULT_CLAIM_DESCRIPTION}
+CLAIM_REQUESTED_SERVICE=${CLAIM_REQUESTED_SERVICE:-DEFAULT_CLAIM_REQUESTED_SERVICE}
+
+BODY="name=$CLAIM_NAME&description=$CLAIM_DESCRIPTION&serviceRequested=$CLAIM_REQUESTED_SERVICE"
+note "Creating the claim using as body: $BODY"
+note "curl -X POST -s -i -k -d \"${BODY}\" ${PRIMAZA_URL}/claims" >&2
+
 RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
   -X POST \
-  -d "${PARAMS}"\
+  -d "${BODY}"\
   -i ${PRIMAZA_URL}/claims)
-
 log_http_response "Claim failed to be saved in Primaza: %s" "Claim installed in Primaza: %s" "$RESPONSE"
