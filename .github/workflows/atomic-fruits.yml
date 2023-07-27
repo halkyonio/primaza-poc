@@ -5,7 +5,7 @@ on:
   push:
     branches: [ test_flow ]
     paths-ignore:
-      #- 'scripts/**' # Ignores bash scripts
+      #- 'scripts/**' # Ignores  scripts
       - '*.md'          # Ignores .md files at the root of the repository
       - '**/*.md'       # Ignores .md files within subdirectories
 
@@ -33,7 +33,7 @@ jobs:
           REGISTRY_NAME: kind-registry
           REGISTRY_PORT: 5000
         run: |
-          curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install
+          curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" |  -s install
           
           # Adding registry name to the /etc/hosts file
           echo "127.0.0.1 $REGISTRY_NAME" | sudo tee -a /etc/hosts
@@ -64,29 +64,29 @@ jobs:
           # Variable needed by the helm chart to configure primaza vault client
           VAULT_URL: http://vault-internal.vault:8200
         run: |
-          bash ./scripts/primaza.sh localdeploy
-          bash ./scripts/primaza.sh isAlive
+           ./scripts/primaza.sh localdeploy
+           ./scripts/primaza.sh isAlive
 
       - name: Load the data such as cluster, services & credentials
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           PRIMAZA_NAMESPACE: primaza
         run: |
-          bash ./scripts/primaza.sh loaddata
+           ./scripts/primaza.sh loaddata
 
       - name: Installing Vault
         run: |
-          bash ./scripts/vault.sh
+           ./scripts/vault.sh
 
       - name: Installing Crossplane
         run: |
-          bash ./scripts/crossplane.sh
+           ./scripts/crossplane.sh
 
       - name: Installing Postgresql DB and Atomic fruits
         env:
           ATOMIC_FRUITS_NAMESPACE: app
         run: |
-          bash ./scripts/atomic-fruits.sh
+           ./scripts/atomic-fruits.sh
           
           # Wait till postgresql pod is ready
           kubectl wait -n $ATOMIC_FRUITS_NAMESPACE pod/postgresql-0 --for=condition=ready --timeout=300s
@@ -96,7 +96,7 @@ jobs:
           source ./scripts/common.sh
           
           # Login as user bob and password sinclair
-          bash ./scripts/vault.sh loginAsUser bob sinclair
+           ./scripts/vault.sh loginAsUser bob sinclair
           
           # Register the primaza KV entries
           note "vault kv put -mount=secret primaza/fruits username=healthy password=healthy database=fruits_database"
@@ -136,7 +136,7 @@ jobs:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           PRIMAZA_NAMESPACE: primaza
         run: |
-          bash ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
+           ./scripts/primaza.sh bindApplication atomic-fruits fruits-claim
 
       - id: wait-for-atomic-fruits
         name: atomic-fruits should now be up and running
@@ -162,7 +162,7 @@ jobs:
       - name: (Only if it failed) Log Primaza traces at failures
         if: failure()
         run: |
-          bash ./scripts/primaza.sh log
+           ./scripts/primaza.sh log
 
       - name: (Only if it failed) Log Atomic Fruits traces at failures
         if: failure()
