@@ -73,7 +73,7 @@ jobs:
           PRIMAZA_NAMESPACE: primaza
         run: |
           #./scripts/primaza.sh loaddata
-          ./scripts/data/cluster.sh url=$PRIMAZa_URL kube_context=kind kube_url=https://kubernetes.default.svc environment=dev ns_to_exclude="default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault"
+          ./scripts/data/cluster.sh url=$PRIMAZa_URL kube_context=kind kube_url="https://kubernetes.default.svc" environment=dev ns_to_exclude="default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault"
 
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=postgresql version=14.5 type=postgresql endpoint=tcp:5432 helmRepo="https://charts.bitnami.com/bitnami&helmChart=postgresql&helmChartVersion=11.9.13"
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=mysql version=8.0 type=mysql endpoint=tcp:3306
