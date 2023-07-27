@@ -18,9 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.branch }}
-          repository: ${{ inputs.repository }}
+        name: Checkout repo
 
       - uses: actions/setup-java@v3
         name: set up jdk ${{matrix.java.version}}
