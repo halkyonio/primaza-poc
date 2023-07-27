@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
+import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Cluster;
 import io.halkyon.model.Service;
 import io.halkyon.utils.StringUtils;
@@ -112,8 +113,16 @@ public class ServiceDiscoveryJob {
     private Optional<io.fabric8.kubernetes.api.model.Service> getServiceInCluster(Service service, Cluster cluster) {
         try {
             return kubernetesClientService.getServiceInCluster(cluster, service.getProtocol(), service.getPort());
-        } catch (Exception ex) {
+        } catch (ClusterConnectException ex) {
             LOG.error("Error trying to discovery the service " + service.name + " in the registered clusters", ex);
+            Cluster errorCluster = Cluster.findByName(cluster.name);
+            errorCluster.status = ClusterStatus.ERROR;
+            if (ex.getCause() != null) {
+                errorCluster.errorMessage = ex.getCause().getMessage();
+            } else {
+                errorCluster.errorMessage = ex.getMessage();
+            }
+            errorCluster.persist();
         }
 
         return Optional.empty();

@@ -160,7 +160,7 @@ public class ClaimResource {
             return list();
         } catch (ClusterConnectException ex) {
             throw new InternalServerErrorException("Cannot delete the claim because can't connect with the cluster "
-                    + ex.getCluster().name + " where is deployed. Cause: " + ex.getMessage());
+                    + ex.getClusterName() + " where is deployed. Cause: " + ex.getMessage());
         }
     }
 
