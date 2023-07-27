@@ -54,7 +54,7 @@ jobs:
           # Variable needed by the helm chart to configure primaza vault client
           VAULT_URL: http://vault-internal.vault:8200
         run: |
-          bash ./scripts/primaza.sh build
+          ./scripts/primaza.sh build
 
       - name: Deploy primaza helm chart
         env:
