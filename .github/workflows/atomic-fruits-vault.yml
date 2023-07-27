@@ -14,7 +14,7 @@ env:
   PSEUDO_TTY: "false"
 
 jobs:
-  setup-primaza-k8s-platform:
+  e2e-atomic-fruits-vault:
     runs-on: ubuntu-latest
     strategy:
       matrix:
