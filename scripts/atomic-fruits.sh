@@ -44,6 +44,7 @@ function deploy() {
       --set db.auth.database=${DB_DATABASE} \
       --set db.auth.username=${DB_USERNAME} \
       --set db.auth.password=${DB_PASSWORD} \
+      --set db.enabled=false \
       --set app.serviceBinding.enabled=false"
 }
 

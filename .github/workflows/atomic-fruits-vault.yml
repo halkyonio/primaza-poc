@@ -86,18 +86,17 @@ jobs:
         run: |
           ./scripts/vault.sh
 
-      - name: Installing Crossplane
-        run: |
-          ./scripts/crossplane.sh
-
       - name: Installing Postgresql DB and Atomic fruits
         env:
           ATOMIC_FRUITS_NAMESPACE: app
         run: |
-          ./scripts/atomic-fruits.sh
+          ./scripts/atomic-fruits.sh installdb
           
           # Wait till postgresql pod is ready
           kubectl wait -n $ATOMIC_FRUITS_NAMESPACE pod/postgresql-0 --for=condition=ready --timeout=300s
+          
+          # Install the atomic fruits helm chart from Halkyion repo
+          ./scripts/atomic-fruits.sh deploy
 
       - name: Creating the Primaza fruits Vault KV key
         run: |
