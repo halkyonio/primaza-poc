@@ -132,8 +132,10 @@ log_http_response() {
     # Extract the response code from the output
     http_code=${RESPONSE:${#RESPONSE}-3}
     
-    # Read the response body from the file
+    # Read the response body from the file and remove Headers
     response=$(cat response.txt)
+    removeHeaders=$(echo "$response" | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)")
+    bodyMessage=$(echo "$removeHeaders" | tr -d '\n\r')
 
     if [[ "$http_code" = 500 ]]; then
       error "$(format_message "$ERROR_MSG" "500 Internal Server Error")"
@@ -160,19 +162,16 @@ log_http_response() {
       exit 1
     fi
     if [[ "$response" = *"alert-danger"* ]]; then
-      error "$(format_message "$ERROR_MSG" "$response")"
+      error "$(format_message "$ERROR_MSG" "$bodyMessage")"
       exit 1
     fi
 
-    removeHeaders=$(echo "$response" | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)")
-    cleanBodyMessage=$(echo "$removeHeaders" | tr -d '\n\r')
-    note "$(format_message "$SUCCESS_MSG" "$cleanBodyMessage")"
+    note "$(format_message "$SUCCESS_MSG" "$bodyMessage")"
 }
-
 
 function cmdExec() {
   COMMAND=${1}
-  if [ "$CONTEXT" = "no-tty" ]; then
+  if [ "$PSEUDO_TTY" = "false" ]; then
     fmt "${COMMAND}"
     eval "${COMMAND}"
   else

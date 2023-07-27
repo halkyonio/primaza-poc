@@ -11,7 +11,7 @@ on:
 
 env:
   # Variable used to disable the pv tool which is not working here as pseudo tty is not supported by GitHub steps
-  CONTEXT: "no-tty"
+  PSEUDO_TTY: "false"
 
 jobs:
   setup-primaza-k8s-platform:
