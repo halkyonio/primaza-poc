@@ -78,7 +78,7 @@ jobs:
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=postgresql version=14.5 type=postgresql endpoint=tcp:5432 helm_repo="https://charts.bitnami.com/bitnami&helmChart=postgresql&helmChartVersion=11.9.13"
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=mysql version=8.0 type=mysql endpoint=tcp:3306
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=activemq-artemis version=2.26 type=activemq endpoint=tcp:8161
-          ./scripts/data/services.sh url=$PRIMAZA_URL service_name=mariadb version=10.9 type=mariadb&endpoint=tcp:3306
+          ./scripts/data/services.sh url=$PRIMAZA_URL service_name=mariadb version=10.9 type=mariadb endpoint=tcp:3306
           
           ./scripts/data/credentials.sh url=$PRIMAZA_URL credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
            
