@@ -82,7 +82,7 @@ jobs:
           
           ./scripts/data/credentials.sh url=$PRIMAZA_URL credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
            
-          ./scripts/data/claims.sh url=$PRIMAZA_URL claim_name=fruits-claim claim_description=postgresql-fruits-db requested_service=postgresql-14.5
+          ./scripts/data/claims.sh url=$PRIMAZA_URL claim_name=fruits-claim description=postgresql-fruits-db requested_service=postgresql-14.5
       - name: Installing Vault
         run: |
           ./scripts/vault.sh
