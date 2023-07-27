@@ -57,7 +57,7 @@ parse_parameters() {
 parse_parameters "$@"
 
 PRIMAZA_URL=${PRIMAZA_URL:-$DEFAULT_PRIMAZA_URL}
-NS_TO_EXCLUDE=${NS_TO_BE_EXCLUDED:-$DEFAULT_NS_TO_EXCLUDE}
+NS_TO_EXCLUDE=${NS_TO_EXCLUDE:-$DEFAULT_NS_TO_EXCLUDE}
 KUBE_CONTEXT=${CONTEXT_TO_USE:-$DEFAULT_KUBE_CONTEXT}
 KIND_URL=${KIND_URL:-$DEFAULT_KIND_URL}
 ENVIRONMENT=${ENVIRONMENT:-$DEFAULT_ENVIRONMENT}
@@ -76,7 +76,7 @@ note "curl -sS -o /dev/null -w '%{http_code}'\
 
 RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}'\
   -X POST -H 'Content-Type: multipart/form-data' \
-  -F excludedNamespaces=${NS_TO_BE_EXCLUDED}\
+  -F excludedNamespaces=${NS_TO_EXCLUDE}\
   -F name=${CONTEXT_TO_USE}\
   -F environment=DEV\
   -F url=${KIND_URL}\

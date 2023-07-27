@@ -132,8 +132,8 @@ log_http_response() {
     # Extract the response code from the output
     http_code=${RESPONSE:${#RESPONSE}-3}
     
-    # Read the response body from the file and remove Headers
-    response=$(cat response.txt)
+    # Read the response body, remove the trailing null from the file and remove Headers
+    response=$(cat response.txt | tr -d '\000')
     removeHeaders=$(echo "$response" | grep -vE "^(Content-Type:|Content-Length:|Date:|Location:|Connection:|HTTP/1.1)")
     bodyMessage=$(echo "$removeHeaders" | tr -d '\n\r')
 
