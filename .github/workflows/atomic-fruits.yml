@@ -67,7 +67,7 @@ jobs:
           ./scripts/primaza.sh localdeploy
           ./scripts/primaza.sh isAlive
 
-      - name: Load the data such as cluster, services & credentials
+      - name: Load the data such as cluster, services, claim & credential
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           PRIMAZA_NAMESPACE: primaza
