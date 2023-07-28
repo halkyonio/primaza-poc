@@ -119,7 +119,8 @@ public class ApplicationResource {
             if (claim.application == null) {
                 claim.application = application;
                 // TODO: If we try a NotFoundException, then it is not displayed within the console of the application !
-                // throw new NotFoundException("Claim with name " + claim.name + " is not associated to an application.");
+                // throw new NotFoundException("Claim with name " + claim.name + " is not associated to an
+                // application.");
             }
             LOG.debug("Claim.application is not null");
             claim.service.cluster = claim.application.cluster;
