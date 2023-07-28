@@ -260,10 +260,12 @@ public class KubernetesClientService {
         } else {
             client = getClientForCluster(service.cluster);
         }
+        LOG.debug("Cluster is not null");
 
         MixedOperation<Release, KubernetesResourceList<Release>, Resource<Release>> releaseClient = client
                 .resources(Release.class);
         releaseClient.resource(release.build()).create();
+        LOG.debugf("Helm release created");
     }
 
     @Transactional

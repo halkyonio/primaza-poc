@@ -18,6 +18,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.jboss.logging.Logger;
+
 import io.halkyon.Templates;
 import io.halkyon.exceptions.ClusterConnectException;
 import io.halkyon.model.Application;
@@ -30,6 +32,8 @@ import io.quarkus.qute.TemplateInstance;
 
 @Path("/applications")
 public class ApplicationResource {
+
+    private static final Logger LOG = Logger.getLogger(ApplicationResource.class);
 
     @Inject
     BindApplicationService bindService;
@@ -95,10 +99,12 @@ public class ApplicationResource {
     @Produces(MediaType.TEXT_HTML)
     @Path("/claim/{id}")
     public Response doClaimApplication(@PathParam("id") long applicationId, @FormParam("claimId") long claimId) {
+        LOG.debug("Application claiming started ...");
         Application application = Application.findById(applicationId);
         if (application == null) {
             throw new NotFoundException(String.format("Application %s not found", applicationId));
         }
+        LOG.debugf("Application found: %s", application.name);
 
         Claim claim = Claim.findById(claimId);
         if (claim == null) {
@@ -107,20 +113,27 @@ public class ApplicationResource {
         if (claim.service == null) {
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
         }
+        LOG.debug("Claim is not null like claim.service");
         if (claim.service.installable) {
+            LOG.debugf("Service is installable: %s", claim.service.installable);
             if (claim.application == null) {
-                throw new NotFoundException("Claim with name " + claim.name + " is not associated to an application.");
+                claim.application = application;
+                // TODO: If we try a NotFoundException, then it is not displayed within the console of the application !
+                // throw new NotFoundException("Claim with name " + claim.name + " is not associated to an application.");
             }
+            LOG.debug("Claim.application is not null");
             claim.service.cluster = claim.application.cluster;
             claim.service.namespace = claim.application.namespace;
             claim.persist();
             try {
+                LOG.debug("Started to create the crossplane helm release ...");
                 kubernetesClientService.createCrossplaneHelmRelease(application.cluster, claim.service);
             } catch (ClusterConnectException ex) {
                 throw new InternalServerErrorException("Can't deploy the service with the cluster "
                         + ex.getClusterName() + ". Cause: " + ex.getMessage());
             }
         }
+        LOG.debugf("Service is installable: %s", claim.service.installable);
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));
         }
