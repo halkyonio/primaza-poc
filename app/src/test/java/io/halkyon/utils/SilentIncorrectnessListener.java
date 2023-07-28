@@ -1,6 +1,6 @@
 package io.halkyon.utils;
 
-import com.gargoylesoftware.htmlunit.IncorrectnessListener;
+import org.htmlunit.IncorrectnessListener;
 
 public class SilentIncorrectnessListener implements IncorrectnessListener {
     @Override
