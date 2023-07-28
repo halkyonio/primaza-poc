@@ -63,6 +63,19 @@ public final class TestUtils {
                 .as(Service.class);
     }
 
+    public static Service createServiceToBeProvisioned(String serviceName, String serviceVersion, String serviceType,
+            String endpoint) {
+        given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", serviceName)
+                .formParam("version", serviceVersion).formParam("type", serviceType).formParam("endpoint", endpoint)
+                .formParam("installable", true).formParam("type", "helm")
+                .formParam("helmRepo", "https://charts.bitnami.com/bitnami").formParam("helmChart", "postgresql")
+                .formParam("helmChartVersion", "11.9.13").when().post("/services").then().statusCode(201);
+
+        return given().contentType(MediaType.APPLICATION_JSON)
+                .get("/services/name/" + serviceName + "/version/" + serviceVersion).then().statusCode(200).extract()
+                .as(Service.class);
+    }
+
     public static Claim createClaim(String claimName, String serviceRequested) {
         given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", claimName)
                 .formParam("serviceRequested", serviceRequested).formParam("status", "new")
