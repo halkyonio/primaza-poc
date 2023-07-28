@@ -2,8 +2,13 @@ name: Temporary job to test all steps to install kind, vault & crossplane
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '*.md'          # Ignores .md files at the root of the repository
+      - '**/*.md'       # Ignores .md files within subdirectories
   push:
-    branches: [ test_flow ]
+    branches: [ main ]
     paths-ignore:
       - '*.md'          # Ignores .md files at the root of the repository
       - '**/*.md'       # Ignores .md files within subdirectories
