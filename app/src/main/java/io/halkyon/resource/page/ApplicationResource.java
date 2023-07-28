@@ -114,8 +114,8 @@ public class ApplicationResource {
             try {
                 kubernetesClientService.createCrossplaneHelmRelease(application.cluster, claim.service);
             } catch (ClusterConnectException ex) {
-                throw new InternalServerErrorException(
-                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+                throw new InternalServerErrorException("Can't deploy the service with the cluster "
+                        + ex.getClusterName() + ". Cause: " + ex.getMessage());
             }
         }
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
@@ -129,7 +129,7 @@ public class ApplicationResource {
         } catch (ClusterConnectException ex) {
             throw new InternalServerErrorException(
                     "Can't bind the application " + application.name + " because can't connect " + "with the cluster "
-                            + ex.getCluster() + ". Cause: " + ex.getMessage());
+                            + ex.getClusterName() + ". Cause: " + ex.getMessage());
         }
 
     }

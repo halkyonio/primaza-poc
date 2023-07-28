@@ -113,8 +113,8 @@ public class ClaimService {
                     claim.service.cluster = claim.application.cluster;
                 }
             } catch (ClusterConnectException ex) {
-                throw new InternalServerErrorException(
-                        "Can't deploy the service with the cluster " + ex.getCluster() + ". Cause: " + ex.getMessage());
+                throw new InternalServerErrorException("Can't deploy the service with the cluster "
+                        + ex.getClusterName() + ". Cause: " + ex.getMessage());
             }
         }
 

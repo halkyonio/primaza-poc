@@ -41,7 +41,7 @@ public class ClusterService {
             serviceDiscoveryJob.discoverServices(cluster);
             applicationDiscoveryJob.discoverApplications(cluster);
         } catch (ClusterConnectException e) {
-            LOG.error("Could not connect with the cluster '" + e.getCluster().name + "'. Caused by: " + e.getMessage());
+            LOG.error("Could not connect with the cluster '" + e.getClusterName() + "'. Caused by: " + e.getMessage());
         }
     }
 
