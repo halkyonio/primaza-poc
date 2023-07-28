@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
-
 source ${SCRIPTS_DIR}/common.sh
-source ${SCRIPTS_DIR}/play-demo.sh
 
 # Parameters to play the demo
 export TYPE_SPEED=400
@@ -32,7 +30,7 @@ function deploy() {
     crossplane-stable/crossplane
   kubectl rollout status deployment/crossplane -n crossplane-system
 
-  p "Configure the ControllerConfig resource to set the debug arg"
+  note "Configure the ControllerConfig resource to set the debug arg"
   cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
@@ -45,7 +43,7 @@ EOF
 }
 
 function kubernetesProvider(){
-    p "Installing the kubernetes provider"
+    note "Installing the kubernetes provider"
     cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -57,13 +55,13 @@ spec:
       name: debug-config
 EOF
 
-    pe "kubectl wait provider.pkg.crossplane.io/kubernetes-provider --for condition=Healthy=true --timeout=300s"
+    cmdExec "kubectl wait provider.pkg.crossplane.io/kubernetes-provider --for condition=Healthy=true --timeout=300s"
 
-    p "Give more RBAC rights to the crossplane service account"
+    note "Give more RBAC rights to the crossplane service account"
     SA=$(kubectl -n crossplane-system get sa -o name | grep kubernetes-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
     kubectl create clusterrolebinding kubernetes-provider-admin-binding --clusterrole cluster-admin --serviceaccount=${SA}
 
-  p "Deploy the Crossplane Kubernetes ProviderConfig"
+  note "Deploy the Crossplane Kubernetes ProviderConfig"
   cat <<EOF | kubectl apply -f -
 apiVersion: kubernetes.crossplane.io/v1alpha1
 kind: ProviderConfig
@@ -76,7 +74,7 @@ EOF
 }
 
 function helmProvider() {
-  p "Installing the Helm provider ..."
+  note "Installing the Helm provider ..."
   cat <<EOF | kubectl apply -f -
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -88,18 +86,18 @@ spec:
       name: debug-config
 EOF
 
-  pe "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
+  cmdExec "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
 
-  pe "kubectl rollout status deployment/crossplane -n crossplane-system"
-  p "Give more RBAC rights to the crossplane service account"
+  cmdExec "kubectl rollout status deployment/crossplane -n crossplane-system"
+  note "Give more RBAC rights to the crossplane service account"
   SA=$(kubectl -n crossplane-system get sa -o name | grep helm-provider | sed -e 's|serviceaccount\/|crossplane-system:|g')
   echo ${SA}
 
   kubectl create clusterrolebinding helm-provider-admin-binding --clusterrole cluster-admin --serviceaccount=${SA}
 
-  pe "kubectl wait providerrevision -lpkg.crossplane.io/package=helm-provider --for condition=Healthy=true --timeout=300s"
+  cmdExec "kubectl wait providerrevision -lpkg.crossplane.io/package=helm-provider --for condition=Healthy=true --timeout=300s"
 
-  p "Configure the Crossplane Helm Provider"
+  note "Configure the Crossplane Helm Provider"
   cat <<EOF | kubectl apply -f -
 apiVersion: helm.crossplane.io/v1beta1
 kind: ProviderConfig
@@ -127,8 +125,10 @@ case $1 in
     helm-provider) helmProvider; exit;;
     kube-provider) kubernetesProvider; exit;;
     remove)       "$@"; exit;;
+    *)
+      deploy
+      helmProvider
+      kubernetesProvider
+      exit;;
 esac
 
-deploy
-helmProvider
-kubernetesProvider
