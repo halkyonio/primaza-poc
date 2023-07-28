@@ -108,6 +108,9 @@ public class ApplicationResource {
             throw new NotAcceptableException(String.format("Claim %s has no services available", claimId));
         }
         if (claim.service.installable) {
+            if (claim.application == null) {
+                throw new NotFoundException("Claim with name " + claim.name + " is not associated to an application.");
+            }
             claim.service.cluster = claim.application.cluster;
             claim.service.namespace = claim.application.namespace;
             claim.persist();
