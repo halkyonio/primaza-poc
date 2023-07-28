@@ -140,24 +140,6 @@ function localDeploy() {
 
 }
 
-function bindApplication() {
-  APPLICATION_NAME=$1
-  CLAIM_NAME=$2
-
-  APPLICATION=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/applications/name/$APPLICATION_NAME)
-  APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
-  note "Application ID to be bound: $APPLICATION_ID"
-
-  CLAIM=$(curl -H 'Accept: application/json' -s $PRIMAZA_URL/claims/name/$CLAIM_NAME)
-  CLAIM_ID=$(echo "$CLAIM" | jq -r '.id')
-  note "Claim ID to be bound: $CLAIM_ID"
-
-  note "curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d \"claimId=$CLAIM_ID\" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID"
-  RESULT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d "claimId=$CLAIM_ID" -s -i $PRIMAZA_URL/applications/claim/$APPLICATION_ID)
-
-  log_http_response "Application failed to be bound in Primaza: %s" "Application bound in Primaza: %s" "$RESULT"
-}
-
 function loadData() {
    note "Creating the cluster's record"
    ${SCRIPTS_DIR}/data/cluster.sh
@@ -209,6 +191,7 @@ function isAlive() {
       warn "Primaza is not yet alive."
       sleep $retry_delay
     fi
+    ((retry_attempt++))
   done
 }
 
@@ -218,13 +201,12 @@ case $1 in
     deploy)       "$@"; exit;;
     localdeploy)  localDeploy; exit;;
     loaddata)     loadData; exit;;
-    bindApplication) "$@"; exit;;
     isAlive)      isAlive; exit;;
     remove)       "$@"; exit;;
     log)          log; exit;;
     *)
       build
       localDeploy
-      loadData
+      #loadData
       exit;;
 esac
