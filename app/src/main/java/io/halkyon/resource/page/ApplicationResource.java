@@ -107,6 +107,7 @@ public class ApplicationResource {
         LOG.debugf("Application found: %s", application.name);
 
         Claim claim = Claim.findById(claimId);
+        claim.application = application;
         if (claim == null) {
             throw new NotFoundException(String.format("Claim %s not found", claimId));
         }
@@ -116,13 +117,6 @@ public class ApplicationResource {
         LOG.debug("Claim is not null like claim.service");
         if (claim.service.installable) {
             LOG.debugf("Service is installable: %s", claim.service.installable);
-            if (claim.application == null) {
-                claim.application = application;
-                // TODO: If we try a NotFoundException, then it is not displayed within the console of the application !
-                // throw new NotFoundException("Claim with name " + claim.name + " is not associated to an
-                // application.");
-            }
-            LOG.debug("Claim.application is not null");
             claim.service.cluster = claim.application.cluster;
             claim.service.namespace = claim.application.namespace;
             claim.persist();
@@ -138,7 +132,6 @@ public class ApplicationResource {
         if (claim.service.credentials == null || claim.service.credentials.isEmpty()) {
             throw new NotAcceptableException(String.format("Service %s has no credentials", claim.service.name));
         }
-        claim.application = application;
         try {
             bindService.bindApplication(claim);
             claim.persist();
