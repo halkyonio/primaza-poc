@@ -1,5 +1,8 @@
 package io.halkyon.services;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -10,6 +13,7 @@ import io.halkyon.model.Credential;
 import io.halkyon.model.CredentialParameter;
 import io.halkyon.model.Service;
 import io.halkyon.resource.requests.CredentialRequest;
+import io.sundr.utils.Strings;
 
 @ApplicationScoped
 public class CredentialService {
@@ -57,7 +61,14 @@ public class CredentialService {
         credential.name = request.name;
         credential.username = request.username;
         credential.password = request.password;
-        credential.vaultKvPath = request.vaultKvPath;
+        if (request.vaultKvPath != null) {
+            Pattern stringPattern = Pattern.compile("^/*");
+            Matcher matcher = stringPattern.matcher(request.vaultKvPath);
+            if (Strings.isNotNullOrEmpty(request.vaultKvPath) && matcher.find()) {
+                request.vaultKvPath = matcher.replaceFirst("");
+            }
+            credential.vaultKvPath = request.vaultKvPath;
+        }
         credential.service = Service.findById(request.serviceId);
         credential.params.clear();
         if (request.params != null) {
