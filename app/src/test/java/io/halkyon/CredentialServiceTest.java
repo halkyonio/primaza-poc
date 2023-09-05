@@ -82,6 +82,7 @@ public class CredentialServiceTest extends BaseTest {
         assertEquals("TestEditedCredential", credential.name);
         assertEquals("testEditeduser", credential.username);
         assertEquals("testEditedpassword", credential.password);
+        assertEquals(credential.service, edited.service);
         assertEquals("another/path", credential.vaultKvPath);
         assertEquals(1, credential.params.size());
         assertEquals("foz", credential.params.get(0).paramName);
