@@ -72,7 +72,7 @@ jobs:
           ./scripts/primaza.sh localdeploy
           ./scripts/primaza.sh isAlive
 
-      - name: Load the data such as cluster, services, claim & credential
+      - name: Load the data such as cluster, services & credential
         env:
           PRIMAZA_URL: primaza.127.0.0.1.nip.io
           PRIMAZA_NAMESPACE: primaza
@@ -86,7 +86,6 @@ jobs:
           
           ./scripts/data/credentials.sh url=$PRIMAZA_URL credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
            
-          ./scripts/data/claims.sh url=$PRIMAZA_URL claim_name=fruits-claim description=postgresql-fruits-db requested_service=postgresql-14.5
       - name: Installing Vault
         run: |
           ./scripts/vault.sh
@@ -136,6 +135,10 @@ jobs:
             note "Attempt $retry_attempt of $max_retries"
             if discover_atomic_fruits; then
               note "Primaza discovered the atomic-fruits application: $APPLICATION."
+              note "Getting the application id for atomic-fruits"
+              APPLICATION_ID=$(echo "$APPLICATION" | jq -r '.id')
+              echo "atomic-fruits application id: $APPLICATION_ID"          
+              ./scripts/data/claims.sh url=$PRIMAZA_URL claim_name=fruits-claim description=postgresql-fruits-db requested_service=postgresql-14.5 application_id=$APPLICATION_ID
               exit 0
             else
               warn "Primaza didn't yet discovered the atomic-fruits application: $APPLICATION."
