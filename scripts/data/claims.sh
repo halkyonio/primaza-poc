@@ -37,6 +37,9 @@ parse_parameters() {
       requested_service=*)
         CLAIM_REQUESTED_SERVICE="${arg#*=}"
         ;;
+      application_id=*)
+        APPLICATION_ID="${arg#*=}"
+        ;;
       *)
         # Handle any other unrecognized parameters
         echo "Unrecognized parameter: $arg"
@@ -56,6 +59,12 @@ CLAIM_DESCRIPTION=${CLAIM_DESCRIPTION:-$DEFAULT_CLAIM_DESCRIPTION}
 CLAIM_REQUESTED_SERVICE=${CLAIM_REQUESTED_SERVICE:-$DEFAULT_CLAIM_REQUESTED_SERVICE}
 
 BODY="name=$CLAIM_NAME&description=$CLAIM_DESCRIPTION&serviceRequested=$CLAIM_REQUESTED_SERVICE"
+
+# shellcheck disable=SC1073
+if [ -n "$APPLICATION_ID" ];then
+  note "Application id: $APPLICATION_ID "
+  BODY="$BODY&application_id=$APPLICATION_ID"
+fi
 note "Creating the claim using as body: $BODY"
 note "curl -X POST -s -i -k -d \"${BODY}\" ${PRIMAZA_URL}/claims" >&2
 
