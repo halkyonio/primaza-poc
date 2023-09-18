@@ -13,7 +13,7 @@
   <description>Exposes CRUD operations on service resources</description>
   <properties>
     <bootstrap-icons.version>1.10.5</bootstrap-icons.version>
-    <bootstrap.version>5.3.1</bootstrap.version>
+    <bootstrap.version>5.3.2</bootstrap.version>
     <htmx.version>1.9.3</htmx.version>
     <quarkus-helm.version>1.1.0</quarkus-helm.version>
     <quarkus-vault.version>3.1.0</quarkus-vault.version>
