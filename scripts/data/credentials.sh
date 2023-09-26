@@ -18,6 +18,7 @@ NO_WAIT=true
 # Default parameter values
 DEFAULT_PRIMAZA_URL="localhost:8080"
 
+DEFAULT_CREDENTIAL_TYPE="basic"
 DEFAULT_CREDENTIAL_NAME=""
 DEFAULT_SERVICE_NAME=""
 DEFAULT_USERNAME=""
@@ -34,6 +35,9 @@ parse_parameters() {
         ;;
       credential_name=*)
         CREDENTIAL_NAME="${arg#*=}"
+        ;;
+      credential_type=*)
+        CREDENTIAL_TYPE="${arg#*=}"
         ;;
       service_name=*)
         SERVICE_NAME="${arg#*=}"
@@ -65,6 +69,7 @@ parse_parameters "$@"
 # Set defaults if parameters are not provided
 PRIMAZA_URL=${PRIMAZA_URL:-$DEFAULT_PRIMAZA_URL}
 CREDENTIAL_NAME=${CREDENTIAL_NAME:-$DEFAULT_CREDENTIAL_NAME}
+CREDENTIAL_TYPE=${CREDENTIAL_TYPE:-$DEFAULT_CREDENTIAL_TYPE}
 SERVICE_ID=${SERVICE_ID:-$DEFAULT_SERVICE_ID}
 SERVICE_NAME=${SERVICE_NAME:-$DEFAULT_SERVICE_NAME}
 USERNAME=${USERNAME:-$DEFAULT_USERNAME}
@@ -83,14 +88,13 @@ else
   note "Service id found: $SERVICE_ID"
 fi
 
-if [ -z "$USERNAME" ] && [ -z "$PASSWORD" ]; then
-  BODY="name=$CREDENTIAL_NAME&serviceId=$SERVICE_ID&vaultKvPath=primaza/fruits"
-else
-  BODY="name=$CREDENTIAL_NAME&serviceId=$SERVICE_ID&username=$USERNAME&password=$PASSWORD&params=database:$DATABASE_NAME"
-fi
-
-note "Creating the credential using as body: $BODY"
-note "curl -X POST -s -k -d \"${BODY}\" ${PRIMAZA_URL}/credentials" >&2
+case $CREDENTIAL_TYPE in
+   basic)
+     BODY="type=$CREDENTIAL_TYPE&name=$CREDENTIAL_NAME&serviceId=$SERVICE_ID&username=$USERNAME&password=$PASSWORD&params=database:$DATABASE_NAME"
+     ;;
+   vault)
+     BODY="type=$CREDENTIAL_TYPE&name=$CREDENTIAL_NAME&serviceId=$SERVICE_ID&vaultKvPath=$VAULT_KV"
+esac
 
 RESPONSE=$(curl -s -k -o response.txt -w '%{http_code}' \
   -X POST \
