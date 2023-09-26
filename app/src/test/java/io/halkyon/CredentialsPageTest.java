@@ -61,7 +61,7 @@ public class CredentialsPageTest extends BaseTest {
         // Create data
         String prefix = "CredentialsPageTest-testEditCredentialFromPage-";
         Service service = createService(prefix + "service", "8", "type");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+        Credential credential = createCredential(prefix + "credential", "basic", service.id, "user", "pass",
                 "myapps/vault-quickstart/private");
         // Go to the page
         page.goTo("/credentials");
@@ -85,7 +85,7 @@ public class CredentialsPageTest extends BaseTest {
     public void testDeleteCredential() {
         String prefix = "CredentialsPageTest-testDeleteCredential-";
         Service service = createService(prefix + "service", "8", "postgresql");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+        Credential credential = createCredential(prefix + "credential", "basic", service.id, "user", "pass",
                 "myapps/vault-quickstart/private");
 
         // When, we go to the credentials page

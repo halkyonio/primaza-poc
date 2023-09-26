@@ -110,9 +110,10 @@ public final class TestUtils {
         return app;
     }
 
-    public static Credential createCredential(String credentialName, long serviceId, String username, String password,
+    public static Credential createCredential(String credentialName, String credentialType, long serviceId, String username, String password,
             String vaultPath) {
         given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", credentialName)
+                .formParam("credentialType",credentialType)
                 .formParam("serviceId", serviceId).formParam("username", username).formParam("password", password)
                 .formParam("vaultKvPath", vaultPath).when().post("/credentials").then().statusCode(201);
 

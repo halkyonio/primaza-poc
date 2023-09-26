@@ -148,13 +148,14 @@ public class ApplicationsPageTest extends BaseTest {
         String claimName = prefix + "claim";
         String serviceName = prefix + "service";
         String credentialName = prefix + "credential";
+        String credentialType = "basic";
         String appName = prefix + "app";
         // mock data
         configureMockServiceFor(clusterName, "testbind", "1111", "ns1");
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1", null);
+        createCredential(credentialName, credentialType, service.id, "user1", "pass1", null);
         createCluster(clusterName, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
         Claim claim = createClaim(claimName, serviceName + "-version");
@@ -209,6 +210,7 @@ public class ApplicationsPageTest extends BaseTest {
         String claimName = prefix + "claim";
         String serviceName = prefix + "service";
         String credentialName = prefix + "credential";
+        String credentialType = "basic";
         String appName = prefix + "app";
         String externalServiceIp = serviceName + "ip";
 
@@ -218,7 +220,7 @@ public class ApplicationsPageTest extends BaseTest {
 
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, "user1", "pass1", null);
+        createCredential(credentialName, credentialType, service.id, "user1", "pass1", null);
         createCluster(clusterNameOfService, "host:9999");
         createCluster(clusterNameOfApplication, "host:9999");
         serviceDiscoveryJob.execute(); // this action will change the service to available
@@ -314,6 +316,7 @@ public class ApplicationsPageTest extends BaseTest {
         String claimName = prefix + "claim";
         String serviceName = prefix + "service";
         String credentialName = prefix + "credential";
+        String credentialType = "vault";
         String appName = prefix + "app";
         String username = "user1";
         String password = "pass1";
@@ -323,7 +326,7 @@ public class ApplicationsPageTest extends BaseTest {
         configureMockApplicationFor(clusterName, appName, "image2", "ns1");
         // create data
         Service service = createService(serviceName, "version", "type", "testbind:1111");
-        createCredential(credentialName, service.id, null, null, "myapps/app");
+        createCredential(credentialName, credentialType, service.id, null, null, "myapps/app");
         createCluster(clusterName, "host:9999");
 
         Map<String, String> newsecrets = new HashMap<>();
