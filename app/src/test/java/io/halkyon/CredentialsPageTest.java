@@ -16,7 +16,7 @@ public class CredentialsPageTest extends BaseTest {
 
     @Test
     public void testCreateUserPasswordCredential() {
-        createService("postgresql-credential1", "8", "postgresql");
+        Service service = createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
 
         // add param a=1
@@ -29,7 +29,7 @@ public class CredentialsPageTest extends BaseTest {
         page.clickById("add-param-to-credential-button");
 
         // set data
-        page.select("credential_service", "postgresql-credential1-8");
+        page.select("credential_service", service.name + "-" + service.version);
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
@@ -53,7 +53,7 @@ public class CredentialsPageTest extends BaseTest {
         assertEquals("2", credential.params.get(1).paramValue);
 
         // and the service should have been linked to it.
-        Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
+        service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
                 .as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
@@ -61,14 +61,14 @@ public class CredentialsPageTest extends BaseTest {
 
     @Test
     public void testCreateNewVaultCredential() {
-        createService("postgresql-credential2", "8", "postgresql");
+        Service service = createService("postgresql-credential2", "8", "postgresql");
         page.goTo("/credentials/new");
 
         page.select("credential_type", "vault");
 
         // set data
-        page.select("credential_service", "postgresql-credential2-8");
-        page.type("credential_name", "Credential1");
+        page.select("credential_service", service.name + "-" + service.version);
+        page.type("credential_name", "Credential2");
 
         page.type("credential_vault_path", "myapps/vault-quickstart/private");
         // submit credential
@@ -76,16 +76,16 @@ public class CredentialsPageTest extends BaseTest {
 
         // then, the new credential should be listed:
         page.goTo("/credentials");
-        page.assertContentContains("Credential1");
-        Credential credential = given().when().get("/credentials/name/Credential1").then().statusCode(200).extract()
+        page.assertContentContains("Credential2");
+        Credential credential = given().when().get("/credentials/name/Credential2").then().statusCode(200).extract()
                 .as(Credential.class);
         assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
 
         // and the service should have been linked to it.
-        Service service = given().when().get("/services/name/postgresql-credential2").then().statusCode(200).extract()
+        service = given().when().get("/services/name/postgresql-credential2").then().statusCode(200).extract()
                 .as(Service.class);
         assertEquals(1, service.credentials.size());
-        assertEquals("Credential1", service.credentials.get(0).name);
+        assertEquals("Credential2", service.credentials.get(0).name);
     }
 
     @Test
