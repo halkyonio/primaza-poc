@@ -147,6 +147,7 @@ jobs:
           PASSWORD=superman
           TYPE=postgresql
           DATABASE_NAME=database
+          CREDENTIAL_TYPE=basic
 
           # First, we install Postgresql via Helm.
           helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -157,7 +158,7 @@ jobs:
           .github/register_service_in_primaza.sh postgresql 11 tcp:5432 $TYPE
 
           # And finally the credentials
-          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME
+          .github/register_service_credential_in_primaza.sh postgresql-credentials postgresql $USERNAME $PASSWORD $DATABASE_NAME $CREDENTIAL_TYPE
 
       - name: Register claim
         run: .github/register_claim_in_primaza.sh heroClaimDb postgresql-11
