@@ -15,7 +15,7 @@ import io.quarkus.test.junit.QuarkusTest;
 public class CredentialsPageTest extends BaseTest {
 
     @Test
-    public void testCreateNewBasicCredential() {
+    public void testCreateUserPasswordCredential() {
         createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
 
