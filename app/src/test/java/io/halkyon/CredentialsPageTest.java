@@ -61,13 +61,13 @@ public class CredentialsPageTest extends BaseTest {
 
     @Test
     public void testCreateNewVaultCredential() {
-        createService("postgresql-credential1", "8", "postgresql");
+        createService("postgresql-credential2", "8", "postgresql");
         page.goTo("/credentials/new");
 
         page.select("credential_type", "vault");
 
         // set data
-        page.select("credential_service", "postgresql-credential1-8");
+        page.select("credential_service", "postgresql-credential2-8");
         page.type("credential_name", "Credential1");
 
         page.type("credential_vault_path", "myapps/vault-quickstart/private");
@@ -82,7 +82,7 @@ public class CredentialsPageTest extends BaseTest {
         assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
 
         // and the service should have been linked to it.
-        Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
+        Service service = given().when().get("/services/name/postgresql-credential2").then().statusCode(200).extract()
                 .as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
