@@ -15,9 +15,12 @@ import io.quarkus.test.junit.QuarkusTest;
 public class CredentialsPageTest extends BaseTest {
 
     @Test
-    public void testCreateNewCredential() {
+    public void testCreateNewBasicCredential() {
         createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
+
+        page.select("credential_type", "basic");
+
         // add param a=1
         page.type("new-param-name", "a");
         page.type("new-param-value", "1");
@@ -26,13 +29,13 @@ public class CredentialsPageTest extends BaseTest {
         page.type("new-param-name", "b");
         page.type("new-param-value", "2");
         page.clickById("add-param-to-credential-button");
+
         // set data
         page.select("credential_service", "postgresql-credential1-8");
         page.type("credential_name", "Credential1");
-        page.select("credential_type", "basic");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
-        page.type("credential_vault_path", "myapps/vault-quickstart/private");
+
         // submit credential
         page.clickById("credential-button");
 
@@ -43,12 +46,41 @@ public class CredentialsPageTest extends BaseTest {
                 .as(Credential.class);
         assertEquals("Admin", credential.username);
         assertEquals("Supersecret", credential.password);
-        assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
+
         assertEquals(2, credential.params.size());
         assertEquals("a", credential.params.get(0).paramName);
         assertEquals("1", credential.params.get(0).paramValue);
         assertEquals("b", credential.params.get(1).paramName);
         assertEquals("2", credential.params.get(1).paramValue);
+
+        // and the service should have been linked to it.
+        Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
+                .as(Service.class);
+        assertEquals(1, service.credentials.size());
+        assertEquals("Credential1", service.credentials.get(0).name);
+    }
+
+    @Test
+    public void testCreateNewVaultCredential() {
+        createService("postgresql-credential1", "8", "postgresql");
+        page.goTo("/credentials/new");
+
+        page.select("credential_type", "vault");
+
+        // set data
+        page.select("credential_service", "postgresql-credential1-8");
+        page.type("credential_name", "Credential1");
+
+        page.type("credential_vault_path", "myapps/vault-quickstart/private");
+        // submit credential
+        page.clickById("credential-button");
+
+        // then, the new credential should be listed:
+        page.goTo("/credentials");
+        page.assertContentContains("Credential1");
+        Credential credential = given().when().get("/credentials/name/Credential1").then().statusCode(200).extract()
+                .as(Credential.class);
+        assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
 
         // and the service should have been linked to it.
         Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
