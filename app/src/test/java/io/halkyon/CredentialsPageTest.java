@@ -15,9 +15,10 @@ import io.quarkus.test.junit.QuarkusTest;
 public class CredentialsPageTest extends BaseTest {
 
     @Test
-    public void testCreateNewCredential() {
-        createService("postgresql-credential1", "8", "postgresql");
+    public void testCreateUserPasswordCredential() {
+        Service service = createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
+
         // add param a=1
         page.type("new-param-name", "a");
         page.type("new-param-value", "1");
@@ -26,12 +27,14 @@ public class CredentialsPageTest extends BaseTest {
         page.type("new-param-name", "b");
         page.type("new-param-value", "2");
         page.clickById("add-param-to-credential-button");
+
         // set data
-        page.select("credential_service", "postgresql-credential1-8");
+        page.select("credential_service", service.name + "-" + service.version);
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
-        page.type("credential_vault_path", "myapps/vault-quickstart/private");
+        page.select("credential_type", "basic");
+
         // submit credential
         page.clickById("credential-button");
 
@@ -42,7 +45,7 @@ public class CredentialsPageTest extends BaseTest {
                 .as(Credential.class);
         assertEquals("Admin", credential.username);
         assertEquals("Supersecret", credential.password);
-        assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
+
         assertEquals(2, credential.params.size());
         assertEquals("a", credential.params.get(0).paramName);
         assertEquals("1", credential.params.get(0).paramValue);
@@ -50,10 +53,39 @@ public class CredentialsPageTest extends BaseTest {
         assertEquals("2", credential.params.get(1).paramValue);
 
         // and the service should have been linked to it.
-        Service service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
+        service = given().when().get("/services/name/postgresql-credential1").then().statusCode(200).extract()
                 .as(Service.class);
         assertEquals(1, service.credentials.size());
         assertEquals("Credential1", service.credentials.get(0).name);
+    }
+
+    @Test
+    public void testCreateNewVaultCredential() {
+        Service service = createService("postgresql-credential2", "8", "postgresql");
+        page.goTo("/credentials/new");
+
+        page.select("credential_type", "vault");
+
+        // set data
+        page.select("credential_service", service.name + "-" + service.version);
+        page.type("credential_name", "Credential2");
+
+        page.type("credential_vault_path", "myapps/vault-quickstart/private");
+        // submit credential
+        page.clickById("credential-button");
+
+        // then, the new credential should be listed:
+        page.goTo("/credentials");
+        page.assertContentContains("Credential2");
+        Credential credential = given().when().get("/credentials/name/Credential2").then().statusCode(200).extract()
+                .as(Credential.class);
+        assertEquals("myapps/vault-quickstart/private", credential.vaultKvPath);
+
+        // and the service should have been linked to it.
+        service = given().when().get("/services/name/postgresql-credential2").then().statusCode(200).extract()
+                .as(Service.class);
+        assertEquals(1, service.credentials.size());
+        assertEquals("Credential2", service.credentials.get(0).name);
     }
 
     @Test
@@ -61,7 +93,7 @@ public class CredentialsPageTest extends BaseTest {
         // Create data
         String prefix = "CredentialsPageTest-testEditCredentialFromPage-";
         Service service = createService(prefix + "service", "8", "type");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+        Credential credential = createCredential(prefix + "credential", "basic", service.id, "user", "pass",
                 "myapps/vault-quickstart/private");
         // Go to the page
         page.goTo("/credentials");
@@ -85,7 +117,7 @@ public class CredentialsPageTest extends BaseTest {
     public void testDeleteCredential() {
         String prefix = "CredentialsPageTest-testDeleteCredential-";
         Service service = createService(prefix + "service", "8", "postgresql");
-        Credential credential = createCredential(prefix + "credential", service.id, "user", "pass",
+        Credential credential = createCredential(prefix + "credential", "basic", service.id, "user", "pass",
                 "myapps/vault-quickstart/private");
 
         // When, we go to the credentials page

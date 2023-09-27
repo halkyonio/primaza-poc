@@ -85,7 +85,7 @@ jobs:
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=activemq-artemis version=2.26 type=activemq endpoint=tcp:8161
           ./scripts/data/services.sh url=$PRIMAZA_URL service_name=mariadb version=10.9 type=mariadb endpoint=tcp:3306
           
-          ./scripts/data/credentials.sh url=$PRIMAZA_URL credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
+          ./scripts/data/credentials.sh url=$PRIMAZA_URL credential_type=vault credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
            
       - name: Installing Vault
         run: |
