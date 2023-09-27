@@ -29,7 +29,7 @@ public class CredentialsPageTest extends BaseTest {
         // set data
         page.select("credential_service", "postgresql-credential1-8");
         page.type("credential_name", "Credential1");
-        page.type("credential_type","basic");
+        page.type("credential_type", "basic");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
         page.type("credential_vault_path", "myapps/vault-quickstart/private");
