@@ -19,8 +19,6 @@ public class CredentialsPageTest extends BaseTest {
         createService("postgresql-credential1", "8", "postgresql");
         page.goTo("/credentials/new");
 
-        page.select("credential_type", "basic");
-
         // add param a=1
         page.type("new-param-name", "a");
         page.type("new-param-value", "1");
@@ -35,6 +33,7 @@ public class CredentialsPageTest extends BaseTest {
         page.type("credential_name", "Credential1");
         page.type("credential_username", "Admin");
         page.type("credential_password", "Supersecret");
+        page.select("credential_type", "basic");
 
         // submit credential
         page.clickById("credential-button");
