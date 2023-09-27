@@ -113,9 +113,9 @@ public final class TestUtils {
     public static Credential createCredential(String credentialName, String credentialType, long serviceId,
             String username, String password, String vaultPath) {
         given().contentType(MediaType.APPLICATION_FORM_URLENCODED).formParam("name", credentialName)
-                .formParam("type", credentialType).formParam("serviceId", serviceId)
-                .formParam("username", username).formParam("password", password).formParam("vaultKvPath", vaultPath)
-                .when().post("/credentials").then().statusCode(201);
+                .formParam("type", credentialType).formParam("serviceId", serviceId).formParam("username", username)
+                .formParam("password", password).formParam("vaultKvPath", vaultPath).when().post("/credentials").then()
+                .statusCode(201);
 
         return given().contentType(MediaType.APPLICATION_JSON).get("/credentials/name/" + credentialName).then()
                 .statusCode(200).extract().as(Credential.class);
