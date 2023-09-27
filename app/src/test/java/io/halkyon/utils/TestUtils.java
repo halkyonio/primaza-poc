@@ -48,7 +48,7 @@ public final class TestUtils {
     public static Service createServiceWithCredential(String serviceName, String serviceVersion, String serviceType,
             String endpoint) {
         Service service = createService(serviceName, serviceVersion, serviceType, endpoint);
-        createCredential(serviceName + "-credential", service.id, "username", "password", null);
+        createCredential(serviceName + "-credential", "basic", service.id, "username", "password", null);
         return service;
     }
 
