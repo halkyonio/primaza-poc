@@ -59,6 +59,7 @@ public class CredentialService {
     public Credential initializeCredential(CredentialRequest request) {
         Credential credential = new Credential();
         credential.name = request.name;
+        credential.type = request.type;
         credential.username = request.username;
         credential.password = request.password;
         if (request.vaultKvPath != null) {
