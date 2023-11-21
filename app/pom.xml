@@ -12,8 +12,8 @@
   <name>Primaza :: REST Application</name>
   <description>Exposes CRUD operations on service resources</description>
   <properties>
+    <bootstrap.version>5.3.2</bootstrap.version>
     <bootstrap-icons.version>1.11.1</bootstrap-icons.version>
-    <bootstrap.version>5.3.1</bootstrap.version>
     <htmx.version>1.9.3</htmx.version>
     <quarkus-helm.version>1.2.1</quarkus-helm.version>
     <quarkus-vault.version>3.1.0</quarkus-vault.version>
