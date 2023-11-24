@@ -23,7 +23,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.halkyon.exceptions.ClusterConnectException;
@@ -309,7 +308,6 @@ public class ApplicationsPageTest extends BaseTest {
     }
 
     @Test
-    @Disabled("Disable until version 3.4.0 of Vault extension is released because there is an SSL problem")
     public void testBindApplicationGettingCredentialsFromVault() throws ClusterConnectException {
         pauseScheduler();
         // names
