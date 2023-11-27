@@ -15,18 +15,11 @@
   <description>Watches for Claim resources</description>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <properties>
-  </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.quarkiverse.operatorsdk</groupId>
       <artifactId>quarkus-operator-sdk</artifactId>
-    </dependency>
-    <!-- Needed to generate OLM bundle. If you're not interested in this, you can remove this dependency -->
-    <dependency>
-      <groupId>io.quarkiverse.operatorsdk</groupId>
-      <artifactId>quarkus-operator-sdk-bundle-generator</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

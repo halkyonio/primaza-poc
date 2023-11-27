@@ -11,12 +11,6 @@ resources:
     crdVersion: v1
     namespaced: true
   domain: halkyon.io
-  kind: PrimazaOperator
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: halkyon.io
-  kind: Primaza
+  kind: Claim
   version: v1alpha1
 version: "3"

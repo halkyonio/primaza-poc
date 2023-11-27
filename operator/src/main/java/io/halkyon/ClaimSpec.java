@@ -1,6 +1,6 @@
 package io.halkyon;
 
-public class PrimazaSpec {
+public class ClaimSpec {
 
     // Add Spec information here
 }

@@ -187,6 +187,7 @@
 
     <modules>
         <module>app</module>
+        <module>operator</module>
     </modules>
 
     <profiles>

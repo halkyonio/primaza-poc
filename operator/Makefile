@@ -24,8 +24,8 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # This variable is used to construct full image tags for bundle and catalog images.
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
-# halkyon.io/primaza-operator-bundle:$VERSION and halkyon.io/primaza-operator-catalog:$VERSION.
-IMAGE_TAG_BASE ?= halkyon.io/primaza-operator
+# halkyon.io/expose-bundle:$VERSION and halkyon.io/expose-catalog:$VERSION.
+IMAGE_TAG_BASE ?= halkyon.io/expose
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
@@ -78,7 +78,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 .PHONY: bundle
 bundle:  ## Generate bundle manifests and metadata, then validate generated files.
 ## marker
-	cat target/kubernetes/primazaoperators.halkyon.io-v1alpha1.yml target/kubernetes/primazas.halkyon.io-v1alpha1.yml target/kubernetes/kubernetes.yml | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	cat target/kubernetes/claims.halkyon.io-v1alpha1.yml target/kubernetes/kubernetes.yml | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
 	operator-sdk bundle validate ./bundle
 	
 .PHONY: bundle-build

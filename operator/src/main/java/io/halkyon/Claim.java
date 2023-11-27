@@ -7,5 +7,5 @@ import io.fabric8.kubernetes.model.annotation.Version;
 
 @Version("v1alpha1")
 @Group("halkyon.io")
-public class Primaza extends CustomResource<PrimazaSpec, PrimazaStatus> implements Namespaced {}
-
+public class Claim extends CustomResource<ClaimSpec, ClaimStatus> implements Namespaced {
+}

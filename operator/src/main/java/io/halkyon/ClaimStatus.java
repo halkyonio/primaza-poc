@@ -1,6 +1,6 @@
 package io.halkyon;
 
-public class PrimazaStatus {
+public class ClaimStatus {
 
     // Add Status information here
 }
