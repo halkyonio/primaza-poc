@@ -188,6 +188,7 @@
     <modules>
         <module>app</module>
         <module>operator</module>
+        <module>core</module>
     </modules>
 
     <profiles>
