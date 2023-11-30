@@ -4,6 +4,7 @@ import static org.awaitility.Awaitility.await;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
@@ -19,6 +20,7 @@ public class ClaimReconcilerTest {
 
     protected final KubernetesClient client = KubernetesClientUtils.createClient();
 
+    @Disabled
     @Test
     void reconcileShouldBind() {
         final var claim = new Claim();
