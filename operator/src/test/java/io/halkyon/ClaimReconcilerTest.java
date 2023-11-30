@@ -34,7 +34,7 @@ public class ClaimReconcilerTest {
         String appName = prefix + "app";
 
         claim.getSpec().setApplication(prefix + "app");
-        claim.getSpec().setCredential(credentialName);
+        // claim.getSpec().setCredential(credentialName);
         claim.getSpec().setService(serviceName);
 
         client.resource(claim).create();

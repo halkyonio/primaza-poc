@@ -2,6 +2,7 @@ package io.halkyon;
 
 import static io.halkyon.utils.StringUtils.getHostFromUrl;
 import static io.halkyon.utils.StringUtils.getPortFromUrl;
+import static io.halkyon.utils.StringUtils.isNotEmpty;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -16,7 +17,6 @@ import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.halkyon.utils.StringUtils;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
@@ -67,7 +67,7 @@ public class ClaimReconciler implements Reconciler<Claim> {
         String password = "";
         String database = "";
 
-        if (StringUtils.isNotEmpty(credential.username) && StringUtils.isNotEmpty(credential.password)) {
+        if (isNotEmpty(credential.username) && isNotEmpty(credential.password)) {
             username = credential.username;
             password = credential.password;
             // for (CredentialParameter param : credential.params) {
@@ -98,7 +98,7 @@ public class ClaimReconciler implements Reconciler<Claim> {
         // }
         secretData.put(USERNAME_KEY, toBase64(username));
         secretData.put(PASSWORD_KEY, toBase64(password));
-        if (StringUtils.isNotEmpty(database)) {
+        if (isNotEmpty(database)) {
             secretData.put(DATABASE_KEY, toBase64(database));
         }
         return secretData;

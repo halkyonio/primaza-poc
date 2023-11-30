@@ -1,5 +1,7 @@
 package io.halkyon.resource.page;
 
+import static io.halkyon.utils.StringUtils.isNullOrEmpty;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +29,6 @@ import io.halkyon.model.Claim;
 import io.halkyon.services.BindApplicationService;
 import io.halkyon.services.KubernetesClientService;
 import io.halkyon.utils.FilterableQueryBuilder;
-import io.halkyon.utils.StringUtils;
 import io.quarkus.qute.TemplateInstance;
 
 @Path("/applications")
@@ -54,19 +55,19 @@ public class ApplicationResource {
     public Response filter(@QueryParam("name") String name, @QueryParam("namespace") String namespace,
             @QueryParam("image") String image, @QueryParam("cluster.name") String clusterName) {
         FilterableQueryBuilder query = new FilterableQueryBuilder();
-        if (!StringUtils.isNullOrEmpty(name)) {
+        if (!isNullOrEmpty(name)) {
             query.containsIgnoreCase("name", name);
         }
 
-        if (!StringUtils.isNullOrEmpty(namespace)) {
+        if (!isNullOrEmpty(namespace)) {
             query.containsIgnoreCase("namespace", namespace);
         }
 
-        if (!StringUtils.isNullOrEmpty(image)) {
+        if (!isNullOrEmpty(image)) {
             query.containsIgnoreCase("image", image);
         }
 
-        if (!StringUtils.isNullOrEmpty(clusterName)) {
+        if (!isNullOrEmpty(clusterName)) {
             query.containsIgnoreCase("cluster.name", clusterName);
         }
 
