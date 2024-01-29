@@ -228,7 +228,7 @@ jobs:
             -Dgit.sha.commit=$(git rev-parse --short HEAD)
         
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.REPO_TOKEN }}
           repository: halkyonio/helm-charts
