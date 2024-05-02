@@ -24,7 +24,7 @@ DB_RELEASE_NAME=postgresql
 DB_VERSION=11.9.13
 
 # Parameters to play the demo
-TYPE_SPEED=${TYPE_SPEED:=200}
+export TYPE_SPEED=${TYPE_SPEED:=400}
 NO_WAIT=true
 
 function remove() {
