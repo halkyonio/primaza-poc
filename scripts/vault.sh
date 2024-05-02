@@ -196,13 +196,13 @@ EOF
 }
 
 function registerUser() {
-  if [ -v 1 ]; then
+  if [ -n "$1" ]; then
     VAULT_USER=$1
   fi
-  if [ -v 2 ]; then
+  if [ -n "$2" ]; then
     VAULT_PASSWORD=$2
   fi
-  if [ -v 3 ]; then
+  if [ -n "$3" ]; then
     VAULT_POLICY_NAME=$3
   fi
 
@@ -217,15 +217,15 @@ function putHelloKey() {
 }
 
 function putKey() {
-    if [ -v 1 ]; then
+    if [ -n "$1" ]; then
       # primaza
       KV_APP_NAME=$1
     fi
-    if [ -v 2 ]; then
+    if [ -n "$2" ]; then
       # fruits
       KV_KEY=$2
     fi
-    if [ -v 3 ]; then
+    if [ -n "$3" ]; then
       # username=healthy password=healthy database=fruits_database
       KV_ENTRIES=$3
     fi
