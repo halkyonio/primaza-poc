@@ -17,6 +17,7 @@ import org.jboss.logging.Logger;
 
 import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
+import io.crossplane.helm.v1beta1.ReleaseSpec;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -249,7 +250,11 @@ public class KubernetesClientService {
                 .endSet().addNewSet().withName("auth.password").withValue("healthy").endSet()
                 .withNamespace(service.namespace).withWait(true).withNewChart().withName(service.helmChart)
                 .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endChart().endForProvider()
-                .withNewProviderConfigRef().withName("helm-provider").endProviderConfigRef().endSpec();
+                .withNewProviderConfigRef().withName("helm-provider").endProviderConfigRef()
+                .withManagementPolicies()
+                .addToManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE)
+                .addToManagementPolicies(ReleaseSpec.ManagementPolicies.DELETE)
+                .addToManagementPolicies(ReleaseSpec.ManagementPolicies.OBSERVE).endSpec();
 
         // TODO: Logic to be reviewed as we have 2 use cases:
         // Service(s) instances has been discovered in cluster x.y.z
