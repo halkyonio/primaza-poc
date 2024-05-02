@@ -81,7 +81,7 @@ kind: Provider
 metadata:
   name: helm-provider
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.18.1
+  package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.14
   controllerConfigRef:
     name: debug-config
 EOF
