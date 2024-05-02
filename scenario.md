@@ -31,6 +31,7 @@ export PRIMAZA_URL=primaza.$VM_IP.nip.io
 export PRIMAZA_IMAGE_NAME=kind-registry:5000/local/primaza-app
 
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --delete-kind-cluster
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s install --registry-name kind-registry.local
 kubectl rollout status deployment/ingress-nginx-controller -n ingress
 
 $(pwd)/scripts/vault.sh
