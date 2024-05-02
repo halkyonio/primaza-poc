@@ -179,7 +179,7 @@ jobs:
         run: |
           ./scripts/primaza.sh log
 
-      - name: (Only if it failed) Log Atomic Fruits traces at failures
+      - name: (Only if it failed) Log Atomic Fruits traces at failure like Primaza
         if: failure()
         env:
           ATOMIC_FRUITS_NAMESPACE: app
@@ -204,3 +204,6 @@ jobs:
           
           log BLUE "Logs of atomic-fruits terminated pod"
           kubectl logs -p $POD_NAME -n $ATOMIC_FRUITS_NAMESPACE
+          
+          log BLUE "Logs of Primaza pod"
+          ./scripts/primaza.sh log
