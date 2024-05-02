@@ -3,6 +3,10 @@
 SCRIPTS_DIR="$(cd $(dirname "${BASH_SOURCE}") && pwd)"
 source ${SCRIPTS_DIR}/common.sh
 
+# Parameters to play the demo
+export TYPE_SPEED=400
+NO_WAIT=true
+
 ####################
 ## Global parameters
 #####################
