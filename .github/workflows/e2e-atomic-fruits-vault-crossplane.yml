@@ -95,7 +95,7 @@ jobs:
         run: |
           ./scripts/crossplane.sh
 
-      - name: Installing Postgresql DB and Atomic fruits
+      - name: Installing Atomic fruits
         env:
           ATOMIC_FRUITS_NAMESPACE: app
         run: |
