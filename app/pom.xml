@@ -237,7 +237,9 @@
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclaims.yaml</url>
             <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclasses.yaml</url>
             <!-- Crossplane Helm release able to deploy a helm chart -->
-            <url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/master/package/crds/helm.crossplane.io_releases.yaml</url>
+            <!-- Revert to an old version of the CRD as we got a class cast exception using ManagedPolicies field introduced recently -->
+            <!--<url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/v0.14.0/package/crds/helm.crossplane.io_releases.yaml</url>-->
+            <url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/v0.18.1/package/crds/helm.crossplane.io_releases.yaml</url>
           </urls>
         </configuration>
       </plugin>
