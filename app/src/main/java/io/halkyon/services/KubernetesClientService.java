@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import io.crossplane.helm.v1beta1.ReleaseSpec;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -244,7 +245,7 @@ public class KubernetesClientService {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
-                .endMetadata().withNewSpec().withNewForProvider().addNewSet().withName("auth.database")
+                .endMetadata().withNewSpec().withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE).withNewForProvider().addNewSet().withName("auth.database")
                 .withValue("fruits_database").endSet().addNewSet().withName("auth.username").withValue("healthy")
                 .endSet().addNewSet().withName("auth.password").withValue("healthy").endSet()
                 .withNamespace(service.namespace).withWait(true).withNewChart().withName(service.helmChart)
