@@ -250,9 +250,11 @@ public class KubernetesClientService {
                 .withNamespace(service.namespace).withWait(true).withNewChart().withName(service.helmChart)
                 .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endChart().endForProvider()
                 .withNewProviderConfigRef().withName("helm-provider").endProviderConfigRef()
-                /* TODO: Remove or keep the code when issue https://github.com/halkyonio/primaza-poc/issues/476 will be fixed
-                 * .withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE, ReleaseSpec.ManagementPolicies.DELETE,
-                 * ReleaseSpec.ManagementPolicies.UPDATE, ReleaseSpec.ManagementPolicies.OBSERVE)
+                /*
+                 * TODO: Remove or keep the code when issue https://github.com/halkyonio/primaza-poc/issues/476 will be
+                 * fixed .withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE,
+                 * ReleaseSpec.ManagementPolicies.DELETE, ReleaseSpec.ManagementPolicies.UPDATE,
+                 * ReleaseSpec.ManagementPolicies.OBSERVE)
                  */
                 .endSpec();
 
