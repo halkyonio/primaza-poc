@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import io.crossplane.helm.v1beta1.ReleaseSpec;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -18,6 +17,7 @@ import org.jboss.logging.Logger;
 
 import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
+import io.crossplane.helm.v1beta1.ReleaseSpec;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -245,12 +245,13 @@ public class KubernetesClientService {
         // Create Release object
         ReleaseBuilder release = new ReleaseBuilder();
         release.withApiVersion("helm.crossplane.io").withKind("v1beta1").withNewMetadata().withName(service.helmChart)
-                .endMetadata().withNewSpec().withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE).withNewForProvider().addNewSet().withName("auth.database")
-                .withValue("fruits_database").endSet().addNewSet().withName("auth.username").withValue("healthy")
-                .endSet().addNewSet().withName("auth.password").withValue("healthy").endSet()
-                .withNamespace(service.namespace).withWait(true).withNewChart().withName(service.helmChart)
-                .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endChart().endForProvider()
-                .withNewProviderConfigRef().withName("helm-provider").endProviderConfigRef().endSpec();
+                .endMetadata().withNewSpec().withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE)
+                .withNewForProvider().addNewSet().withName("auth.database").withValue("fruits_database").endSet()
+                .addNewSet().withName("auth.username").withValue("healthy").endSet().addNewSet()
+                .withName("auth.password").withValue("healthy").endSet().withNamespace(service.namespace).withWait(true)
+                .withNewChart().withName(service.helmChart).withRepository(service.helmRepo)
+                .withVersion(service.helmChartVersion).endChart().endForProvider().withNewProviderConfigRef()
+                .withName("helm-provider").endProviderConfigRef().endSpec();
 
         // TODO: Logic to be reviewed as we have 2 use cases:
         // Service(s) instances has been discovered in cluster x.y.z
