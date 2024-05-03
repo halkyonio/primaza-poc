@@ -29,8 +29,10 @@ export VM_IP=127.0.0.1 or export VM_IP=$(ifconfig eth0 | grep 'inet ' | cut -d: 
 export VAULT_URL=http://vault-internal.vault:8200
 export PRIMAZA_URL=primaza.$VM_IP.nip.io
 export PRIMAZA_IMAGE_NAME=kind-registry:5000/local/primaza-app
+export PRIMAZA_NAMESPACE=primaza
 
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --delete-kind-cluster
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s install --registry-name kind-registry
 kubectl rollout status deployment/ingress-nginx-controller -n ingress
 
 $(pwd)/scripts/vault.sh
@@ -49,8 +51,24 @@ $(pwd)/scripts/primaza.sh build
 $(pwd)/scripts/primaza.sh localdeploy
 
 export KIND_URL=https://kubernetes.default.svc
-$(pwd)/scripts/data/services.sh
-$(pwd)/scripts/data/credentials.sh
+
+$(pwd)/scripts/data/cluster.sh url=$PRIMAZA_URL kube_context=kind kind_url="https://kubernetes.default.svc" environment=dev ns_to_exclude="default,kube-system,ingress,pipelines-as-code,local-path-storage,crossplane-system,primaza,tekton-pipelines,tekton-pipelines-resolvers,vault"
+
+$(pwd)/scripts/data/services.sh url=$PRIMAZA_URL service_name=postgresql version=14.5 installable=on type=postgresql endpoint=tcp:5432 helm_repo="https://charts.bitnami.com/bitnami&helmChart=postgresql&helmChartVersion=11.9.13"
+$(pwd)/scripts/data/services.sh url=$PRIMAZA_URL service_name=mysql version=8.0 type=mysql endpoint=tcp:3306
+$(pwd)/scripts/data/services.sh url=$PRIMAZA_URL service_name=activemq-artemis version=2.26 type=activemq endpoint=tcp:8161
+$(pwd)/scripts/data/services.sh url=$PRIMAZA_URL service_name=mariadb version=10.9 type=mariadb endpoint=tcp:3306
+
+$(pwd)/scripts/data/credentials.sh url=$PRIMAZA_URL credential_type=vault credential_name=fruits_database-vault-creds service_name=postgresql vault_kv=primaza/fruits
+
+# Install atomic fruits
+$(pwd)/scripts/atomic-fruits.sh deploy
+
+# Create the claim
+$(pwd)/scripts/data/claims.sh url=$PRIMAZA_URL claim_name=fruits-claim description=postgresql-fruits-db requested_service=postgresql-14.5 application_id=1
+
+# Do the binding
+$(pwd)/scripts/data/bind_application.sh application_name=atomic-fruits claim_name=fruits-claim
 ```
 
 ## Access the cluster using mvn quarkus:dev

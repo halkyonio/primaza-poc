@@ -1,4 +1,4 @@
-name: Job testing an end to end scenario with simple application. It tests all steps from kind and vault installation.
+name: Job doing e2e scenario using primaza + vault and atomic fruits
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Job testing an end to end scenario with simple application. It tests all steps from kind, vault and crossplane installation.
+name: Job doing e2e scenario using primaza + vault + crossplane and atomic fruits
 
 on:
   workflow_dispatch:
@@ -95,7 +95,7 @@ jobs:
         run: |
           ./scripts/crossplane.sh
 
-      - name: Installing Postgresql DB and Atomic fruits
+      - name: Installing Atomic fruits
         env:
           ATOMIC_FRUITS_NAMESPACE: app
         run: |
@@ -179,13 +179,16 @@ jobs:
         run: |
           ./scripts/primaza.sh log
 
-      - name: (Only if it failed) Log Atomic Fruits traces at failures
+      - name: (Only if it failed) Log Atomic Fruits traces at failure like Primaza
         if: failure()
         env:
           ATOMIC_FRUITS_NAMESPACE: app
         run: |
           source ./scripts/common.sh
-        
+          
+          log BLUE "Logs of Primaza pod"
+          ./scripts/primaza.sh log
+          
           log BLUE "List of the pods deployed on the cluster"
           kubectl get pods -A
           

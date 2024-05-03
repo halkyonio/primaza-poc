@@ -50,7 +50,7 @@ kind: Provider
 metadata:
   name: kubernetes-provider
 spec:
-  package: "crossplane/provider-kubernetes:main"
+  package: "xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.11.4"
   controllerConfigRef:
       name: debug-config
 EOF
@@ -81,9 +81,10 @@ kind: Provider
 metadata:
   name: helm-provider
 spec:
-  package: crossplanecontrib/provider-helm:v0.14.0
+  # Use a more recent version of the provider supporting the managementPolicies: https://github.com/crossplane-contrib/provider-helm/issues/209
+  package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.18.1
   controllerConfigRef:
-      name: debug-config
+    name: debug-config
 EOF
 
   cmdExec "kubectl wait provider.pkg.crossplane.io/helm-provider --for condition=Healthy=true --timeout=300s"
