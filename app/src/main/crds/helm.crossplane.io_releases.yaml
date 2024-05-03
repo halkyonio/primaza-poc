@@ -243,7 +243,7 @@ spec:
                 - namespace
                 type: object
               managementPolicies:
-                default:
+                # default:
                 # Removed it to check if error is gone: https://github.com/halkyonio/primaza-poc/issues/476
                 # - '*'
                 description: 'THIS IS A BETA FIELD. It is on by default but can be
@@ -774,8 +774,8 @@ spec:
                 - namespace
                 type: object
               managementPolicies:
-                default:
-                - '*'
+                #default:
+                #- '*'
                 description: 'THIS IS A BETA FIELD. It is on by default but can be
                   opted out through a Crossplane feature flag. ManagementPolicies
                   specify the array of actions Crossplane is allowed to take on the
@@ -795,7 +795,7 @@ spec:
                   - Update
                   - Delete
                   - LateInitialize
-                  - '*'
+                  # - '*'
                   type: string
                 type: array
               providerConfigRef:
