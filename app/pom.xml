@@ -230,21 +230,6 @@
         <configuration>
           <extraAnnotations>true</extraAnnotations>
           <source>src/main/crds</source>
-          <!-- crds added to src/main/crds
-          <urls>
-            &lt;!&ndash; Primaza CRDs &ndash;&gt;
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_clusterenvironments.yaml</url>
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_registeredservices.yaml</url>
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_servicebindings.yaml</url>
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_servicecatalogs.yaml</url>
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclaims.yaml</url>
-            <url>https://raw.githubusercontent.com/primaza/primaza/main/config/crd/bases/primaza.io_serviceclasses.yaml</url>
-            &lt;!&ndash; Crossplane Helm release able to deploy a helm chart &ndash;&gt;
-            &lt;!&ndash; Revert to an old version of the CRD as we got a class cast exception using ManagedPolicies field introduced recently &ndash;&gt;
-            &lt;!&ndash;<url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/v0.14.0/package/crds/helm.crossplane.io_releases.yaml</url>&ndash;&gt;
-            <url>https://raw.githubusercontent.com/crossplane-contrib/provider-helm/v0.18.1/package/crds/helm.crossplane.io_releases.yaml</url>
-          </urls>
-          -->
         </configuration>
       </plugin>
     </plugins>
