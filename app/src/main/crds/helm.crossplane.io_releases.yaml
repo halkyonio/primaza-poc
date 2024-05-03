@@ -1,3 +1,6 @@
+# TODO: This CRD is based on the release v0.18.1: https://github.com/crossplane-contrib/provider-helm/releases/tag/v0.18.1
+# but has been hacked to propose a workaround reported here: https://github.com/halkyonio/primaza-poc/issues/476
+# The default property of the ManagementPolicies has been commented till a fix will be provided by fabric8 kubernetes client
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -265,11 +268,6 @@ spec:
                   - Update
                   - Delete
                   - LateInitialize
-                  # Removed it to check if error is gone: https://github.com/halkyonio/primaza-poc/issues/476
-                  # Code generated is:
-                  #  public class ReleaseSpec implements io.fabric8.kubernetes.api.model.KubernetesResource {
-                  #  ...
-                  #  private java.util.List<ManagementPolicies> managementPolicies = io.fabric8.kubernetes.client.utils.Serialization.unmarshal("[\"*\"]", java.util.List.class);
                   - '*'
                   type: string
                 type: array
