@@ -270,7 +270,7 @@ spec:
                   #  public class ReleaseSpec implements io.fabric8.kubernetes.api.model.KubernetesResource {
                   #  ...
                   #  private java.util.List<ManagementPolicies> managementPolicies = io.fabric8.kubernetes.client.utils.Serialization.unmarshal("[\"*\"]", java.util.List.class);
-                  # - '*'
+                  - '*'
                   type: string
                 type: array
               providerConfigRef:
@@ -795,7 +795,7 @@ spec:
                   - Update
                   - Delete
                   - LateInitialize
-                  # - '*'
+                  - '*'
                   type: string
                 type: array
               providerConfigRef:

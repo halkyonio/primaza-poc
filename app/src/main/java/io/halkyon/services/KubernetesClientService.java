@@ -17,7 +17,6 @@ import org.jboss.logging.Logger;
 
 import io.crossplane.helm.v1beta1.Release;
 import io.crossplane.helm.v1beta1.ReleaseBuilder;
-import io.crossplane.helm.v1beta1.ReleaseSpec;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
@@ -251,8 +250,10 @@ public class KubernetesClientService {
                 .withNamespace(service.namespace).withWait(true).withNewChart().withName(service.helmChart)
                 .withRepository(service.helmRepo).withVersion(service.helmChartVersion).endChart().endForProvider()
                 .withNewProviderConfigRef().withName("helm-provider").endProviderConfigRef()
-                .withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE, ReleaseSpec.ManagementPolicies.DELETE,
-                        ReleaseSpec.ManagementPolicies.UPDATE, ReleaseSpec.ManagementPolicies.OBSERVE)
+                /*
+                 * .withManagementPolicies(ReleaseSpec.ManagementPolicies.CREATE, ReleaseSpec.ManagementPolicies.DELETE,
+                 * ReleaseSpec.ManagementPolicies.UPDATE, ReleaseSpec.ManagementPolicies.OBSERVE)
+                 */
                 .endSpec();
 
         // TODO: Logic to be reviewed as we have 2 use cases:
