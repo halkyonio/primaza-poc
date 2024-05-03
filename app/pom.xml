@@ -17,7 +17,6 @@
     <htmx.version>1.9.3</htmx.version>
     <quarkus-helm.version>1.2.1</quarkus-helm.version>
     <quarkus-vault.version>3.5.0</quarkus-vault.version>
-    <kubernetes-client.version>6.9.2</kubernetes-client.version>
   </properties>
   <dependencies>
     <dependency>
