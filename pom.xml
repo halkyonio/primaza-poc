@@ -41,7 +41,7 @@
         <htmlunit.version>3.9.0</htmlunit.version>
         <formatter-maven-plugin.version>2.23.0</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.9.0</impsort-maven-plugin.version>
-        <lobmok.version>1.18.30</lobmok.version>
+        <lobmok.version>1.18.32</lobmok.version>
         <sundrio.version>0.200.0</sundrio.version>
         <!-- <sundrio.version>0.103.1</sundrio.version> -->
         <kubernetes-client.version>6.12.1</kubernetes-client.version>
