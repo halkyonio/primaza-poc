@@ -264,7 +264,12 @@ spec:
                   - Update
                   - Delete
                   - LateInitialize
-                  - '*'
+                  # Removed it to check if error is gone: https://github.com/halkyonio/primaza-poc/issues/476
+                  # Code generated is:
+                  #  public class ReleaseSpec implements io.fabric8.kubernetes.api.model.KubernetesResource {
+                  #  ...
+                  #  private java.util.List<ManagementPolicies> managementPolicies = io.fabric8.kubernetes.client.utils.Serialization.unmarshal("[\"*\"]", java.util.List.class);
+                  # - '*'
                   type: string
                 type: array
               providerConfigRef:
