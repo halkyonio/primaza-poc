@@ -40,7 +40,7 @@
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <htmlunit.version>4.1.0</htmlunit.version>
         <formatter-maven-plugin.version>2.23.0</formatter-maven-plugin.version>
-        <impsort-maven-plugin.version>1.9.0</impsort-maven-plugin.version>
+        <impsort-maven-plugin.version>1.11.0</impsort-maven-plugin.version>
         <lobmok.version>1.18.32</lobmok.version>
         <sundrio.version>0.200.0</sundrio.version>
         <!-- <sundrio.version>0.103.1</sundrio.version> -->
